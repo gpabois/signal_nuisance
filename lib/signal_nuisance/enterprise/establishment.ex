@@ -16,7 +16,7 @@ defmodule SignalNuisance.Establishment do
     end
   
     @doc false  
-    defp registration_changeset(establishment, attrs) do 
+    defp creation_changeset(establishment, attrs) do 
         fields = [:name, :slug, :enterprise_id, :loc]
         
         establishment
@@ -27,9 +27,9 @@ defmodule SignalNuisance.Establishment do
     @doc """
       Register an establishment
     """
-    def register_establishment(attrs) do
+    def create_establishment(attrs) do
       %__MODULE__{}
-      |> registration_changeset(attrs)
+      |> creation_changeset(attrs)
       |> Repo.insert()
     end
 

@@ -20,7 +20,7 @@ defmodule SignalNuisance.EstablishmentsFixtures do
       {:ok, establishment} =
         attrs
         |> valid_establishment_attributes()
-        |> SignalNuisance.Establishment.register_establishment()
+        |> SignalNuisance.Establishment.create_establishment()
   
         establishment
     end

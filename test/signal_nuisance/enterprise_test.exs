@@ -117,10 +117,10 @@ defmodule SignalNuisance.EnterpriseTest do
     end
 
     describe "manage establishments" do
-        test "register_establishment/1" do
+        test "create_establishment/1" do
             enterprise = enterprise_fixture()
             establishment_attrs = valid_establishment_attributes(%{enterprise_id: enterprise.id})
-            assert {:ok, _establishment} = Establishment.register_establishment(establishment_attrs)
+            assert {:ok, _establishment} = Establishment.create_establishment(establishment_attrs)
         end
 
         test "get_by_entreprise/1" do
