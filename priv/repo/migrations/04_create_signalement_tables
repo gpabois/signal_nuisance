@@ -1,0 +1,15 @@
+defmodule SignalNuisance.Repo.Migrations.InitSignalement do
+    use Ecto.Migration
+
+    def up do
+        # Assert postgis
+        execute "CREATE EXTENSION IF NOT EXISTS postgis"
+
+        create table(:signalements) do
+            timestamp()
+        end
+
+        execute("SELECT AddGeometryColumn('signalements', 'loc', 4326, 'POINT', 2)")
+        flush()
+    end
+end
