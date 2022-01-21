@@ -100,8 +100,10 @@ defmodule SignalNuisance.EnterpriseTest do
             enterprise  = enterprise_fixture()
 
             assert user not in Enterprise.members(enterprise)
+            
             Enterprise.register_member(enterprise, user)
             assert user in Enterprise.members(enterprise)
+            
             Enterprise.unregister_member(enterprise, user)
             assert user not in Enterprise.members(enterprise)
         end
@@ -135,7 +137,7 @@ defmodule SignalNuisance.EnterpriseTest do
             establishment = establishment_fixture(%{enterprise_id: enterprise.id})
 
             d0 = Distance.km(10)
-            d1 = Distance.km(12)
+            d1 = Distance.km(10)
             pt = GeoMath.random_within(establishment.loc, d0)
 
             assert GeoMath.within?(establishment.loc, pt, d0)
