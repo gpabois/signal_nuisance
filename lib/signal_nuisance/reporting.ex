@@ -3,7 +3,7 @@ defmodule SignalNuisance.Reporting do
 
     alias SignalNuisance.Repo
     
-    alias SignalNuisance.Reporting.Authorization.ReportSecretKeyPermission
+    alias SignalNuisance.Reporting.Authorization.ReportTokenPermission
     alias SignalNuisance.Reporting.Authorization.ReportUserPermission
     alias SignalNuisance.Reporting.Authorization.ReportPermission   
 
@@ -13,7 +13,7 @@ defmodule SignalNuisance.Reporting do
     def create_reporting_by_email(attrs, recipient) do
         Repo.transaction fn -> 
             with {:ok, report}     <- Report.create(attrs),
-                 {:ok, secret_key} <- ReportSecretKeyPermission.grant(report, ReportPermission.owner_permissions()),
+                 {:ok, secret_key} <- ReportTokenPermission.grant(report, ReportPermission.owner_permissions()),
                  {:ok, _mail}      <- ReportingNotifier.deliver_secret_key_based_receipt(recipient, report, secret_key)
             do
                 {:ok, :reporting, [secret_key: secret_key]}

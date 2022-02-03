@@ -1,16 +1,17 @@
-defmodule SignalNuisance.Enteprises.EnterpriseAuthorization do
+defmodule SignalNuisance.Enterprises.EnterpriseAuthorization do
     alias SignalNuisance.Enterprises.Authorization.EnterprisePermission
-  
+    alias SignalNuisance.Authorization
+
     @doc false
-    def can(user, enterprise, opts \\ []) do
+    def can(entity, enterprise, opts \\ []) do
       case opts do
         [other | tail]  -> 
           if other in EnterprisePermission.permissions() do
-            EnterprisePermission.has_permission?(user, enterprise, other)
+            EnterprisePermission.has_permission?(entity, enterprise, other)
           else
-            can(user, enterprise, tail)
+            can(entity, enterprise, tail)
           end
         [] -> false
-      end
+      end or Authorization.can(entity, manage: :enterprises)
     end
   end

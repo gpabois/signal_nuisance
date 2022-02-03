@@ -115,7 +115,12 @@ defmodule SignalNuisance.Enterprises do
   end
 
   @doc """
-    Get all members of an enterprise
+    Returns the list of an enterprise's members
+
+    ## Parameters
+    - enterpise
+    - opts: Guards (if: [...]), ...
+
   """
   def get_enterprise_members(enterprise, opts \\ []) do
     with :ok <- is_possible(opts, enterprise: enterprise, manage: :members) do
@@ -125,15 +130,32 @@ defmodule SignalNuisance.Enterprises do
     end
   end
 
+  @doc """
+    Checks if the user is a member of an enterprise.
+
+    ## Parameters
+    - enterprise
+    - user
+
+    ## Examples
+    iex> SignalNuisance.Enterprises.is_enterprise_member?(enterprise, user)
+  """
   def is_enterprise_member?(enterprise, user) do
     EnterpriseMember.is_member?(enterprise, user)
   end
 
   @doc """
-    Set a member's permissions in an enterprise
+    Set a entity's enterprise-related permissions
 
-    set_user_enterprise_permissions enterprise, user, [{:manage, :members}] , if: [is_authorized: initiator, is_not_same: {a, b}]
-    set_user_enterprise_permissions enterprise, user, [{:manage, :members}] 
+    ## Parameters
+      - enterprise: The enterprise
+      - user: The user
+      - permissions: a permission as planned in SignalNuisance.Enterprises.Authorization.EnterprisePermission.permissions/0
+      - opts: Guards (if[...])
+
+    ## Examples
+    iex> SignalNuisance.Enterprises.set_user_enterprise_permissions enterprise, user, [{:manage, :members}], if: [is_authorized: initiator, is_not_same: {a, b}]
+    iex> SignalNuisance.Enterprises.set_user_enterprise_permissions enterprise, user, [{:manage, :members}] 
   """
   def set_entity_enterprise_permissions(enterprise, user, permissions, opts \\ []) do
     with :ok <- is_possible(opts, enterprise: enterprise, manage: :members) do
@@ -141,19 +163,32 @@ defmodule SignalNuisance.Enterprises do
     end
   end
   
-  def has_entity_enterprise_permission?(enterprise, user, permissions) do
-    EnterprisePermission.has_permission?(user, enterprise, permissions)
+  @doc """
+    Checks if an entity has enterprise-related permissions.
+
+    ## Parameters
+    - enterprise
+    - entity: a user
+    - permissions: a permission as planned in SignalNuisance.Enterprises.Authorization.EnterprisePermission.permissions/0
+  """
+  def has_entity_enterprise_permission?(enterprise, entity, permissions) do
+    EnterprisePermission.has_permission?(entity, enterprise, permissions)
   end
 
   @doc """
-    Set an entity (user) permissions in an establishment
+    Set a entity's establishment-related permissions
 
-    set_entity_enterprise_permissions enterprise, user, [{:manage, :members}] , if: [is_authorized: initiator, is_not_same: {a, b}]
-    set_entity_enterprise_permissions enterprise, user, [{:manage, :members}] 
+    ## Parameters
+    - establishment
+    - entity: a user
+    
+    ## Examples
+    iex> SignalNuisance.Enterprises.set_entity_enterprise_permissions enterprise, user, [{:manage, :members}] , if: [is_authorized: initiator, is_not_same: {a, b}]
+    iex> SignalNuisance.Enterprises.set_entity_enterprise_permissions enterprise, user, [{:manage, :members}] 
   """
-  def set_entity_establishment_permissions(establishment, user, permissions, opts \\ []) do
+  def set_entity_establishment_permissions(establishment, entity, permissions, opts \\ []) do
     with :ok <- is_possible(opts, establishment: establishment, manage: :members) do
-      EstablishmentPermission.grant(user, establishment, permissions)
+      EstablishmentPermission.grant(entity, establishment, permissions)
     end
   end
 

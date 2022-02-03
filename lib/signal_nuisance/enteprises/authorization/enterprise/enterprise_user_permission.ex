@@ -11,8 +11,8 @@ defmodule SignalNuisance.Enterprises.Authorization.EnterpriseUserPermission do
 
     schema "enterprise_user_permissions" do
         belongs_to :enterprise,  Enterprise
-        belongs_to :user,       User
-        field :permissions,     :integer
+        belongs_to :user,        User
+        field :permissions,      :integer
     end
 
     def create(user, enterprise, permissions) do

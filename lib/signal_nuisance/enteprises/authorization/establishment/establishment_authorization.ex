@@ -1,18 +1,18 @@
-defmodule SignalNuisance.Enteprises.EstablishmentAuthorization do
+defmodule SignalNuisance.Enterprises.EstablishmentAuthorization do
     alias SignalNuisance.Enterprises.Authorization.EstablishmentPermission
-  
-    @doc false
-    def can(user, establishment, opts \\ []) do
+    alias SignalNuisance.Authorization
+
+    def can(entity, establishment, opts \\ []) do
       case opts do
-        [{:access, :dashboard} | _] -> can(user, establishment, [:access])
-        [{:do, :toggle_production}] -> can(user, establishment, [{:manage, :production}])
+        [{:access, :dashboard} | _] -> can(entity, establishment, [:access])
+        [{:do, :toggle_production}] -> can(entity, establishment, [{:manage, :production}])
         [other | tail] ->
           if other in  EstablishmentPermission.permissions() do
-            EstablishmentPermission.has_permission?(user, establishment, other)
+            EstablishmentPermission.has_permission?(entity, establishment, other)
           else
-            can(user, establishment, tail)
+            can(entity, establishment, tail)
           end
         [] -> false
-      end
-    end
+      end or Authorization.can(entity, enterprise: %{id: establishment.enterprise_id}, manage: :establishments) 
+    end 
   end

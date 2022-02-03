@@ -13,28 +13,9 @@ defmodule SignalNuisance.Enterprises.Authorization.EnterprisePermission do
         manage: :establishments
     ]
 
-    def has_permission?(user, enterprise, permissions) do
-        UserPermission.has_permission?(user, enterprise, permissions)
-    end
-
-    def grant(entity, establishment, permissions) do
+    def permission_entity_dispatch(entity) do
         case entity do
-            %SignalNuisance.Accounts.User{} -> UserPermission.grant(entity, establishment, permissions)
-            _ -> raise "Unknown entity to grant permissions."
-        end
-    end
-
-    def revoke_all(entity, establishment) do
-        case entity do
-            %SignalNuisance.Accounts.User{} -> UserPermission.revoke_all(entity, establishment)
-            _ -> raise "Unknown entity to grant permissions."
-        end
-    end
-
-    def revoke(entity, establishment, permissions) do
-        case entity do
-            %SignalNuisance.Accounts.User{} -> UserPermission.revoke(entity, establishment, permissions)
-            _ -> raise "Unknown entity to grant permissions."
+            %SignalNuisance.Accounts.User{} -> UserPermission
         end
     end
 end 

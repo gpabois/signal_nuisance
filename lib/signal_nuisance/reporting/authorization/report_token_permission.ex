@@ -1,4 +1,4 @@
-defmodule SignalNuisance.Reporting.Authorization.ReportSecretKeyPermission do
+defmodule SignalNuisance.Reporting.Authorization.ReportTokenPermission do
     use Ecto.Schema
 
     alias SignalNuisance.Repo
@@ -8,7 +8,7 @@ defmodule SignalNuisance.Reporting.Authorization.ReportSecretKeyPermission do
     import Ecto.Query
     import Ecto.Changeset
 
-    schema "report_secret_key_permissions" do
+    schema "report_token_permissions" do
         belongs_to :report, Report
         field :secret_key,  :string
         field :permissions, :integer
@@ -35,14 +35,24 @@ defmodule SignalNuisance.Reporting.Authorization.ReportSecretKeyPermission do
         |> Repo.update
     end
 
-    def revoke(secret_key) do
+    def revoke_all(%{secret: secret_key} = _token, _report) do
         from(
             perm in __MODULE__,
             where: perm.secret_key == ^secret_key
         ) |> Repo.delete_all
+
+        :ok
     end
 
-    def has_permission?(secret_key, %{id: report_id} = _report, permissions) do
+    def revoke(%{secret: secret_key} = _token, _report, _permissions) do
+        from(
+            perm in __MODULE__,
+            where: perm.secret_key == ^secret_key
+        ) |> Repo.delete_all
+        :ok
+    end
+
+    def has_permission?(%{secret: secret_key} = _token, %{id: report_id} = _report, permissions) do
         permissions = Permission.encode_permission(permissions)
         from(perm in __MODULE__,
             where: perm.secret_key == ^secret_key,
