@@ -1,11 +1,11 @@
-defmodule SignalNuisance.Enterprise.Member do
+defmodule SignalNuisance.Enterprises.EnterpriseMember do
     use Ecto.Schema
 
     import Ecto.Query
     import Ecto.Changeset
 
     alias SignalNuisance.Repo
-    alias SignalNuisance.Enterprise
+    alias SignalNuisance.Enterprises.Enterprise
     alias SignalNuisance.Accounts.User
 
     schema "enterprise_members" do
@@ -20,9 +20,12 @@ defmodule SignalNuisance.Enterprise.Member do
     end
   
     def add(enterprise, user) do
-      %__MODULE__{}
+      with {:ok, _} <- %__MODULE__{}
       |> registration_changeset(%{user_id: user.id, enterprise_id: enterprise.id})
-      |> Repo.insert
+      |> Repo.insert 
+      do
+        :ok
+      end
     end
 
     def get_by_enterprise(enterprise) do
@@ -32,7 +35,7 @@ defmodule SignalNuisance.Enterprise.Member do
         ) |> Repo.all |> Repo.preload(:user)
     end
 
-    def is_member(enterprise, user) do
+    def is_member?(enterprise, user) do
       from(
         m in __MODULE__, 
         where: m.enterprise_id == ^enterprise.id,
@@ -46,6 +49,7 @@ defmodule SignalNuisance.Enterprise.Member do
             where: m.user_id == ^user.id, 
             where: m.enterprise_id == ^enterprise.id
         ) |> Repo.delete_all
+        :ok
     end
   end
   

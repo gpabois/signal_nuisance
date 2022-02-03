@@ -1,4 +1,4 @@
-defmodule SignalNuisance.Establishment do
+defmodule SignalNuisance.Enterprises.Establishment do
     use Ecto.Schema
 
     import Ecto.Changeset
@@ -6,13 +6,15 @@ defmodule SignalNuisance.Establishment do
     import Geo.PostGIS
   
     alias SignalNuisance.Repo
-    alias SignalNuisance.Enterprise
+    alias SignalNuisance.Enterprises.Enterprise
   
     schema "establishments" do
       belongs_to :enterprise, Enterprise
       field :name, :string
       field :slug, :string
       field :loc, Geo.PostGIS.Geometry
+
+      timestamps()
     end
   
     @doc false  
@@ -21,13 +23,14 @@ defmodule SignalNuisance.Establishment do
         
         establishment
         |> cast(attrs, fields)
+        |> unique_constraint(:slug, name: :establishment_slug_unique_index)
         |> validate_required(fields)
     end
 
     @doc """
       Register an establishment
     """
-    def create_establishment(attrs) do
+    def create(attrs) do
       %__MODULE__{}
       |> creation_changeset(attrs)
       |> Repo.insert()
@@ -36,7 +39,7 @@ defmodule SignalNuisance.Establishment do
     @doc """
       Find all establishments owned by the enterprise
     """
-    def get_by_entreprise(enterprise) do
+    def get_by_enterprise(enterprise) do
         from(
             m in __MODULE__, 
             where: m.enterprise_id == ^enterprise.id

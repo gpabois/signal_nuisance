@@ -1,7 +1,9 @@
 defmodule SignalNuisance.Authorization do
 
     @resource_based %{
-        enterprise: SignalNuisance.Enterprise.Authorization
+        enterprise:     SignalNuisance.Enterprise.Authorization,
+        establishment:  SignalNuisance.Enterprise.Authorization,
+        reporting:      SignalNuisance.Reporting.Authorization
     }
 
     def can(user, opts \\ []) do
@@ -13,4 +15,5 @@ defmodule SignalNuisance.Authorization do
 
     # user |> can access: :dashboard, enterprise: tartampion
     # Authorization.can 
+    # user |> can access: :report, reporting: blabla, with: [secret_key: sk]
 end

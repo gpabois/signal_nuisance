@@ -35,7 +35,7 @@ end
 defmodule GeoMath do
     alias GeoMath.Distance
 
-    def distance(%Geo.Point{coordinates: {latA, longA}, srid: srid} , %Geo.Point{coordinates: {latB, longB}}, unit) do
+    def distance(%Geo.Point{coordinates: {latA, longA}, srid: _srid} , %Geo.Point{coordinates: {latB, longB}}, unit) do
         d = Geocalc.distance_between([latA, longA], [latB, longB])
         %Distance{value: d, unit: :m} |> Distance.to(unit)
     end
