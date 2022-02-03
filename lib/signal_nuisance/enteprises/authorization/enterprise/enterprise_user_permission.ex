@@ -1,5 +1,6 @@
 defmodule SignalNuisance.Enterprises.Authorization.EnterpriseUserPermission do
     use Ecto.Schema
+    use Bitwise
     import Ecto.Changeset
     import Ecto.Query
   
@@ -71,11 +72,12 @@ defmodule SignalNuisance.Enterprises.Authorization.EnterpriseUserPermission do
     def has_permission?(%{id: user_id} = _user, %{id: enterprise_id} = _enterprise, permissions) do
         permissions = Permission.encode_permission(permissions)
         
-        from(perm in __MODULE__,
+        stored = from(perm in __MODULE__,
             where: perm.user_id == ^user_id,
             where: perm.enterprise_id == ^enterprise_id,
-            where: (perm.permissions and ^permissions) == ^permissions,
-            select: count()
-        ) |> Repo.one > 0
+            select: perm.permissions
+        ) |> Repo.all
+
+        stored |> Enum.any?(fn p -> (p &&& permissions) == permissions end)
     end
 end 

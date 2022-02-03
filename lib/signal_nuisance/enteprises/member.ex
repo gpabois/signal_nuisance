@@ -16,7 +16,9 @@ defmodule SignalNuisance.Enterprises.EnterpriseMember do
     def registration_changeset(member, attrs) do 
       member
       |> cast(attrs, [:user_id, :enterprise_id])
-       |> validate_required([:user_id, :enterprise_id])
+      |> foreign_key_constraint(:enterprise_id, name: :enterprise_members_enterprise_id_fkey)
+      |> foreign_key_constraint(:user_id, name: :enterprise_members_user_id_fkey)
+      |> validate_required([:user_id, :enterprise_id])
     end
   
     def add(enterprise, user) do

@@ -49,7 +49,6 @@ defmodule SignalNuisance.Enterprises do
     Repo.transaction fn ->
       with {:ok, enterprise} <- get_enterprise_by_id(attrs.enterprise_id),
            :ok <- is_possible(opts, enterprise: enterprise, manage: :establishments),
-           :ok <- is_possible([if: [is_member: [user: user, enterprise: enterprise]]], []),
            {:ok, establishment} <- Establishment.create(attrs),
            :ok <- set_entity_establishment_permissions(establishment, user, EstablishmentPermission.owner_permission())
       do
@@ -75,7 +74,7 @@ defmodule SignalNuisance.Enterprises do
     add_enterprise_member enterprise, user 
   """
   def add_enterprise_member(enterprise, user, opts \\ []) do
-    with :ok <- is_possible(opts, enterprise: enterprise, manager: :members) do
+    with :ok <- is_possible(opts, enterprise: enterprise, manage: :members) do
       case Repo.transaction(fn ->
         with :ok <- EnterpriseMember.add(enterprise, user),
              :ok <- EnterprisePermission.grant(user, enterprise, EnterprisePermission.base_permission())
@@ -141,6 +140,10 @@ defmodule SignalNuisance.Enterprises do
       EnterprisePermission.grant(user, enterprise, permissions)
     end
   end
+  
+  def has_entity_enterprise_permission?(enterprise, user, permissions) do
+    EnterprisePermission.has_permission?(user, enterprise, permissions)
+  end
 
   @doc """
     Set an entity (user) permissions in an establishment
@@ -152,6 +155,10 @@ defmodule SignalNuisance.Enterprises do
     with :ok <- is_possible(opts, establishment: establishment, manage: :members) do
       EstablishmentPermission.grant(user, establishment, permissions)
     end
+  end
+
+  def has_entity_establishment_permission?(establishment, user, permissions) do
+    EstablishmentPermission.has_permission?(user, establishment, permissions)
   end
   
 end

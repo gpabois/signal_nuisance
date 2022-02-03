@@ -52,6 +52,52 @@ defmodule SignalNuisance.EnterpriseTest do
             assert :ok = Enterprises.add_enterprise_member(enterprise, user)
             assert Enterprises.is_enterprise_member?(enterprise, user)
         end
+
+        test "Add a member to a non-existing enterprise" do
+            user        = user_fixture()
+
+            assert {:error, changeset} = Enterprises.add_enterprise_member(%{id: 100}, user)
+            assert %{
+                enterprise_id: ["does not exist"]
+            } = errors_on(changeset)
+        end
+
+        test "Add a non-existing member to an existing enterprise" do
+            enterprise  = enterprise_fixture()
+
+            assert {:error, changeset} = Enterprises.add_enterprise_member(enterprise, %{id: 100})
+            assert %{
+                user_id: ["does not exist"]
+            } = errors_on(changeset)
+        end
+
+        test "Add a member to an enterprise, when is authorized" do
+            manager = user_fixture()
+            user    = user_fixture()
+
+            enterprise = enterprise_fixture()
+
+            # Prepare the manager permissions
+            Enterprises.add_enterprise_member(enterprise, manager)
+            Enterprises.set_entity_enterprise_permissions(enterprise, manager, [{:manage, :members}])
+
+            # Add a member to the enterprise if the manager is authorized.
+            assert :ok = Enterprises.add_enterprise_member(enterprise, user, if: [is_authorized: manager])
+        end
+
+        test "Add a member to an enterprise, when is not authorized" do
+            manager = user_fixture()
+            user    = user_fixture()
+
+            enterprise = enterprise_fixture()
+
+            # Prepare the manager permissions
+            Enterprises.add_enterprise_member(enterprise, manager)
+            # Enterprises.set_entity_enterprise_permissions(enterprise, manager, [{:manage, :members}])
+
+            # Add a member to the enterprise if the manager is not authorized.
+            assert {:error, :unauthorized} = Enterprises.add_enterprise_member(enterprise, user, if: [is_authorized: manager])
+        end
     end
 
     describe "Enterprises.remove_enterprise_member/2" do
@@ -61,6 +107,137 @@ defmodule SignalNuisance.EnterpriseTest do
 
             assert :ok = Enterprises.remove_enterprise_member(enterprise, user)
             refute Enterprises.is_enterprise_member?(enterprise, user)
+        end
+
+        test "Remove a member to an enterprise, when is authorized" do
+            manager = user_fixture()
+            user    = user_fixture()
+
+            enterprise = enterprise_fixture()
+
+            # Prepare the manager permissions
+            Enterprises.add_enterprise_member(enterprise, manager)
+            Enterprises.set_entity_enterprise_permissions(enterprise, manager, [{:manage, :members}])
+            Enterprises.add_enterprise_member(enterprise, user)
+
+            # Add a member to the enterprise if the manager is authorized.
+            assert :ok = Enterprises.remove_enterprise_member(enterprise, user, if: [is_authorized: manager])
+        end
+
+        test "Remove a member to an enterprise, when is authorized but it's the same user." do
+            manager = user_fixture()
+            user    = manager
+
+            enterprise = enterprise_fixture()
+
+            # Prepare the manager permissions
+            Enterprises.add_enterprise_member(enterprise, manager)
+            Enterprises.set_entity_enterprise_permissions(enterprise, manager, [{:manage, :members}])
+
+            # Add a member to the enterprise if the manager is authorized.
+            assert {:error, :are_same} = Enterprises.remove_enterprise_member(enterprise, user, 
+                if: [
+                    is_authorized: manager, 
+                    are_different: {user, manager}
+                ]
+            )
+        end
+
+        test "Remove a member to an enterprise, when is not authorized" do
+            manager = user_fixture()
+            user    = user_fixture()
+
+            enterprise = enterprise_fixture()
+
+            # Prepare the manager permissions
+            Enterprises.add_enterprise_member(enterprise, manager)
+            # Enterprises.set_entity_enterprise_permissions(enterprise, manager, [{:manage, :members}])
+            Enterprises.add_enterprise_member(enterprise, user)
+
+            # Add a member to the enterprise if the manager is not authorized.
+            assert {:error, :unauthorized} = Enterprises.remove_enterprise_member(enterprise, user, if: [is_authorized: manager])
+        end
+    end
+
+    describe "Enterprises.set_entity_enterprise_permissions/3" do
+        test "Grant enterprise-related permissions to a user" do
+            user        = user_fixture()
+            enterprise  = enterprise_fixture()
+
+            Enterprises.set_entity_enterprise_permissions enterprise, user, [:access]
+            assert Enterprises.has_entity_enterprise_permission?(enterprise, user, [:access])
+        end
+
+        test "Grant permissions to a user when the initiator has the enterprise's manage member permissions" do
+            user        = user_fixture()
+            manager     = user_fixture()
+            enterprise  = enterprise_fixture()
+
+            Enterprises.set_entity_enterprise_permissions enterprise, manager, [manage: :members]
+
+            assert :ok = Enterprises.set_entity_enterprise_permissions(enterprise, user, [:access], if: [
+                is_authorized: manager
+            ])
+        end
+
+        test "Grant permissions to a user when the initiatior has no permissions" do
+            user = user_fixture()
+            manager = user_fixture()
+            enterprise = enterprise_fixture()
+
+
+            assert {:error, :unauthorized} = Enterprises.set_entity_enterprise_permissions(enterprise, user, [:access], if: [
+                is_authorized: manager
+            ])
+        end
+    end
+
+    describe "Enterprises.set_entity_establishment_permissions/3" do
+        test "Grant establishment-related permissions to a user" do
+            user = user_fixture()
+            establishment = establishment_fixture()
+
+            Enterprises.set_entity_establishment_permissions establishment, user, [:access]
+            assert Enterprises.has_entity_establishment_permission?(establishment, user, [:access])
+        end
+
+        test "Grant establishment-related permissions the initiatior has establishment's manage members permissions" do
+            user = user_fixture()
+            manager = user_fixture()
+
+            establishment = establishment_fixture()
+
+            Enterprises.set_entity_establishment_permissions establishment, manager, [manage: :members]
+
+            assert :ok = Enterprises.set_entity_establishment_permissions(
+                establishment, user, [:access],
+                if: [is_authorized: manager]
+            )
+        end
+
+        test "Grant establishment-related permissions the initiatior has enterprise's manage establishments permissions" do
+            user = user_fixture()
+            manager = user_fixture()
+
+            establishment = establishment_fixture()
+
+            Enterprises.set_entity_enterprise_permissions %{id: establishment.enterprise_id}, manager, [manage: :establishments]
+
+            assert :ok = Enterprises.set_entity_establishment_permissions(
+                establishment, user, [:access],
+                if: [is_authorized: manager]
+            )
+        end
+
+        test "Grant permissions to a user when the initiatior has no permissions" do
+            user = user_fixture()
+            manager = user_fixture()
+            establishment = establishment_fixture()
+
+            assert {:error, :unauthorized} = Enterprises.set_entity_establishment_permissions(
+                establishment, user, [:access],
+                if: [is_authorized: manager]
+            )
         end
     end
 
@@ -84,6 +261,32 @@ defmodule SignalNuisance.EnterpriseTest do
             assert %{
                 slug: ["has already been taken"]
             } = errors_on(changeset)
+        end
+
+        test "register an establishment, when the user is not authorized." do
+            user        = user_fixture()
+            enterprise  = enterprise_fixture()
+            establishment_attrs = valid_establishment_attributes(%{}, enterprise: enterprise)
+
+            Enterprises.set_entity_enterprise_permissions(enterprise, user, [])
+            
+            assert {:error, :unauthorized} = Enterprises.register_establishment(establishment_attrs, user, 
+                if: [
+                    is_authorized: user
+                ]
+            )
+        end
+
+        test "register an establishment, when the user is authorized." do
+            user        = user_fixture()
+            enterprise  = enterprise_fixture()
+            establishment_attrs = valid_establishment_attributes(%{}, enterprise: enterprise)
+
+            Enterprises.set_entity_enterprise_permissions(enterprise, user, [manage: :establishments])
+            
+            assert {:ok, _} = Enterprises.register_establishment(establishment_attrs, user, 
+                if: [is_authorized: user]
+            )
         end
     end
 

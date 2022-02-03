@@ -1,8 +1,8 @@
 defmodule SignalNuisance.Authorization do
 
     @resource_based %{
-        enterprise:     SignalNuisance.Enterprise.Authorization,
-        establishment:  SignalNuisance.Enterprise.Authorization,
+        enterprise:     SignalNuisance.Enterprises.Authorization,
+        establishment:  SignalNuisance.Enterprises.Authorization,
         reporting:      SignalNuisance.Reporting.Authorization
     }
 

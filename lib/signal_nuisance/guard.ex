@@ -19,10 +19,10 @@ defmodule SignalNuisance.Guard do
                 if is_authorized?(user, context), do: :ok, else: {:error, :unauthorized}
             {:is_member, context} ->
                 if is_member?(context), do: :ok, else: {:error, :not_member}
-            {:are_same, a, b} ->
-                if a == b, do: :ok, else: {:error, :not_same}
-            {:are_different, a, b} ->
-                if a != b, do: :ok, else: {:error, :same}
+            {:are_same, {a, b}} ->
+                if a == b, do: :ok, else: {:error, :are_different}
+            {:are_different, {a, b}} ->
+                if a != b, do: :ok, else: {:error, :are_same}
             _ -> {:error, :unknown_check}
         end
     end
