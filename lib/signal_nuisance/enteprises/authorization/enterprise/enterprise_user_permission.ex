@@ -9,6 +9,10 @@ defmodule SignalNuisance.Enterprises.Authorization.EnterpriseUserPermission do
     alias SignalNuisance.Enterprises.Enterprise
     alias SignalNuisance.Enterprises.Authorization.EnterprisePermission, as: Permission
 
+    use SignalNuisance.Authorization.Permission,
+        permissions: Permission.permissions(),
+        encoding: :byte
+
     schema "enterprise_user_permissions" do
         belongs_to :enterprise,  Enterprise
         belongs_to :user,        User
@@ -16,11 +20,10 @@ defmodule SignalNuisance.Enterprises.Authorization.EnterpriseUserPermission do
     end
 
     def create(user, enterprise, permissions) do
-        permissions = Permission.encode_permission(permissions)
         with {:ok, _entry} <- %__MODULE__{
             enterprise_id: enterprise.id, 
             user_id: user.id, 
-            permissions: permissions
+            permissions: encode_permission(permissions)
             } |> Repo.insert 
         do
             :ok
@@ -35,7 +38,20 @@ defmodule SignalNuisance.Enterprises.Authorization.EnterpriseUserPermission do
         ) |> Repo.one > 0
     end
 
-    def grant(user, enterprise, permissions) do
+    @doc """
+        Grant enterprise-related permissions to a user.
+
+        ## Parameters
+        - entity: [user: user],
+        - resource: [enterprise: enterprise]
+        - permission
+        - ...
+    """
+    def grant(context) do
+        permissions = context |> get_permissions
+        user = context |> get_entities |> Keyword.fetch!(:user)
+        enterprise = context |> get_resources |> Keyword.fetch!(:enterprise)
+
         result = if not has_entry?(user, enterprise, permissions) do
             create(user, enterprise, permissions)
         else
@@ -51,7 +67,7 @@ defmodule SignalNuisance.Enterprises.Authorization.EnterpriseUserPermission do
         end
     end
 
-    def revoke_all(user, enterprise) do
+    def revoke_all(user) do
         from(
             perm in __MODULE__,
             where: perm.user_id == ^user.id,
@@ -60,7 +76,7 @@ defmodule SignalNuisance.Enterprises.Authorization.EnterpriseUserPermission do
         :ok
     end
 
-    def revoke(user, enterprise, _permissions) do
+    def revoke(context) do
         from(
             perm in __MODULE__,
             where: perm.user_id == ^user.id,
@@ -70,14 +86,12 @@ defmodule SignalNuisance.Enterprises.Authorization.EnterpriseUserPermission do
     end
 
     def has_permission?(%{id: user_id} = _user, %{id: enterprise_id} = _enterprise, permissions) do
-        permissions = Permission.encode_permission(permissions)
+        permissions = encode_permission(permissions)
         
         stored = from(perm in __MODULE__,
             where: perm.user_id == ^user_id,
             where: perm.enterprise_id == ^enterprise_id,
             select: perm.permissions
-        ) |> Repo.all
-
-        stored |> Enum.any?(fn p -> (p &&& permissions) == permissions end)
+        ) |> Repo.all |> Enum.any?(fn p -> (p &&& permissions) == permissions end)
     end
 end 

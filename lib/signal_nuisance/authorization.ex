@@ -1,19 +1,28 @@
 defmodule SignalNuisance.Authorization do
-
     @resource_based %{
         enterprise:     SignalNuisance.Enterprises.EnterpriseAuthorization,
         establishment:  SignalNuisance.Enterprises.EstablishmentAuthorization,
-        reporting:      SignalNuisance.Reporting.Authorization
+        alert:          SignalNuisance.Reporting.AlertAuthorization
     }
 
-    def can(entity, opts \\ []) do
+    def resource_dispatch(context) do 
         case opts |> Enum.filter(fn ({k, _v}) -> Map.has_key?(@resource_based, k) end) do
-            [{resource_type, resource}] -> @resource_based[resource_type].can(entity, resource, opts)
-            [] -> false
+            @resource_based[resource_type]
+            [] -> nil
         end
     end
 
-    # user |> can access: :dashboard, enterprise: tartampion
-    # Authorization.can 
-    # user |> can access: :report, reporting: blabla, with: [secret_key: sk]
+    @doc """
+        Check if, based on the context, the action can be performed.
+
+        ## Examples
+        iex> Authorization.can user: user, enterprise: enterprise, access: :dashboard
+    """
+    def can?(context) do
+        case resource_dispatch(context) do
+            nil -> false
+            hdlr -> hdlr.can?(context)
+        end
+    end
+
 end

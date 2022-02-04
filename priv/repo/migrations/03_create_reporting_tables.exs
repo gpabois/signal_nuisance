@@ -5,23 +5,29 @@ defmodule SignalNuisance.Repo.Migrations.CreateReportingTables do
         # Assert postgis
         execute "CREATE EXTENSION IF NOT EXISTS postgis;"
 
-        create table(:reports) do
+        create table(:alerts) do
             add :nature, :string, null: false
             add :loc, :geography, null: false
             add :closed, :boolean, default: false
-            add :closure_reason, :string
             
             timestamps()
         end
 
         execute("CREATE INDEX report_loc_idx ON reports USING GIST (loc);")
         
-        create table(:reporting_user_permissions) do
-            add :report_id, references("reports", on_delete: :delete_all), null: false
-            add :user_id, references("reports", on_delete: :delete_all), null: false
+        create table(:alert_user_permissions) do
+            add :alert_id, references("alerts", on_delete: :delete_all), null: false
+            add :user_id, references("users", on_delete: :delete_all), null: false
             add :permissions, :integer, null: false
         end
 
-        create unique_index(:reporting_user_permissions, [:report_id, :user_id], name: :report_user_permissions_unique_index)
+        create unique_index(:alert_user_permissions, [:alert_id, :user_id], name: :alert_user_permissions_unique_index)
+
+        create table(:alert_token_permissions) do
+            add :alert_id, references("alerts", on_delete: :delete_all), null: false
+            add :secret_key, :string, null: false
+            add :permissions, :integer, null: false
+        end
+
     end
 end

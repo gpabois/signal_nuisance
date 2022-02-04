@@ -1,4 +1,6 @@
 defmodule SignalNuisance.Guard do
+    use SignalNuisance.Context
+
     def is_member?(context) do
         case Keyword.has_key?(context, :enterprise) do
             true ->
@@ -9,14 +11,14 @@ defmodule SignalNuisance.Guard do
         end
     end
 
-    def is_authorized?(user, context) do
-        SignalNuisance.Authorization.can user, context
+    def is_authorized?(context) do
+        SignalNuisance.Authorization.can context
     end
 
     def dispatch(check, context) do
         case check do
-            {:is_authorized, user} ->
-                if is_authorized?(user, context), do: :ok, else: {:error, :unauthorized}
+            {:is_authorized, {type, entity}} ->
+                if is_authorized?(context ++ [entity(type, entity)]), do: :ok, else: {:error, :unauthorized}
             {:is_member, context} ->
                 if is_member?(context), do: :ok, else: {:error, :not_member}
             {:are_same, {a, b}} ->

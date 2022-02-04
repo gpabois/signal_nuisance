@@ -3,31 +3,39 @@ defmodule SignalNuisance.Reporting do
 
     alias SignalNuisance.Repo
     
-    alias SignalNuisance.Reporting.Authorization.ReportTokenPermission
-    alias SignalNuisance.Reporting.Authorization.ReportUserPermission
-    alias SignalNuisance.Reporting.Authorization.ReportPermission   
+    alias SignalNuisance.Reporting.Authorization.Permission   
 
-    alias SignalNuisance.Reporting.ReportingNotifier 
-    alias SignalNuisance.Reporting.Report 
+    alias SignalNuisance.Reporting.AlertNotifier 
+    alias SignalNuisance.Reporting.Alert 
+    alias SignalNuisance.Reporting.AlertBinding
 
-    def create_reporting_by_email(attrs, recipient) do
-        Repo.transaction fn -> 
-            with {:ok, report}     <- Report.create(attrs),
-                 {:ok, secret_key} <- ReportTokenPermission.grant(report, ReportPermission.owner_permissions()),
-                 {:ok, _mail}      <- ReportingNotifier.deliver_secret_key_based_receipt(recipient, report, secret_key)
-            do
-                {:ok, :reporting, [secret_key: secret_key]}
-            else
-                {:error, error} -> Repo.rollback(error)
-            end
+    def create_alert_by_email(attrs, recipient) do
+        case SignalNuisance.Accounts.get_user_by_email(recipient) do
+            nil ->
+                Repo.transaction fn -> 
+                    with {:ok, alert}    <- Alert.create(attrs),
+                         {:ok, token} <- Permission.grant(
+                             entity:   [email: recipient], 
+                             resource: [alert: alert], 
+                             role: :owner
+                         ),
+                         {:ok, _mail} <- AlertNotifier.deliver_secret_key_based_receipt(recipient, alert, token)
+                    do
+                        {:ok, :reporting, [token: token]}
+                    else
+                        {:error, error} -> Repo.rollback(error)
+                    end
+                end
+            user -> create_alert_by_user(attrs, user)
         end
     end
 
-    def create_reporting_by_user(attrs, user) do
+    def create_alert_by_user(attrs, user) do
         Repo.transaction fn -> 
-            with {:ok, report}     <- Report.create(attrs),
-                 :ok <- ReportUserPermission.grant(user, report, ReportPermission.owner_permissions()),
-                 {:ok, _mail}      <- ReportingNotifier.deliver_user_based_receipt(user, report)
+            with {:ok, report}     <- Alert.create(attrs),
+                 :ok               <- AlertBinding.bind(report, user: user),
+                 :ok               <- Permission.grant(entity: [user: user], resource: [report: report], role: :owner),
+                 {:ok, _mail}      <- AlertNotifier.deliver_user_based_receipt(user, report)
             do
                 {:ok, :report, []}
             else
@@ -37,13 +45,13 @@ defmodule SignalNuisance.Reporting do
     end
 
     @doc """
-        create_reporting attr, by: [email: email]
-        create_reporting attr, by: [user: user]
+        create_alert attr, by: [email: email]
+        create_alert attr, by: [user: user]
     """
-    def create_reporting(attr, opts \\ []) do
+    def create_alert(attr, opts \\ []) do
         case Keyword.fetch(opts, :by) do
-            {:ok, [{:email, email}]} -> create_reporting_by_email(attr, email)
-            {:ok, [{:user, user}]}   -> create_reporting_by_user(attr, user)
+            {:ok, [{:email, email}]} -> create_alert_by_email(attr, email)
+            {:ok, [{:user, user}]}   -> create_alert_by_user(attr, user)
             _ -> Report.create(attr)
         end
     end

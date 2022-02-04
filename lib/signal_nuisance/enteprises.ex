@@ -3,6 +3,8 @@ defmodule SignalNuisance.Enterprises do
 
   alias SignalNuisance.Repo
 
+  alias SignalNuisance.Authorization.Permission
+
   alias SignalNuisance.Enterprises.Authorization.{EnterprisePermission, EstablishmentPermission}
   alias SignalNuisance.Enterprises.{Enterprise, Establishment, EnterpriseMember}
 
@@ -33,7 +35,7 @@ defmodule SignalNuisance.Enterprises do
     Repo.transaction fn ->
       with {:ok, enterprise} <- Enterprise.create(attrs),
            :ok <- add_enterprise_member(enterprise, user), 
-           :ok <- set_entity_enterprise_permissions(enterprise, user, EnterprisePermission.owner_permission())
+           :ok <- Permission.grant(entity: [user: user], resource: [enterprise: enterprise], role: :administrator)
       do
         enterprise
       else
@@ -188,7 +190,7 @@ defmodule SignalNuisance.Enterprises do
   """
   def set_entity_establishment_permissions(establishment, entity, permissions, opts \\ []) do
     with :ok <- is_possible(opts, establishment: establishment, manage: :members) do
-      EstablishmentPermission.grant(entity, establishment, permissions)
+      Permission.grant(entity: entity, resource: [establishment: establishment], permissions)
     end
   end
 

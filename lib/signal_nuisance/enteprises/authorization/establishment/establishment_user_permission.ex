@@ -10,6 +10,10 @@ defmodule SignalNuisance.Enterprises.Authorization.EstablishmentUserPermission d
     alias SignalNuisance.Enterprises.Authorization.EstablishmentPermission, as: Permission
     alias SignalNuisance.Enterprises.Establishment
 
+    use SignalNuisance.Authorization.Permission,
+        permissions: Permission.permissions(),
+        encoding: :byte
+
     schema "establishment_user_permissions" do
         belongs_to :establishment,  Establishment
         belongs_to :user,       User
@@ -17,11 +21,10 @@ defmodule SignalNuisance.Enterprises.Authorization.EstablishmentUserPermission d
     end
 
     def create(user, establishment, permissions) do
-        permissions = Permission.encode_permission(permissions)
         with {:ok, _entry} <- %__MODULE__{
             establishment_id: establishment.id, 
             user_id: user.id, 
-            permissions: permissions
+            permissions: encode_permission(permissions)
             } |> Repo.insert 
         do
             :ok
@@ -52,7 +55,10 @@ defmodule SignalNuisance.Enterprises.Authorization.EstablishmentUserPermission d
         end
     end
 
-    def revoke_all(user, establishment) do
+    def revoke_all(context) do
+        user = context |> get_entity!(:user)
+        establishment = context |> get_resource!(:establishment)
+
         from(
             perm in __MODULE__,
             where: perm.user_id == ^user.id,
@@ -81,15 +87,13 @@ defmodule SignalNuisance.Enterprises.Authorization.EstablishmentUserPermission d
         :ok
     end
 
-    def has_permission?(%{id: user_id} = _user, %{id: establishment_id} = _establishment, permissions) do
-        permissions = Permission.encode_permission(permissions)
+    def has?(%{id: user_id} = _user, %{id: establishment_id} = _establishment, permissions) do
+        permissions = encode_permission(permissions)
         
         stored = from(perm in __MODULE__,
             where: perm.user_id == ^user_id,
             where: perm.establishment_id == ^establishment_id,
             select: perm.permissions
-        ) |> Repo.all
-
-        stored |> Enum.any?(fn p -> (p &&& permissions) == permissions end)
+        ) |> Repo.all |> Enum.any?(fn p -> (p &&& permissions) == permissions end)
     end
 end 

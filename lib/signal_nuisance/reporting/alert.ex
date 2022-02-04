@@ -1,19 +1,16 @@
-defmodule SignalNuisance.Reporting.Report do
+defmodule SignalNuisance.Reporting.Alert do
     use Ecto.Schema
-
+    
     import Ecto.Changeset
     # import Ecto.Query
     # import Geo.PostGIS
   
     alias SignalNuisance.Repo
   
-    schema "reports" do
+    schema "alerts" do
       field :nature, :string
-
-      field :loc, Geo.PostGIS.Geometry
-      
+      field :loc, Geo.PostGIS.Geometry     
       field :closed, :boolean
-      field :closure_reason, :string
 
       timestamps()
     end
@@ -33,7 +30,7 @@ defmodule SignalNuisance.Reporting.Report do
     def get(opts) do
         case __MODULE__ |> Repo.get(opts) do
             nil -> {:error, :not_found}
-            report -> {:ok, report}
+            alert -> {:ok, alert}
         end
     end
 end

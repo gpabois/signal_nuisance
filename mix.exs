@@ -55,7 +55,8 @@ defmodule SignalNuisance.MixProject do
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
       {:faker, "~> 0.17", only: :test},
-      {:ex_doc, "~> 0.21", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.21", only: :dev, runtime: false},
+      {:oban, "~> 2.10"}
     ]
   end
 
