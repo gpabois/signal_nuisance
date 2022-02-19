@@ -7,38 +7,50 @@ defmodule SignalNuisance.Authorization.Permission do
 
     use SignalNuisance.Context
 
+    @doc false
+    defp extract_entity(entity) do
+        case entity do
+            [entity] -> entity
+            entity -> entity
+        end
+    end
+
     def resource_related(context) do 
         case opts |> Enum.filter(fn ({k, _v}) -> Map.has_key?(@resource_based, k) end) do
-            {:yes, @resource_based[resource_type]}
+            [{resource_type, _} | _] -> {:yes, @resource_based[resource_type]}
             [] -> :no
         end
     end
 
-    def has?(context) do
+    def has?(entity, permissions, context) do
+        entity = extract_entity(entity)
         case resource_related(context) do
-            {:yes, hdlr} -> hdlr.has?(context),
-            _ -> false
+            {:yes, hdlr} -> hdlr.has?(entity, permissions, context)
+            :no -> false
         end
     end
 
-    def grant(context) do
+    def grant(entity, permissions, context) do
+        entity = extract_entity(entity)
         case resource_related(context) do
-            {:yes, hdlr} -> hdlr.grant(context),
-            _ -> false
+            {:yes, hdlr} -> hdlr.grant(entity, permissions, context)
+            :no -> false
         end
     end
 
-    def revoke(context) do
+    def revoke(entity, permissions, context) do
+        entity = extract_entity(entity)
         case resource_related(context) do
-            {:yes, hdlr} -> hdlr.revoke(context),
-            _ -> false
+            {:yes, hdlr} -> hdlr.revoke(entity, permissions, context)
+            :no -> false
         end
     end
     
-    def revoke_all(context) do
+    def revoke_all(entity, context) do
+        entity = extract_entity(entity)
         case resource_related(context) do
-            {:yes, hdlr} -> hdlr.revoke_all(context),
-            _ -> false
+            {:yes, hdlr} -> hdlr.revoke_all(entity, context)
+            :no -> false
         end
     end
 
@@ -61,10 +73,10 @@ defmodule SignalNuisance.Authorization.Permission do
         
     """
     defmacro __using__(opts \\ []) do
-        permissions = Keyword.fetch!(opts, :permissions)
-        is_delegating = Keyword.has_key?(opts, :dispatch_by_entity)
-        encoding = Keyword.get(opts, :encoding, nil)
-        roles = Keyword.get(opts, :roles, [])
+        permissions     = Keyword.fetch!(opts, :permissions)
+        is_delegating   = Keyword.has_key?(opts, :dispatch_by_entity)
+        encoding        = Keyword.get(opts, :encoding, nil)
+        roles           = Keyword.get(opts, :roles, [])
         entity_delegations = if is_delegating do 
             Keyword.fetch!(opts, :permissions)
         else
@@ -81,8 +93,8 @@ defmodule SignalNuisance.Authorization.Permission do
                 if is_delegating do
                     quote do
                         @doc false
-                        defp delegate_by_entity(context) do
-                            [{type, _entity} | _] = get_entities(context)
+                        defp delegate_by_entity(entity) do
+                            {type, _entity} = entity
                             case Keyword.fetch(unquote(entity_delegations), type) do
                                 {:ok, hdlr} -> hdlr
                                 {:error, _} -> nil
@@ -90,14 +102,15 @@ defmodule SignalNuisance.Authorization.Permission do
                             
                         end
                         
+                        @doc false
                         defp check_roles(context) do
                             case Keyword.fetch(context, :role) do
                                 {:ok, role} -> 
                                     case Keyword.get(unquote(roles), role, []) do
-                                        permissions -> context ++ permissions
-                                        [] -> context
+                                        permissions -> permissions
+                                        [] -> []
                                     end
-                                _ -> context
+                                _ -> []
                             end
                             
                         end
@@ -105,35 +118,35 @@ defmodule SignalNuisance.Authorization.Permission do
                         @doc """
                             Check if an entity has the permissions.
                         """
-                        def has?(context) do
-                            context = check_roles(context)
-                            case delegate_by_entity(context) do
+                        def has?(entity, permissions, context) do
+                            permissions = permissions ++ check_roles(context)
+                            case delegate_by_entity(entity) do
                                 nil -> false
-                                hdlr -> hdlr.has?(context)
+                                hdlr -> hdlr.has?(entity, permissions, context)
                             end
                         end
 
-                        def grant(context) do
-                            context = check_roles(context)
-                            case delegate_by_entity(context) do
+                        def grant(entity, permissions, context) do
+                            permissions = permissions ++ check_roles(context)
+                            case delegate_by_entity(entity) do
                                 nil -> {:error, :unmanaged_or_no_entity}
-                                hdlr -> hdlr.grant(context)
+                                hdlr -> hdlr.grant(entity, permissions, context)
                             end
                         end
             
-                        def revoke_all(context) do
-                            context = check_roles(context)
-                            case delegate_by_entity(context) do
-                                nil -> {:error, :unmanaged_or_no_entity}
-                                hdlr -> hdlr.revoke_all(context)
+                        def revoke_all(entity, context) do
+                            permissions = permissions ++ check_roles(context)
+                            case delegate_by_entity(entity) do
+                                nil -> {:error, :unmanaged_entity}
+                                hdlr -> hdlr.revoke_all(entity, context)
                             end
                         end
             
-                        def revoke(context) do
-                            context = check_roles(context)
-                            case delegate_by_entity(context) do
-                                nil -> {:error, :unmanaged_or_no_entity}
-                                hdlr -> hdlr.revoke(context)
+                        def revoke(entity, permissions, context) do
+                            permissions = permissions ++ check_roles(context)
+                            case delegate_by_entity(entity) do
+                                nil -> {:error, :unmanaged_entity}
+                                hdlr -> hdlr.revoke(entity, permissions, context)
                             end
                         end
             
@@ -144,11 +157,11 @@ defmodule SignalNuisance.Authorization.Permission do
             def permissions(), do: unquote(permissions)
 
             def is_permission?(permission) do
-                permission in unquote, do: permissions
+                permission in unquote do: permissions
             end
 
             def get_permissions(context) do
-                context |> Enum.filter(fn x -> is_permission?(x))
+                context |> Enum.filter(&is_permission?/1)
             end
 
             unquote do
@@ -170,12 +183,12 @@ defmodule SignalNuisance.Authorization.Permission do
                             end
                         end
                     
-                        def add_permission(perms, types) when is_list(types) do
-                            perms ||| encode_permission(types)
+                        def add_permission(permissions, types) when is_list(types) do
+                            permissions ||| encode_permission(types)
                         end   
                     
-                        def remove_permission(perms, types) do
-                            perms &&& ~~~(encode_permission(types))
+                        def remove_permission(permissions, types) do
+                            permissions &&& ~~~(encode_permission(types))
                         end
 
                         def is_permission?(permissions, type) do

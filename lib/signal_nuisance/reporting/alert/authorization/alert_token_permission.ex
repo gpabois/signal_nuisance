@@ -2,7 +2,7 @@ defmodule SignalNuisance.Reporting.Authorization.AlertTokenPermission do
     alias SignalNuisance.Reporting.Authorization.AlertPermission, as: Permission
 
     use SignalNuisance.Authorization.Permission,
-        permissions: Permission.permissions()
+        permissions: Permission.permissions(),
         encoding: :byte
 
     use Ecto.Schema
@@ -19,13 +19,13 @@ defmodule SignalNuisance.Reporting.Authorization.AlertTokenPermission do
         field :permissions, :integer
     end
 
-    def grant(context) do
+    def grant({:token, nil}, permissions, context) do
         secret_key = :crypto.strong_rand_bytes(10)
         permissions = context |> get_permissions() |> encode_permission()
         alert = context |> get_resource!(:alert)
         
         with {:ok, perm} <- %__MODULE__{
-           alert_id:alert.id, 
+            alert_id: alert.id, 
             secret_key: secret_key, 
             permissions: permissions
         }|> Repo.insert 
@@ -34,18 +34,7 @@ defmodule SignalNuisance.Reporting.Authorization.AlertTokenPermission do
         end
     end
 
-    def alter(context) do
-        permissions = context |> get_permissions() |> encode_permission()
-        secret_key = context |> get_entity!(:token)
-
-        Repo.get_by(__MODULE__, secret_key: secret_key)
-        |> change(%{permissions: permissions})
-        |> Repo.update
-    end
-
-    def revoke_all(context) do
-        secret_key = context |> get_entity!(:token)
-
+    def revoke_all({:token, secret_key}, _context) do
         from(
             perm in __MODULE__,
             where: perm.secret_key == ^secret_key
@@ -54,8 +43,7 @@ defmodule SignalNuisance.Reporting.Authorization.AlertTokenPermission do
         :ok
     end
 
-    def revoke(context) do
-        secret_key = context |> get_entity!(:token)
+    def revoke({:token, secret_key}, _permissions, _context) do
         from(
             perm in __MODULE__,
             where: perm.secret_key == ^secret_key
@@ -63,15 +51,14 @@ defmodule SignalNuisance.Reporting.Authorization.AlertTokenPermission do
         :ok
     end
 
-    def has?(context) do
+    def has?({:token, secret_key}, permissions, context) do
         permissions = context |> get_permissions() |> encode_permission()
         %{id: alert_id} = context |> get_resource!(:alert)
-        token = context |> get_entity!(:token)
 
         from(perm in __MODULE__,
             where: perm.secret_key == ^secret_key,
             where: perm.alert_id == ^alert_id,
             select: perm.permissions
-        ) |> Repo.any(fn p -> (p &&& permissions) == permissions end)
+        ) |> Repo.all() |> Enum.any(&is_permission/2)
     end
 end

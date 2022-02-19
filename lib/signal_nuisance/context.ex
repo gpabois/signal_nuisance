@@ -1,4 +1,8 @@
 defmodule SignalNuisance.Context do
+    @docmodule """
+        Context parser.
+    """
+
     @resources [
         :enteprise,
         :establishment,
@@ -20,7 +24,7 @@ defmodule SignalNuisance.Context do
 
     def get_entities(context) do
         case context do
-            [{type, resource} | context] ->
+            [{type, entity} | context] ->
                 if is_entity?(type) do
                     [{type, entity}]
                 else

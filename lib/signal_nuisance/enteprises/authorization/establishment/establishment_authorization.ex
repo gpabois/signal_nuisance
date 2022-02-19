@@ -4,7 +4,7 @@ defmodule SignalNuisance.Enterprises.EstablishmentAuthorization do
 
     use SignalNuisance.Context
 
-    def can?(context) do
+    def can?(entity, context) do
       EstablishmentPermission.can?(context)
       or Authorization.can(get_entities(context)
         ++ [resource(enterprise: %{id: establishment.enterprise_id})]

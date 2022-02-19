@@ -7,7 +7,7 @@ defmodule SignalNuisance.Repo.Migrations.CreateReportingTables do
 
         create table(:alerts) do
             add :nature, :string, null: false
-            add :loc, :geography, null: false
+            add :loc,    :geography, null: false
             add :closed, :boolean, default: false
             
             timestamps()

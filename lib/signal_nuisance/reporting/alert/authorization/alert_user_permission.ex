@@ -1,7 +1,7 @@
 defmodule SignalNuisance.Reporting.Authorization.ReportUserPermission do
     alias SignalNuisance.Reporting.Authorization.AlertPermission, as: Permission
     use SignalNuisance.Authorization.Permission,
-        permissions: Permission.permissions()
+        permissions: Permission.permissions(),
         encoding: :byte
 
     use Ecto.Schema
@@ -19,10 +19,9 @@ defmodule SignalNuisance.Reporting.Authorization.ReportUserPermission do
         field :permissions, :integer
     end
 
-    def grant(context) do
+    def grant({:user, user}, permissions, context) do
         permissions = context |> get_permissions() |> encode_permissions()
         alert = context |> get_resource(:alert)
-        user = context |> get_entity(:user)
 
         with {:ok, _perm} <- %__MODULE__{
                 alert_id: alert.id, 
@@ -34,19 +33,9 @@ defmodule SignalNuisance.Reporting.Authorization.ReportUserPermission do
         end
     end
 
-    def alter(context) do
-        permissions = context |> get_permissions() |> encode_permissions()
-        alert = context |> get_resource(:alert)
-        user = context |> get_entity(:user)
-
-        Repo.get_by(__MODULE__, user_id: user.id, alert_id: alert.id)
-        |> change(%{permissions: permissions})
-        |> Repo.update
-    end
-
-    def revoke(context) do
+    def revoke({:user, user}, _permissions, context) do
         %{id: alert_id} = context |> get_resource(:alert)
-        %{id: user_id} = context |> get_entity(:user)
+        %{id: user_id} = user
 
         from(p in __MODULE__,
             where: p.user_id == ^user_id,
@@ -54,15 +43,15 @@ defmodule SignalNuisance.Reporting.Authorization.ReportUserPermission do
         ) |> Repo.delete_all
     end
 
-    def has?(context) do
+    def has?({:user, user}, permissions, context) do
         permissions = context |> get_permissions() |> encode_permissions()
         %{id: alert_id} = context |> get_resource(:alert)
-        %{id: user_id} = context |> get_entity(:user)
+        %{id: user_id} = user
 
         from(perm in __MODULE__,
             where: perm.user_id == ^user_id,
             where: perm.alert_id == ^alert_id,
             select: perm.permissions
-        ) |> Repo.any(fn p -> (p &&& permissions) == permissions end)
+        ) |> Repo.all() |> Enum.any(&is_permission/2)
     end
 end

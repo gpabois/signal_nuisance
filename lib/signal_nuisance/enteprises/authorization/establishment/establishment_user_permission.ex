@@ -39,7 +39,7 @@ defmodule SignalNuisance.Enterprises.Authorization.EstablishmentUserPermission d
         ) |> Repo.one > 0
     end
 
-    def grant(user, establishment, permissions) do
+    def grant({:user, user}, permissions, context) do
         result = if not has_entry?(user, establishment, permissions) do
             create(user, establishment, permissions)
         else
@@ -55,10 +55,8 @@ defmodule SignalNuisance.Enterprises.Authorization.EstablishmentUserPermission d
         end
     end
 
-    def revoke_all(context) do
-        user = context |> get_entity!(:user)
+    def revoke({:user, user}, _permissions, context) do
         establishment = context |> get_resource!(:establishment)
-
         from(
             perm in __MODULE__,
             where: perm.user_id == ^user.id,
@@ -67,12 +65,17 @@ defmodule SignalNuisance.Enterprises.Authorization.EstablishmentUserPermission d
         :ok
     end
 
-    def revoke(user, establishment, _permissions) do
-        from(
-            perm in __MODULE__,
-            where: perm.user_id == ^user.id,
-            where: perm.establishment_id == ^establishment.id
-        ) |> Repo.delete_all
+    def revoke_all({:user, user}, context) do
+        case context |> get_resource!(:establishment) do
+            [{:by, [{:enterprise, enterprise}]}] -> 
+                revoke_all_by_enterprise(user, enterprise)
+            establishment -> 
+                from(
+                    perm in __MODULE__,
+                    where: perm.user_id == ^user.id,
+                    where: perm.establishment_id == ^establishment.id
+                ) |> Repo.delete_all
+        end
         :ok
     end
 
@@ -87,13 +90,16 @@ defmodule SignalNuisance.Enterprises.Authorization.EstablishmentUserPermission d
         :ok
     end
 
-    def has?(%{id: user_id} = _user, %{id: establishment_id} = _establishment, permissions) do
+    def has?({:user, user}, permissions, context) do
         permissions = encode_permission(permissions)
+        
+        %{id: user_id} = user
+        %{id: establishment_id} = context |> get_resource!(:establishment)
         
         stored = from(perm in __MODULE__,
             where: perm.user_id == ^user_id,
             where: perm.establishment_id == ^establishment_id,
             select: perm.permissions
-        ) |> Repo.all |> Enum.any?(fn p -> (p &&& permissions) == permissions end)
+        ) |> Repo.all |> Enum.any?(&is_permission/2)
     end
 end 

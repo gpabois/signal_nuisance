@@ -11,7 +11,7 @@ defmodule SignalNuisance.Reporting.Authorization.AlertPermission do
 
     def role_based(role) do
         case role do
-            :owner -> [:read, :close]
+            :owner -> [:read, :close, :comment]
             _ -> []
         end
     end

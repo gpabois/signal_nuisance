@@ -43,13 +43,10 @@ defmodule SignalNuisance.Enterprises.Authorization.EnterpriseUserPermission do
 
         ## Parameters
         - entity: [user: user],
+        - permissions
         - resource: [enterprise: enterprise]
-        - permission
-        - ...
     """
-    def grant(context) do
-        permissions = context |> get_permissions
-        user = context |> get_entities |> Keyword.fetch!(:user)
+    def grant({:user, user}, permissions, context) do
         enterprise = context |> get_resources |> Keyword.fetch!(:enterprise)
 
         result = if not has_entry?(user, enterprise, permissions) do
@@ -67,25 +64,29 @@ defmodule SignalNuisance.Enterprises.Authorization.EnterpriseUserPermission do
         end
     end
 
-    def revoke_all(user) do
+    def revoke_all({:user, user}, context) do
+        %{id: enterprise_id} = context |> get_resources |> Keyword.fetch!(:enterprise)
         from(
             perm in __MODULE__,
             where: perm.user_id == ^user.id,
-            where: perm.enterprise_id == ^enterprise.id
+            where: perm.enterprise_id == ^enterprise_id
         ) |> Repo.delete_all
         :ok
     end
 
-    def revoke(context) do
+    def revoke({:user, user}, permissions, context) do
+        %{id: enterprise_id} = context |> get_resource!(:enterprise)
         from(
             perm in __MODULE__,
             where: perm.user_id == ^user.id,
-            where: perm.enterprise_id == ^enterprise.id
+            where: perm.enterprise_id == ^enterprise_id
         ) |> Repo.delete_all
         :ok
     end
 
-    def has_permission?(%{id: user_id} = _user, %{id: enterprise_id} = _enterprise, permissions) do
+    def has?({:user, user}, permissions, context) do
+        %{id: enterprise_id} = context |> get_resource!(:enterprise)
+        %{id: user_id} = user
         permissions = encode_permission(permissions)
         
         stored = from(perm in __MODULE__,

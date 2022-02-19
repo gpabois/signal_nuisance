@@ -5,8 +5,10 @@ defmodule SignalNuisance.Enterprises.EnterpriseAuthorization do
     use SignalNuisance.Context
 
     @doc false
-    def can?(context) do
-      EnterprisePermission.can?(context) or 
-      Authorization.can(Context.get_entities(context) ++ [manage: :enterprises])
+    def can?(entity, context) do
+      case EnteprisePermission.get_permissions(context) do
+        [] -> false,
+        permissions -> Permission.can?(entity, permissions, context) 
+      end or Authorization.can?(entity, manage: :enterprises)
     end
   end
