@@ -19,16 +19,15 @@ defmodule SignalNuisance.Reporting.Authorization.AlertTokenPermission do
         field :permissions, :integer
     end
 
-    def grant({:token, nil}, permissions, context) do
+    def grant({:token, nil}, permissions, alert) do
         secret_key = :crypto.strong_rand_bytes(10)
-        permissions = context |> get_permissions() |> encode_permission()
-        alert = context |> get_resource!(:alert)
-        
+        permissions = permissions |> encode_permission()
+
         with {:ok, perm} <- %__MODULE__{
-            alert_id: alert.id, 
-            secret_key: secret_key, 
+            alert_id: alert.id,
+            secret_key: secret_key,
             permissions: permissions
-        }|> Repo.insert 
+        }|> Repo.insert
         do
             {:ok, perm.secret_key}
         end
@@ -51,14 +50,14 @@ defmodule SignalNuisance.Reporting.Authorization.AlertTokenPermission do
         :ok
     end
 
-    def has?({:token, secret_key}, permissions, context) do
-        permissions = context |> get_permissions() |> encode_permission()
-        %{id: alert_id} = context |> get_resource!(:alert)
+    def has?({:token, secret_key}, permissions, alert) do
+        permissions = permissions |> encode_permission()
+        %{id: alert_id} = alert
 
         from(perm in __MODULE__,
             where: perm.secret_key == ^secret_key,
             where: perm.alert_id == ^alert_id,
             select: perm.permissions
-        ) |> Repo.all() |> Enum.any(&is_permission/2)
+        ) |> Repo.all() |> Enum.any(fn x -> is_permission?(x, permissions) end)
     end
 end

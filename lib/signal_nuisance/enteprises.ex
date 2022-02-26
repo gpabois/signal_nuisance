@@ -1,6 +1,4 @@
 defmodule SignalNuisance.Enterprises do
-  use SignalNuisance.Guard 
-
   alias SignalNuisance.Repo
 
   alias SignalNuisance.Authorization.Permission
@@ -14,7 +12,7 @@ defmodule SignalNuisance.Enterprises do
 
   @doc """
     Get an enterprise by its name
-    
+
     Return nil if no enterprise was found
   """
   def get_enterprise_by_name(name) do
@@ -34,7 +32,7 @@ defmodule SignalNuisance.Enterprises do
   def register_enterprise(attrs, %SignalNuisance.Accounts.User{} = user) do
     Repo.transaction fn ->
       with {:ok, enterprise} <- Enterprise.create(attrs),
-           :ok <- add_enterprise_member(enterprise, user), 
+           :ok <- add_enterprise_member(enterprise, user),
            :ok <- Permission.grant(entity: [user: user], resource: [enterprise: enterprise], role: :administrator)
       do
         enterprise
@@ -50,7 +48,6 @@ defmodule SignalNuisance.Enterprises do
   def register_establishment(attrs, %SignalNuisance.Accounts.User{} = user, opts \\ []) do
     Repo.transaction fn ->
       with {:ok, enterprise} <- get_enterprise_by_id(attrs.enterprise_id),
-           :ok <- is_possible(opts, enterprise: enterprise, manage: :establishments),
            {:ok, establishment} <- Establishment.create(attrs),
            :ok <- set_entity_establishment_permissions(establishment, user, EstablishmentPermission.owner_permission())
       do
@@ -73,27 +70,22 @@ defmodule SignalNuisance.Enterprises do
     Add a member in the enterprise
 
     add_enterprise_member enterprise, user, if: [is_authorized: user]
-    add_enterprise_member enterprise, user 
+    add_enterprise_member enterprise, user
   """
   def add_enterprise_member(enterprise, user, opts \\ []) do
-    with :ok <- is_possible(opts, enterprise: enterprise, manage: :members) do
-      case Repo.transaction(fn ->
-        with :ok <- EnterpriseMember.add(enterprise, user),
-             :ok <- Permission.grant(
-                {:user, user}, 
-                resource: [enterprise: enterprise], 
-                role: :employee
-              )
-        do
+    Repo.transaction(fn ->
+      with :ok <- EnterpriseMember.add(enterprise, user),
+           :ok <- Permission.grant(
+              {:user, user},
+              resource: [enterprise: enterprise],
+              role: :employee
+            )
+      do
 
-        else
-          {:error, error} -> Repo.rollback(error)
-        end
-      end) do
-        {:ok, _} -> :ok
-        error -> error
+      else
+        {:error, error} -> Repo.rollback(error)
       end
-    end
+    end)
   end
 
   @doc """
@@ -103,15 +95,14 @@ defmodule SignalNuisance.Enterprises do
     remove_enterprise_member enterprise, user
   """
   def remove_enterprise_member(enterprise, user, opts \\ []) do
-    with :ok <- is_possible(opts, enterprise: enterprise, manage: :members) do
-      case Repo.transaction(fn ->
+    Repo.transaction(fn ->
       with  :ok <- EnterpriseMember.remove(enterprise, user),
             :ok <- Permission.revoke_all(
-              {:user, user}, 
+              {:user, user},
               resource: [enterprise: enterprise]
             ),
             :ok <- Permission.revoke_all(
-              {:user, user}, 
+              {:user, user},
               resource: [
                 establishment: [
                   by: [enterprise: enterprise]
@@ -123,11 +114,7 @@ defmodule SignalNuisance.Enterprises do
         else
           {:error, error} -> Repo.rollback(error)
         end
-      end) do
-        {:ok, _} -> :ok
-        error -> error
-      end
-    end
+    end)
   end
 
   @doc """
@@ -139,11 +126,9 @@ defmodule SignalNuisance.Enterprises do
 
   """
   def get_enterprise_members(enterprise, opts \\ []) do
-    with :ok <- is_possible(opts, enterprise: enterprise, manage: :members) do
-      enterprise
-      |> EnterpriseMember.get_by_enterprise()
-      |> Enum.map(fn (m) -> m.user end)
-    end
+    enterprise
+    |> EnterpriseMember.get_by_enterprise()
+    |> Enum.map(fn (m) -> m.user end)
   end
 
   @doc """
@@ -171,24 +156,16 @@ defmodule SignalNuisance.Enterprises do
 
     ## Examples
     iex> SignalNuisance.Enterprises.set_user_enterprise_permissions enterprise, user, [{:manage, :members}], if: [is_authorized: initiator, is_not_same: {a, b}]
-    iex> SignalNuisance.Enterprises.set_user_enterprise_permissions enterprise, user, [{:manage, :members}] 
+    iex> SignalNuisance.Enterprises.set_user_enterprise_permissions enterprise, user, [{:manage, :members}]
   """
   def set_entity_enterprise_permissions(enterprise, user, permissions, guard \\ []) do
-    with 
-      :ok <- is_possible(
-        guard, 
-        resource:    [enterprise: enterprise], 
-        permissions: [manage: :members]
-      )
-    do
-      Permission.grant(
-        user, 
-        permissions,
-        resource: [enterprise: enterprise]
-      )
-    end
+    Permission.grant(
+      user,
+      permissions,
+      resource: [enterprise: enterprise]
+    )
   end
-  
+
   @doc """
     Checks if an entity has enterprise-related permissions.
 
@@ -199,7 +176,7 @@ defmodule SignalNuisance.Enterprises do
   """
   def has_entity_enterprise_permission?(enterprise, entity, permissions) do
     Permission.has?(
-      entity, 
+      entity,
       permissions,
       resource: [enterprise: enterprise]
     )
@@ -211,33 +188,25 @@ defmodule SignalNuisance.Enterprises do
     ## Parameters
     - establishment
     - entity: a user
-    
+
     ## Examples
     iex> SignalNuisance.Enterprises.set_entity_enterprise_permissions enterprise, user, [{:manage, :members}] , if: [is_authorized: initiator, is_not_same: {a, b}]
-    iex> SignalNuisance.Enterprises.set_entity_enterprise_permissions enterprise, user, [{:manage, :members}] 
+    iex> SignalNuisance.Enterprises.set_entity_enterprise_permissions enterprise, user, [{:manage, :members}]
   """
   def set_entity_establishment_permissions(establishment, entity, permissions, opts \\ []) do
-    with 
-    :ok <- is_possible(
-        opts, 
-        resource:    [establishment: establishment], 
-        permissions: [manage: :members]
-      ) 
-    do
-      Permission.grant(
-        entity,
-        permissions,
-        resource: [establishment: establishment]
-      )
-    end
-  end
-
-  def has_entity_establishment_permission?(establishment, entity, permissions) do
-    Permission.has?(
-      entity, 
+    Permission.grant(
+      entity,
       permissions,
       resource: [establishment: establishment]
     )
   end
-  
+
+  def has_entity_establishment_permission?(establishment, entity, permissions) do
+    Permission.has?(
+      entity,
+      permissions,
+      resource: [establishment: establishment]
+    )
+  end
+
 end

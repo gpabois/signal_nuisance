@@ -1,11 +1,9 @@
 defmodule SignalNuisance.Authorization.Permission do
     @resource_based %{
-        enterprise: SignalNuisance.Enterprises.Authorization.EnterprisePermission,
-        establishment: SignalNuisance.Enterprises.Authorization.EstablishmentPermission,
-        alert: SignalNuisance.Reporting.Authorization.AlertPermission
+        enterprise:     SignalNuisance.Enterprises.Authorization.EnterprisePermission,
+        establishment:  SignalNuisance.Enterprises.Authorization.EstablishmentPermission,
+        alert:          SignalNuisance.Reporting.Authorization.AlertPermission
     }
-
-    use SignalNuisance.Context
 
     @doc false
     defp extract_entity(entity) do
@@ -15,8 +13,8 @@ defmodule SignalNuisance.Authorization.Permission do
         end
     end
 
-    def resource_related(context) do 
-        case opts |> Enum.filter(fn ({k, _v}) -> Map.has_key?(@resource_based, k) end) do
+    def resource_related(context) do
+        case context |> Enum.filter(fn ({k, _v}) -> Map.has_key?(@resource_based, k) end) do
             [{resource_type, _} | _] -> {:yes, @resource_based[resource_type]}
             [] -> :no
         end
@@ -45,7 +43,7 @@ defmodule SignalNuisance.Authorization.Permission do
             :no -> false
         end
     end
-    
+
     def revoke_all(entity, context) do
         entity = extract_entity(entity)
         case resource_related(context) do
@@ -58,9 +56,9 @@ defmodule SignalNuisance.Authorization.Permission do
         All the permissions possible
     """
     @callback has?(term) :: term
-    @callback grant(context) :: term
-    @callback revoke(context) :: term
-    @callback revoke_all(context) :: term
+    @callback grant(term) :: term
+    @callback revoke(term) :: term
+    @callback revoke_all(term) :: term
 
     @doc """
         ## Parameters
@@ -70,14 +68,14 @@ defmodule SignalNuisance.Authorization.Permission do
             owner: [...]
         ]
         - encoding: :byte
-        
+
     """
     defmacro __using__(opts \\ []) do
         permissions     = Keyword.fetch!(opts, :permissions)
         is_delegating   = Keyword.has_key?(opts, :dispatch_by_entity)
         encoding        = Keyword.get(opts, :encoding, nil)
         roles           = Keyword.get(opts, :roles, [])
-        entity_delegations = if is_delegating do 
+        entity_delegations = if is_delegating do
             Keyword.fetch!(opts, :permissions)
         else
             []
@@ -85,34 +83,36 @@ defmodule SignalNuisance.Authorization.Permission do
 
         quote do
             @behaviour SignalNuisance.Authorization.Permission
-
-            use SignalNuisance.Context
             use Bitwise
-            
+
             unquote do
                 if is_delegating do
                     quote do
                         @doc false
                         defp delegate_by_entity(entity) do
-                            {type, _entity} = entity
+                            type = case entity do
+                                {type, _entity} -> type
+                                %type{} -> type
+                            end
+
                             case Keyword.fetch(unquote(entity_delegations), type) do
                                 {:ok, hdlr} -> hdlr
                                 {:error, _} -> nil
                             end
-                            
+
                         end
-                        
+
                         @doc false
                         defp check_roles(context) do
                             case Keyword.fetch(context, :role) do
-                                {:ok, role} -> 
+                                {:ok, role} ->
                                     case Keyword.get(unquote(roles), role, []) do
                                         permissions -> permissions
                                         [] -> []
                                     end
                                 _ -> []
                             end
-                            
+
                         end
 
                         @doc """
@@ -133,7 +133,7 @@ defmodule SignalNuisance.Authorization.Permission do
                                 hdlr -> hdlr.grant(entity, permissions, context)
                             end
                         end
-            
+
                         def revoke_all(entity, context) do
                             permissions = permissions ++ check_roles(context)
                             case delegate_by_entity(entity) do
@@ -141,7 +141,7 @@ defmodule SignalNuisance.Authorization.Permission do
                                 hdlr -> hdlr.revoke_all(entity, context)
                             end
                         end
-            
+
                         def revoke(entity, permissions, context) do
                             permissions = permissions ++ check_roles(context)
                             case delegate_by_entity(entity) do
@@ -149,7 +149,7 @@ defmodule SignalNuisance.Authorization.Permission do
                                 hdlr -> hdlr.revoke(entity, permissions, context)
                             end
                         end
-            
+
                     end
                 end
             end
@@ -158,10 +158,6 @@ defmodule SignalNuisance.Authorization.Permission do
 
             def is_permission?(permission) do
                 permission in unquote do: permissions
-            end
-
-            def get_permissions(context) do
-                context |> Enum.filter(&is_permission?/1)
             end
 
             unquote do
@@ -182,11 +178,11 @@ defmodule SignalNuisance.Authorization.Permission do
                                 type -> base_encode_permission(type)
                             end
                         end
-                    
+
                         def add_permission(permissions, types) when is_list(types) do
                             permissions ||| encode_permission(types)
-                        end   
-                    
+                        end
+
                         def remove_permission(permissions, types) do
                             permissions &&& ~~~(encode_permission(types))
                         end

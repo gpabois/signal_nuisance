@@ -19,22 +19,21 @@ defmodule SignalNuisance.Reporting.Authorization.ReportUserPermission do
         field :permissions, :integer
     end
 
-    def grant({:user, user}, permissions, context) do
-        permissions = context |> get_permissions() |> encode_permissions()
-        alert = context |> get_resource(:alert)
+    def grant({:user, user}, permissions, alert) do
+        permissions = permissions |> encode_permission()
 
         with {:ok, _perm} <- %__MODULE__{
-                alert_id: alert.id, 
-                user_id: user.id, 
+                alert_id: alert.id,
+                user_id: user.id,
                 permissions: permissions
-            } |> Repo.insert 
+            } |> Repo.insert
         do
             :ok
         end
     end
 
-    def revoke({:user, user}, _permissions, context) do
-        %{id: alert_id} = context |> get_resource(:alert)
+    def revoke({:user, user}, _permissions, alert) do
+        %{id: alert_id} = alert
         %{id: user_id} = user
 
         from(p in __MODULE__,
@@ -43,15 +42,15 @@ defmodule SignalNuisance.Reporting.Authorization.ReportUserPermission do
         ) |> Repo.delete_all
     end
 
-    def has?({:user, user}, permissions, context) do
-        permissions = context |> get_permissions() |> encode_permissions()
-        %{id: alert_id} = context |> get_resource(:alert)
+    def has?({:user, user}, permissions, alert) do
+        permissions = encode_permission(permissions)
+        %{id: alert_id} = alert
         %{id: user_id} = user
 
         from(perm in __MODULE__,
             where: perm.user_id == ^user_id,
             where: perm.alert_id == ^alert_id,
             select: perm.permissions
-        ) |> Repo.all() |> Enum.any(&is_permission/2)
+        ) |> Repo.all() |> Enum.any(fn x -> is_permission?(x, permissions) end)
     end
 end
