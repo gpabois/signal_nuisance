@@ -46,7 +46,7 @@ defmodule SignalNuisance.Enterprises.Authorization.EnterpriseUserPermission do
         - permissions
         - resource: [enterprise: enterprise]
     """
-    def grant({:user, user}, permissions, enterprise) do
+    def grant(user, permissions, enterprise) do
         result = if not has_entry?(user, enterprise, permissions) do
             create(user, enterprise, permissions)
         else
@@ -62,7 +62,7 @@ defmodule SignalNuisance.Enterprises.Authorization.EnterpriseUserPermission do
         end
     end
 
-    def revoke_all({:user, user}, enterprise) do
+    def revoke_all(user, enterprise) do
         %{id: enterprise_id} = enterprise
         from(
             perm in __MODULE__,
@@ -72,7 +72,7 @@ defmodule SignalNuisance.Enterprises.Authorization.EnterpriseUserPermission do
         :ok
     end
 
-    def revoke({:user, user}, permissions, enterprise) do
+    def revoke(user, permissions, enterprise) do
         %{id: enterprise_id} = enterprise
         from(
             perm in __MODULE__,
@@ -82,7 +82,7 @@ defmodule SignalNuisance.Enterprises.Authorization.EnterpriseUserPermission do
         :ok
     end
 
-    def has?({:user, user}, permissions, enterprise) do
+    def has?(user, permissions, enterprise) do
         %{id: enterprise_id} = enterprise
         %{id: user_id} = user
         permissions = encode_permission(permissions)

@@ -39,7 +39,7 @@ defmodule SignalNuisance.Enterprises.Authorization.EstablishmentUserPermission d
         ) |> Repo.one > 0
     end
 
-    def grant({:user, user}, permissions, establishment) do
+    def grant(user, permissions, establishment) do
         result = if not has_entry?(user, establishment, permissions) do
             create(user, establishment, permissions)
         else
@@ -55,8 +55,7 @@ defmodule SignalNuisance.Enterprises.Authorization.EstablishmentUserPermission d
         end
     end
 
-    def revoke({:user, user}, _permissions, establishment) do
-
+    def revoke(user, _permissions, establishment) do
         from(
             perm in __MODULE__,
             where: perm.user_id == ^user.id,
@@ -65,7 +64,7 @@ defmodule SignalNuisance.Enterprises.Authorization.EstablishmentUserPermission d
         :ok
     end
 
-    def revoke_all({:user, user}, establishment) do
+    def revoke_all(user, establishment) do
         case establishment do
             [{:by, [{:enterprise, enterprise}]}] ->
                 revoke_all_by_enterprise(user, enterprise)
@@ -90,7 +89,7 @@ defmodule SignalNuisance.Enterprises.Authorization.EstablishmentUserPermission d
         :ok
     end
 
-    def has?({:user, user}, permissions, establishment) do
+    def has?(user, permissions, establishment) do
         permissions = encode_permission(permissions)
 
         %{id: user_id} = user

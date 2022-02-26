@@ -75,7 +75,7 @@ defmodule SignalNuisance.EnterpriseTest do
     describe "Enterprises.remove_enterprise_member/2" do
         test "Remove a member from an existing enterprise." do
             user        = user_fixture()
-            enterprise  = enterprise_fixture(%{}, register: [user: user])
+            enterprise  = enterprise_fixture(%{}, register: user)
 
             assert :ok = Enterprises.remove_enterprise_member(enterprise, user)
             refute Enterprises.is_enterprise_member?(enterprise, user)
@@ -83,30 +83,29 @@ defmodule SignalNuisance.EnterpriseTest do
     end
 
 
-    describe "Enterprises.set_entity_enterprise_permissions/3" do
+    describe "Enterprises.set_permissions/3" do
         test "Grant enterprise-related permissions to a user" do
             user        = user_fixture()
             enterprise  = enterprise_fixture()
 
-            Enterprises.set_entity_enterprise_permissions enterprise, user, [:access]
-            assert Enterprises.has_entity_enterprise_permission?(enterprise, user, [:access])
+            Enterprises.set_permissions user, [:access], enterprise
+            assert Enterprises.has_permissions?(user, [:access], enterprise)
         end
-    end
 
-    describe "Enterprises.set_entity_establishment_permissions/3" do
         test "Grant establishment-related permissions to a user" do
             user = user_fixture()
             establishment = establishment_fixture()
 
-            Enterprises.set_entity_establishment_permissions establishment, user, [:access]
-            assert Enterprises.has_entity_establishment_permission?(establishment, user, [:access])
+            Enterprises.set_permissions user, [:access], establishment
+            assert Enterprises.has_permissions?(user, [:access], establishment)
         end
     end
+
 
     describe "Enterprises.register_establishment/1" do
         test "register establishment when the name is not already taken." do
             user        = user_fixture()
-            enterprise  = enterprise_fixture(%{}, register: [user: user])
+            enterprise  = enterprise_fixture(%{}, register: user)
 
             establishment_attrs = valid_establishment_attributes(%{}, enterprise: enterprise)
             assert {:ok, _} = Enterprises.register_establishment(establishment_attrs, user)
@@ -114,7 +113,7 @@ defmodule SignalNuisance.EnterpriseTest do
 
         test "register establishment when the name is taken." do
             user        = user_fixture()
-            enterprise  = enterprise_fixture(%{}, register: [user: user])
+            enterprise  = enterprise_fixture(%{}, register: user)
 
             establishment_attrs = valid_establishment_attributes(%{}, enterprise: enterprise)
             Establishment.create(establishment_attrs)

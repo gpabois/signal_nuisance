@@ -3,9 +3,11 @@ defmodule SignalNuisance.Enterprises.Authorization.EstablishmentPermission do
 
     use SignalNuisance.Authorization.Permission,
         permissions: [:access, manage: :production, manage: :members],
-        dispatch_by_entity: [user: UserPermission],
+        dispatch_by_entity: [
+            {SignalNuisance.Accounts.User, UserPermission}
+        ],
         roles: [
-            owner:    [:access, manage: :production, manage: :members],
+            administrator: [:access, manage: :production, manage: :members],
             employee: [:access]
         ]
 

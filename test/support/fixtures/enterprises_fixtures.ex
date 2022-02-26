@@ -6,34 +6,33 @@ defmodule SignalNuisance.EnterprisesFixtures do
 
     alias SignalNuisance.Enterprises.Enterprise
     alias SignalNuisance.Enterprises
-  
+
     def unique_name, do: "enterprise_#{System.unique_integer()}"
     def unique_slug, do: Slug.slugify(unique_name())
-  
+
     def valid_enterprise_attributes(attrs \\ %{}) do
       Enum.into(attrs, %{
         name: unique_name(),
         slug: unique_slug()
       })
     end
-    
+
     def enterprise_fixture(attrs \\ %{}, opts \\ []) do
       case Keyword.fetch(opts, :register) do
-        {:ok, args} -> 
-          {:ok, enterprise} = 
+        {:ok, user} ->
+          {:ok, enterprise} =
           attrs
           |> valid_enterprise_attributes()
-          |> Enterprises.register_enterprise(Keyword.fetch!(args, :user))
+          |> Enterprises.register_enterprise(user)
           enterprise
         _ ->
       {:ok, enterprise} =
         attrs
         |> valid_enterprise_attributes()
         |> Enterprise.create()
-  
+
         enterprise
       end
     end
 
   end
-  
