@@ -73,7 +73,7 @@ defmodule SignalNuisance.Enterprises do
     add_enterprise_member enterprise, user
   """
   def add_enterprise_member(enterprise, user, opts \\ []) do
-    Repo.transaction(fn ->
+    case Repo.transaction(fn ->
       with :ok <- EnterpriseMember.add(enterprise, user),
            :ok <- EnterprisePermission.grant(
               user,
@@ -85,7 +85,10 @@ defmodule SignalNuisance.Enterprises do
       else
         {:error, error} -> Repo.rollback(error)
       end
-    end)
+    end) do
+      {:ok, nil} -> :ok
+      other -> other
+    end
   end
 
   @doc """
@@ -95,7 +98,7 @@ defmodule SignalNuisance.Enterprises do
     remove_enterprise_member enterprise, user
   """
   def remove_enterprise_member(enterprise, user, opts \\ []) do
-    Repo.transaction(fn ->
+    case Repo.transaction(fn ->
       with  :ok <- EnterpriseMember.remove(enterprise, user),
             :ok <- EnterprisePermission.revoke_all(
               user,
@@ -110,7 +113,10 @@ defmodule SignalNuisance.Enterprises do
         else
           {:error, error} -> Repo.rollback(error)
         end
-    end)
+    end) do
+      {:ok, nil} -> :ok
+      other -> other
+    end
   end
 
   @doc """

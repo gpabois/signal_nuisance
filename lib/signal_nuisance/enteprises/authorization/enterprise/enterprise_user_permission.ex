@@ -50,7 +50,7 @@ defmodule SignalNuisance.Enterprises.Authorization.EnterpriseUserPermission do
         result = if not has_entry?(user, enterprise, permissions) do
             create(user, enterprise, permissions)
         else
-            permissions = Permission.encode_permission(permissions)
+            permissions = encode_permission(permissions)
             Repo.get_by(__MODULE__, user_id: user.id, enterprise_id: enterprise.id)
             |> change(%{permissions: permissions})
             |> Repo.update
