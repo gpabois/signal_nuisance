@@ -70,7 +70,7 @@ defmodule SignalNuisance.EnterpriseTest do
             assert EnterprisePermission.has?(user, EnterprisePermission.by_role(:employee), enterprise)
         end
 
-        test "Add a member to a non-existing enterprise" do
+        test "add a member to a non-existing enterprise" do
             user        = user_fixture()
 
             assert {:error, changeset} = Enterprises.add_enterprise_member(%{id: 100}, user)
@@ -79,7 +79,7 @@ defmodule SignalNuisance.EnterpriseTest do
             } = errors_on(changeset)
         end
 
-        test "Add a non-existing member to an existing enterprise" do
+        test "add a non-existing member to an existing enterprise" do
             enterprise  = enterprise_fixture()
 
             assert {:error, changeset} = Enterprises.add_enterprise_member(enterprise, %{id: 100})
@@ -90,7 +90,7 @@ defmodule SignalNuisance.EnterpriseTest do
     end
 
     describe "Enterprises.remove_enterprise_member/2" do
-        test "Remove a member from an existing enterprise." do
+        test "remove a member from an existing enterprise." do
             user        = user_fixture()
             enterprise  = enterprise_fixture(%{}, register: user)
 
@@ -101,7 +101,7 @@ defmodule SignalNuisance.EnterpriseTest do
 
 
     describe "Enterprises.set_permissions/3" do
-        test "Grant enterprise-related permissions to a user" do
+        test "grant enterprise-related permissions to a user" do
             user        = user_fixture()
             enterprise  = enterprise_fixture()
 
