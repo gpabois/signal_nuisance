@@ -5,6 +5,7 @@ defmodule SignalNuisance.EnterpriseTest do
 
     alias SignalNuisance.Enterprises
     alias SignalNuisance.Enterprises.{Enterprise, Establishment}
+    alias SignalNuisance.Enterprises.Authorization.{EnterprisePermission, EstablishmentPermission}
 
     alias GeoMath.Distance
 
@@ -29,6 +30,14 @@ defmodule SignalNuisance.EnterpriseTest do
                 slug: ["has already been taken"]
             } = errors_on(changeset)
         end
+
+        test "registering an enterprise grants administrator permissions." do
+            user = user_fixture()
+            enterprise_attrs = valid_enterprise_attributes()
+
+            {:ok, enterprise} = Enterprises.register_enterprise(enterprise_attrs, user)
+            assert EnterprisePermission.has?(user, EnterprisePermission.by_role(:administrator), enterprise)
+        end
     end
 
     describe "Enterprises.get_enterprise_by_name/1" do
@@ -45,12 +54,20 @@ defmodule SignalNuisance.EnterpriseTest do
     end
 
     describe "Enterprises.add_enterprise_member/2" do
-        test "Register a member to an existing enterprise." do
+        test "register a member to an existing enterprise." do
             user        = user_fixture()
             enterprise  = enterprise_fixture()
 
             assert :ok = Enterprises.add_enterprise_member(enterprise, user)
             assert Enterprises.is_enterprise_member?(enterprise, user)
+        end
+
+        test "adding a member to an existing enterprise grants employee permissions" do
+            user        = user_fixture()
+            enterprise  = enterprise_fixture()
+
+            Enterprises.add_enterprise_member(enterprise, user)
+            assert EnterprisePermission.has?(user, EnterprisePermission.by_role(:employee), enterprise)
         end
 
         test "Add a member to a non-existing enterprise" do
@@ -165,6 +182,13 @@ defmodule SignalNuisance.EnterpriseTest do
             enterprise  = enterprise_fixture(%{})
 
             refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :common}, user, enterprise)
+        end
+        test "Access enterprises common views when has permissions" do
+            user        = user_fixture()
+            enterprise  = enterprise_fixture(%{})
+
+            EnterprisePermission.grant(user, [access: :common], enterprise)
+            assert Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :common}, user, enterprise)
         end
     end
 end
