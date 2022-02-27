@@ -72,7 +72,7 @@ defmodule SignalNuisance.Enterprises.Authorization.EnterpriseUserPermission do
         :ok
     end
 
-    def revoke(user, permissions, enterprise) do
+    def revoke(user, _permissions, enterprise) do
         %{id: enterprise_id} = enterprise
         from(
             perm in __MODULE__,
@@ -87,7 +87,7 @@ defmodule SignalNuisance.Enterprises.Authorization.EnterpriseUserPermission do
         %{id: user_id} = user
         permissions = encode_permission(permissions)
 
-        stored = from(perm in __MODULE__,
+        from(perm in __MODULE__,
             where: perm.user_id == ^user_id,
             where: perm.enterprise_id == ^enterprise_id,
             select: perm.permissions

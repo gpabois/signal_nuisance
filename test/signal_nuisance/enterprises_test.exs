@@ -158,4 +158,13 @@ defmodule SignalNuisance.EnterpriseTest do
             refute establishment in Enterprises.get_nearest_establishments(pt, d1)
         end
     end
+
+    describe "SignalNuisance.Enterprises.SecurityPolicy" do
+        test "Access enterprises common views when has no permissions" do
+            user        = user_fixture()
+            enterprise  = enterprise_fixture(%{})
+
+            refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :common}, user, enterprise)
+        end
+    end
 end

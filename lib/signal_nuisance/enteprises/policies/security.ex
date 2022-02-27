@@ -9,10 +9,10 @@ defmodule SignalNuisance.Enterprises.SecurityPolicy do
     )
   end
 
-  def authorize({:access, %SignalNuisance.Enterprises.Enterprise{} = enterprise}, user, _to) do
+  def authorize({:access, :common}, user, enterprise) do
     SignalNuisance.Enterprises.Authorization.EnterprisePermission.has?(
       user,
-      {:manage, :members},
+      {:access, :common},
       enterprise
     )
   end

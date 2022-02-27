@@ -3,8 +3,7 @@ defmodule SignalNuisance.Enterprises.Authorization.EnterprisePermission do
 
     use SignalNuisance.Authorization.Permission,
         permissions: [
-            :access,
-            :delete,
+            access: :common,
             manage: :members,
             manage: :establishments
         ],
@@ -12,8 +11,8 @@ defmodule SignalNuisance.Enterprises.Authorization.EnterprisePermission do
             {SignalNuisance.Accounts.User, UserPermission}
         ],
         roles: [
-            administrator: [:access, :delete, manage: :members, manage: :establishments],
-            employee: [:access]
+            administrator: [access: :common, manage: :members, manage: :establishments],
+            employee: [access: :common]
         ]
 
 end
