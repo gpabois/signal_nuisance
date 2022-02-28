@@ -176,19 +176,159 @@ defmodule SignalNuisance.EnterpriseTest do
         end
     end
 
-    describe "SignalNuisance.Enterprises.SecurityPolicy" do
+    describe "SignalNuisance.Enterprises.SecurityPolicy::Enterprise" do
         test "Access enterprises common views when has no permissions" do
             user        = user_fixture()
             enterprise  = enterprise_fixture(%{})
 
-            refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :common}, user, enterprise)
+            refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :common_views}, user, enterprise)
         end
-        test "Access enterprises common views when has permissions" do
+        test "Access enterprises common views when has {:access, :common} enterprise-related permissions" do
             user        = user_fixture()
             enterprise  = enterprise_fixture(%{})
 
             EnterprisePermission.grant(user, [access: :common], enterprise)
-            assert Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :common}, user, enterprise)
+            assert Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :common_views}, user, enterprise)
+        end
+
+        test "Access member management view when has no permissions" do
+            user        = user_fixture()
+            enterprise  = enterprise_fixture(%{})
+
+            refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :member_management_views}, user, enterprise)
+        end
+
+        test "Access member management view when has {:manage, :members} enterprise-related permissions" do
+            user        = user_fixture()
+            enterprise  = enterprise_fixture(%{})
+
+            EnterprisePermission.grant(user, [manage: :members], enterprise)
+            assert Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :member_management_views}, user, enterprise)
+        end
+
+        test "Access enterprise general settings view when has no permissions" do
+            user        = user_fixture()
+            enterprise  = enterprise_fixture(%{})
+
+            refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :general_settings_views}, user, enterprise)
+        end
+
+        test "Access enterprise general settings when has {:manage, :enterprise} enterprise-related permissions" do
+            user        = user_fixture()
+            enterprise  = enterprise_fixture(%{})
+
+            EnterprisePermission.grant(user, [manage: :enterprise], enterprise)
+            assert Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :general_settings_views}, user, enterprise)
+        end
+
+        test "Update enterprise-related general settings when has no permissions" do
+            user        = user_fixture()
+            enterprise  = enterprise_fixture(%{})
+
+            refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:update, :general_settings}, user, enterprise)
+        end
+
+        test "Update enterprise-related general settings when has {:manage, :enterprise} enterprise-related permissions" do
+            user        = user_fixture()
+            enterprise  = enterprise_fixture(%{})
+
+            EnterprisePermission.grant(user, [manage: :enterprise], enterprise)
+            assert Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:update, :general_settings}, user, enterprise)
+        end
+
+        test "Assign enterprise-related permissions to a member when has no permissions" do
+            user        = user_fixture()
+            member      = user_fixture()
+            enterprise  = enterprise_fixture(%{})
+
+            refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:assign_permissions, enterprise}, user, member)
+        end
+
+        test "Assign enterprise-related permissions to a member when has {:manage, :members} enterprise-related permissions" do
+            user        = user_fixture()
+            member      = user_fixture()
+            enterprise  = enterprise_fixture(%{})
+
+            EnterprisePermission.grant(user, [manage: :members], enterprise)
+            assert Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:assign_permissions, enterprise}, user, member)
+        end
+
+        test "Add a member when has no permissions" do
+            user        = user_fixture()
+            member      = user_fixture()
+            enterprise  = enterprise_fixture(%{})
+
+            refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:add_member, enterprise}, user, member)
+        end
+
+        test "Add a member when has {:manage, :members} enterprise-related permissions" do
+            user        = user_fixture()
+            member      = user_fixture()
+            enterprise  = enterprise_fixture(%{})
+
+            EnterprisePermission.grant(user, [manage: :members], enterprise)
+            assert Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:add_member, enterprise}, user, member)
+        end
+
+        test "Remove a member when has no permissions" do
+            user        = user_fixture()
+            member      = user_fixture()
+            enterprise  = enterprise_fixture(%{})
+
+            refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:add_member, enterprise}, user, member)
+        end
+
+        test "Remove a member when has {:manage, :members} enterprise-related permissions" do
+            user        = user_fixture()
+            member      = user_fixture()
+            enterprise  = enterprise_fixture(%{})
+
+            EnterprisePermission.grant(user, [manage: :members], enterprise)
+            assert Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:remove_member, enterprise}, user, member)
+        end
+    end
+
+    describe "SignalNuisance.Enterprises.SecurityPolicy::Establishment" do
+        test "Access dashboard when has no permissions" do
+            user        = user_fixture()
+            establishment = establishment_fixture()
+
+            refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :dashboard}, user, establishment)
+        end
+
+        test "Access dashboard when has {:access, :common} enterprise-related permissions" do
+            user        = user_fixture()
+            establishment = establishment_fixture()
+
+            EstablishmentPermission.grant(user, [access: :common], establishment)
+            assert Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :dashboard}, user, establishment)
+        end
+
+        test "Broadcast to the public when has no permissions" do
+            user = user_fixture()
+            establishment = establishment_fixture()
+
+            refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:broadcast, :message, establishment}, user, %{})
+        end
+        test "Broadcast to the public when has {:manage, :communication} establishment permissions" do
+            user = user_fixture()
+            establishment = establishment_fixture()
+
+            EstablishmentPermission.grant(user, [manage: :communication], establishment)
+            assert Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:broadcast, :message, establishment}, user, %{})
+        end
+        test "Reply to an alert when has no permissions" do
+            user = user_fixture()
+            establishment = establishment_fixture()
+
+            refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:reply, :alert, establishment}, user, %{})
+        end
+        test "Reply to an alert when has {:manage, :communication} establishment permissions" do
+            user = user_fixture()
+            establishment = establishment_fixture()
+
+            EstablishmentPermission.grant(user, [manage: :communication], establishment)
+            assert Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:reply, :alert, establishment}, user, %{})
         end
     end
 end

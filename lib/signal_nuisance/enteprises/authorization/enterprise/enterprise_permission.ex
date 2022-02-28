@@ -1,17 +1,20 @@
 defmodule SignalNuisance.Enterprises.Authorization.EnterprisePermission do
     alias SignalNuisance.Enterprises.Authorization.EnterpriseUserPermission, as: UserPermission
 
+    @permissions [
+        access: :common,
+        manage: :enterprise,
+        manage: :members,
+        manage: :establishments
+    ]
+
     use SignalNuisance.Authorization.Permission,
-        permissions: [
-            access: :common,
-            manage: :members,
-            manage: :establishments
-        ],
+        permissions: @permissions,
         dispatch_by_entity: [
             {SignalNuisance.Accounts.User, UserPermission}
         ],
         roles: [
-            administrator: [access: :common, manage: :members, manage: :establishments],
+            administrator: @permissions,
             employee: [access: :common]
         ]
 

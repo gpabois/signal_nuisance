@@ -1,14 +1,21 @@
 defmodule SignalNuisance.Enterprises.Authorization.EstablishmentPermission do
     alias SignalNuisance.Enterprises.Authorization.EstablishmentUserPermission, as: UserPermission
 
+    @permissions [
+        access: :common,
+        manage: :production,
+        manage: :communication,
+        manage: :members
+    ]
+
     use SignalNuisance.Authorization.Permission,
-        permissions: [:access, manage: :production, manage: :members],
+        permissions: @permissions,
         dispatch_by_entity: [
             {SignalNuisance.Accounts.User, UserPermission}
         ],
         roles: [
-            administrator: [:access, manage: :production, manage: :members],
-            employee: [:access]
+            administrator: @permissions,
+            employee: [access: :common]
         ]
 
     def revoke_all_by_enterprise(context) do
