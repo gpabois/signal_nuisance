@@ -61,10 +61,10 @@ defmodule SignalNuisance.Authorization.Permission do
     @doc """
         All the permissions possible
     """
-    @callback has?(term) :: term
-    @callback grant(term) :: term
-    @callback revoke(term) :: term
-    @callback revoke_all(term) :: term
+    @callback has?(term, term, term) :: term
+    @callback grant(term, term, term) :: term
+    @callback revoke(term, term, term) :: term
+    @callback revoke_all(term, term) :: term
 
     @doc """
         ## Parameters
@@ -88,7 +88,6 @@ defmodule SignalNuisance.Authorization.Permission do
         end
 
         quote do
-            @behaviour SignalNuisance.Authorization.Permission
             use Bitwise
 
             unquote do
@@ -102,17 +101,14 @@ defmodule SignalNuisance.Authorization.Permission do
                             end
 
                             case Keyword.fetch(unquote(entity_delegations), type) do
-                                {:ok, hdlr} -> hdlr
-                                {:error, _} -> nil
+                                {:ok, hdlr} -> {:yes, hdlr}
+                                {:error, _} -> :no
                             end
                         end
 
                         @doc false
                         def by_role(role) do
-                            case Keyword.get(unquote(roles), role, []) do
-                                permissions -> permissions
-                                [] -> []
-                            end
+                            Keyword.get(unquote(roles), role, [])
                         end
 
                         @doc """
@@ -120,29 +116,29 @@ defmodule SignalNuisance.Authorization.Permission do
                         """
                         def has?(entity, permissions, context) do
                             case delegate_by_entity(entity) do
-                                nil -> false
-                                hdlr -> hdlr.has?(entity, permissions, context)
+                                :no -> false
+                                {:yes, hdlr} -> hdlr.has?(entity, permissions, context)
                             end
                         end
 
                         def grant(entity, permissions, context) do
                             case delegate_by_entity(entity) do
-                                nil -> {:error, :unmanaged_or_no_entity}
-                                hdlr -> hdlr.grant(entity, permissions, context)
+                                :no -> {:error, :unmanaged_or_no_entity}
+                                {:yes, hdlr}  -> hdlr.grant(entity, permissions, context)
                             end
                         end
 
                         def revoke_all(entity, context) do
                             case delegate_by_entity(entity) do
-                                nil -> {:error, :unmanaged_entity}
-                                hdlr -> hdlr.revoke_all(entity, context)
+                                :no -> {:error, :unmanaged_entity}
+                                {:yes, hdlr}  -> hdlr.revoke_all(entity, context)
                             end
                         end
 
                         def revoke(entity, permissions, context) do
                             case delegate_by_entity(entity) do
-                                nil -> {:error, :unmanaged_entity}
-                                hdlr -> hdlr.revoke(entity, permissions, context)
+                                :no -> {:error, :unmanaged_entity}
+                                {:yes, hdlr} -> hdlr.revoke(entity, permissions, context)
                             end
                         end
 
@@ -189,6 +185,8 @@ defmodule SignalNuisance.Authorization.Permission do
                     end
                 end
             end
+
+            @behaviour SignalNuisance.Authorization.Permission
         end
     end
 end

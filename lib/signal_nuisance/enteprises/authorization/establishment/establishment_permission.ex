@@ -21,7 +21,7 @@ defmodule SignalNuisance.Enterprises.Authorization.EstablishmentPermission do
     def revoke_all_by_enterprise(context) do
         case delegate_by_entity(context) do
             nil -> {:error, :unmanaged_or_no_entity}
-            hdlr -> revoke_all_by_enterprise(context)
+            hdlr -> hdlr.revoke_all_by_enterprise(context)
         end
     end
 end

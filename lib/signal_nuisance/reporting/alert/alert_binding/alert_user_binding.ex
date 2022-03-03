@@ -1,9 +1,7 @@
 defmodule SignalNuisance.Reporting.AlertUserBinding do
     use Ecto.Schema
 
-    import Ecto.Changeset
-    # import Ecto.Query
-    # import Geo.PostGIS
+    import Ecto.Query
 
     alias SignalNuisance.Repo
     alias SignalNuisance.Reporting.Alert
@@ -14,11 +12,19 @@ defmodule SignalNuisance.Reporting.AlertUserBinding do
       belongs_to :alert, Alert
     end
 
-    def bind(alert, entity) do
+    def bind(alert, user) do
+      %__MODULE__{
+        user_id: user.id,
+        alert_id: alert.id
+      } |> Repo.insert()
 
     end
 
-    def unbind(alert, entity) do
-
+    def unbind(alert, user) do
+      from(
+        b in __MODULE__,
+        where: b.user_id == ^user.id,
+        where: b.alert_id == ^alert.id
+      ) |> Repo.delete_all()
     end
 end

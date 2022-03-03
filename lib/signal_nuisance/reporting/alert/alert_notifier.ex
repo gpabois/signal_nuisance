@@ -1,4 +1,4 @@
-defmodule SignalNuisance.Reporting.ReportingNotifier do
+defmodule SignalNuisance.Reporting.AlertNotifier do
   import Swoosh.Email
 
   alias SignalNuisance.Mailer

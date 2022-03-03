@@ -1,8 +1,6 @@
 defmodule SignalNuisance.Enterprises do
   alias SignalNuisance.Repo
 
-  alias SignalNuisance.Authorization.Permission
-
   alias SignalNuisance.Enterprises.Authorization.{EnterprisePermission, EstablishmentPermission}
   alias SignalNuisance.Enterprises.{Enterprise, Establishment, EnterpriseMember}
 
@@ -45,9 +43,9 @@ defmodule SignalNuisance.Enterprises do
   @doc """
     Register an establishment, and add the user, and grants him owner-related permissions
   """
-  def register_establishment(attrs, %SignalNuisance.Accounts.User{} = user, opts \\ []) do
+  def register_establishment(attrs, %SignalNuisance.Accounts.User{} = user) do
     Repo.transaction fn ->
-      with {:ok, enterprise} <- get_enterprise_by_id(attrs.enterprise_id),
+      with {:ok, _enterprise} <- get_enterprise_by_id(attrs.enterprise_id),
            {:ok, establishment} <- Establishment.create(attrs),
            :ok <- set_permissions(user, EstablishmentPermission.by_role(:administrator), establishment)
       do
@@ -69,10 +67,9 @@ defmodule SignalNuisance.Enterprises do
   @doc """
     Add a member in the enterprise
 
-    add_enterprise_member enterprise, user, if: [is_authorized: user]
     add_enterprise_member enterprise, user
   """
-  def add_enterprise_member(enterprise, user, opts \\ []) do
+  def add_enterprise_member(enterprise, user) do
     case Repo.transaction(fn ->
       with :ok <- EnterpriseMember.add(enterprise, user),
            :ok <- EnterprisePermission.grant(
@@ -94,10 +91,9 @@ defmodule SignalNuisance.Enterprises do
   @doc """
     Remove a member from the enterprise, and revoke its credentials (enterprise-related and establishments-related)
 
-    remove_enterprise_member enterprise, user, if: [is_authorized: initiator]
     remove_enterprise_member enterprise, user
   """
-  def remove_enterprise_member(enterprise, user, opts \\ []) do
+  def remove_enterprise_member(enterprise, user) do
     case Repo.transaction(fn ->
       with  :ok <- EnterpriseMember.remove(enterprise, user),
             :ok <- EnterprisePermission.revoke_all(
@@ -121,13 +117,8 @@ defmodule SignalNuisance.Enterprises do
 
   @doc """
     Returns the list of an enterprise's members
-
-    ## Parameters
-    - enterpise
-    - opts: Guards (if: [...]), ...
-
   """
-  def get_enterprise_members(enterprise, opts \\ []) do
+  def get_enterprise_members(enterprise) do
     enterprise
     |> EnterpriseMember.get_by_enterprise()
     |> Enum.map(fn (m) -> m.user end)

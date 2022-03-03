@@ -7,8 +7,8 @@ defmodule SignalNuisance.Enterprises.Authorization.EstablishmentUserPermission d
 
     alias SignalNuisance.Repo
     alias SignalNuisance.Accounts.User
-    alias SignalNuisance.Enterprises.Authorization.EstablishmentPermission, as: Permission
     alias SignalNuisance.Enterprises.Establishment
+    alias SignalNuisance.Enterprises.Authorization.EstablishmentPermission, as: Permission
 
     use SignalNuisance.Authorization.Permission,
         permissions: Permission.permissions(),
@@ -43,7 +43,7 @@ defmodule SignalNuisance.Enterprises.Authorization.EstablishmentUserPermission d
         result = if not has_entry?(user, establishment, permissions) do
             create(user, establishment, permissions)
         else
-            permissions = Permission.encode_permission(permissions)
+            permissions = encode_permission(permissions)
             Repo.get_by(__MODULE__, user_id: user.id, establishment_id: establishment.id)
             |> change(%{permissions: permissions})
             |> Repo.update
@@ -95,7 +95,7 @@ defmodule SignalNuisance.Enterprises.Authorization.EstablishmentUserPermission d
         %{id: user_id} = user
         %{id: establishment_id} = establishment
 
-        stored = from(perm in __MODULE__,
+        from(perm in __MODULE__,
             where: perm.user_id == ^user_id,
             where: perm.establishment_id == ^establishment_id,
             select: perm.permissions

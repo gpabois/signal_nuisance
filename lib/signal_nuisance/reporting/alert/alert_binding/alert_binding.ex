@@ -48,10 +48,8 @@ defmodule SignalNuisance.Reporting.AlertBinding do
         this function will transfer the previous alerts to its account.
     """
     def transfer_to_user(user) do
-        stored = Repo.all(SignalNuisance.Reporting.AlertEmailMember, email: user.email)
-
         Repo.transaction fn ->
-            stored
+            Repo.all(SignalNuisance.Reporting.AlertEmailMember, email: user.email)
             |> Enum.each(fn m ->
                 bind_to_user %{id: m.alert_id}, user
                 unbind_from_email  %{id: m.alert_id}, user.email

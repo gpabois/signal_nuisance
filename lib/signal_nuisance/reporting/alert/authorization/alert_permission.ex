@@ -1,18 +1,14 @@
 defmodule SignalNuisance.Reporting.Authorization.AlertPermission do
     alias SignalNuisance.Reporting.Authorization.AlertTokenPermission
     alias SignalNuisance.Reporting.Authorization.AlertUserPermission
+
+    @permissions [:read, :close]
     
     use SignalNuisance.Authorization.Permission,
-        permissions: [:read, :close],
+        permissions: @permissions,
         dispatch_by_entity: [
-            token: AlertTokenPermission,
-            user: AlertUserPermission
+            {SignalNuisance.Accounts.User, AlertUserPermission},
+            email: AlertTokenPermission            
         ]
 
-    def role_based(role) do
-        case role do
-            :owner -> [:read, :close, :comment]
-            _ -> []
-        end
-    end
 end
