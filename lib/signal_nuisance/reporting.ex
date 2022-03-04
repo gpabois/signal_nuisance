@@ -18,7 +18,7 @@ defmodule SignalNuisance.Reporting do
                             alert
                         ),
                         :ok  <- AlertBinding.bind_to_email(alert, recipient),
-                        {:ok, _mail} <- AlertNotifier.deliver_secret_key_based_receipt(recipient, alert, token)
+                        {:ok, _mail} <- AlertNotifier.deliver_token_based_receipt(recipient, alert, token)
                     do
                         {:ok, :alert, [token: token]}
                     else

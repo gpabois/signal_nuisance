@@ -17,13 +17,13 @@ defmodule SignalNuisance.Reporting.AlertNotifier do
     end
   end
 
-  def deliver_secret_key_based_receipt(recipient, report, secret_key) do
+  def deliver_token_based_receipt(recipient, report, token) do
     deliver(recipient, "Récipissé de signalement ##{report.id}", """ 
     Bonjour,
 
     Nous confirmons avoir bien reçu votre signalement n°#{report.id}.
 
-    Vous pouvez y accéder via le lien #{secret_key}.
+    Vous pouvez y accéder via le lien #{token}.
 
     Cordialement,
 
