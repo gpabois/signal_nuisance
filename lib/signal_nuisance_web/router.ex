@@ -57,8 +57,6 @@ defmodule SignalNuisanceWeb.Router do
     end
   end
 
-  ## Authentication routes
-
   scope "/", SignalNuisanceWeb do
     pipe_through [:browser, :redirect_if_user_is_authenticated]
 
@@ -78,6 +76,11 @@ defmodule SignalNuisanceWeb.Router do
     get "/users/settings", UserSettingsController, :edit
     put "/users/settings", UserSettingsController, :update
     get "/users/settings/confirm_email/:token", UserSettingsController, :confirm_email
+
+    get "/enterprises/register", EnterpriseRegistrationController, :new
+    post "/enterprises/register", EnterpriseRegistrationController, :create
+
+    get "/enterprises/:slug/dashboard", EnterpriseDashboardController, :show
   end
 
   scope "/", SignalNuisanceWeb do

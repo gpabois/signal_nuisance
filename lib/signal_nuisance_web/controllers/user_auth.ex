@@ -94,6 +94,10 @@ defmodule SignalNuisanceWeb.UserAuth do
     assign(conn, :current_user, user)
   end
 
+  def get_current_user(%{assigns: %{current_user: current_user}} = _conn) do
+    current_user
+  end
+
   defp ensure_user_token(conn) do
     if user_token = get_session(conn, :user_token) do
       {user_token, conn}

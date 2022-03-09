@@ -35,6 +35,7 @@ defmodule SignalNuisance.MixProject do
     [
       {:pbkdf2_elixir, "~> 1.0"},
       {:bodyguard, "~> 2.4"},
+      {:slugy, "~> 4.1.1"},
       {:phoenix, "~> 1.6.6"},
       {:phoenix_ecto, "~> 4.4"},
       {:ecto_sql, "~> 3.6"},

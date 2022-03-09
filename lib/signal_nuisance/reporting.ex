@@ -17,7 +17,7 @@ defmodule SignalNuisance.Reporting do
                             AlertPermission.by_role(:owner),
                             alert
                         ),
-                        :ok  <- AlertBinding.bind_to_email(alert, recipient),
+                        :ok <- AlertBinding.bind_to_email(alert, recipient),
                         {:ok, _mail} <- AlertNotifier.deliver_token_based_receipt(recipient, alert, token)
                     do
                         {:ok, :alert, [token: token]}
@@ -38,7 +38,7 @@ defmodule SignalNuisance.Reporting do
                     AlertPermission.by_role(:owner), 
                     alert
                 ),
-                {:ok, _mail}      <- AlertNotifier.deliver_user_based_receipt(user, alert)
+                {:ok, _mail} <- AlertNotifier.deliver_user_based_receipt(user, alert)
             do
                 {:ok, :alert, []}
             else

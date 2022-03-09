@@ -29,7 +29,7 @@ defmodule SignalNuisance.EnterprisesFixtures do
       {:ok, enterprise} =
         attrs
         |> valid_enterprise_attributes()
-        |> Enterprise.create()
+        |> Enterprise.register()
 
         enterprise
       end

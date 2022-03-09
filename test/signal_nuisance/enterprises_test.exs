@@ -22,7 +22,7 @@ defmodule SignalNuisance.EnterpriseTest do
             user = user_fixture()
             enterprise_attrs = valid_enterprise_attributes()
 
-            Enterprise.create(enterprise_attrs)
+            Enterprise.register(enterprise_attrs)
 
             {:error, changeset} = Enterprises.register_enterprise(enterprise_attrs, user)
 
@@ -177,25 +177,25 @@ defmodule SignalNuisance.EnterpriseTest do
     end
 
     describe "SignalNuisance.Enterprises.SecurityPolicy::Enterprise" do
-        test "Access enterprises common views when has no permissions" do
+        test "Access enterprises dashboard view when has no permissions" do
             user        = user_fixture()
             enterprise  = enterprise_fixture(%{})
 
-            refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :common_views}, user, enterprise)
+            refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :view, :dashboard}, user, enterprise)
         end
-        test "Access enterprises common views when has {:access, :common} enterprise-related permissions" do
+        test "Access enterprises common view when has {:access, :common} enterprise-related permissions" do
             user        = user_fixture()
             enterprise  = enterprise_fixture(%{})
 
             EnterprisePermission.grant(user, [access: :common], enterprise)
-            assert Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :common_views}, user, enterprise)
+            assert Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :view, :dashboard}, user, enterprise)
         end
 
         test "Access member management view when has no permissions" do
             user        = user_fixture()
             enterprise  = enterprise_fixture(%{})
 
-            refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :member_management_views}, user, enterprise)
+            refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :view, :member_management}, user, enterprise)
         end
 
         test "Access member management view when has {:manage, :members} enterprise-related permissions" do
@@ -203,14 +203,14 @@ defmodule SignalNuisance.EnterpriseTest do
             enterprise  = enterprise_fixture(%{})
 
             EnterprisePermission.grant(user, [manage: :members], enterprise)
-            assert Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :member_management_views}, user, enterprise)
+            assert Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :view, :member_management}, user, enterprise)
         end
 
         test "Access enterprise general settings view when has no permissions" do
             user        = user_fixture()
             enterprise  = enterprise_fixture(%{})
 
-            refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :general_settings_views}, user, enterprise)
+            refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :view, :general_settings}, user, enterprise)
         end
 
         test "Access enterprise general settings when has {:manage, :enterprise} enterprise-related permissions" do
@@ -218,7 +218,7 @@ defmodule SignalNuisance.EnterpriseTest do
             enterprise  = enterprise_fixture(%{})
 
             EnterprisePermission.grant(user, [manage: :enterprise], enterprise)
-            assert Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :general_settings_views}, user, enterprise)
+            assert Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :view, :general_settings}, user, enterprise)
         end
 
         test "Update enterprise-related general settings when has no permissions" do
@@ -293,7 +293,7 @@ defmodule SignalNuisance.EnterpriseTest do
             user        = user_fixture()
             establishment = establishment_fixture()
 
-            refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :dashboard}, user, establishment)
+            refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :view, :dashboard}, user, establishment)
         end
 
         test "Access dashboard when has {:access, :common} enterprise-related permissions" do
@@ -301,7 +301,7 @@ defmodule SignalNuisance.EnterpriseTest do
             establishment = establishment_fixture()
 
             EstablishmentPermission.grant(user, [access: :common], establishment)
-            assert Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :dashboard}, user, establishment)
+            assert Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :view, :dashboard}, user, establishment)
         end
 
         test "Broadcast to the public when has no permissions" do

@@ -17,6 +17,10 @@ defmodule SignalNuisance.Enterprises do
     SignalNuisance.Enterprises.Enterprise.get_by_name(name)
   end
 
+  def get_enterprise_by_slug(slug) do
+    SignalNuisance.Enterprises.Enterprise.get_by_slug(slug)
+  end
+
   @doc """
     Get enterprise by its member
   """
@@ -24,12 +28,16 @@ defmodule SignalNuisance.Enterprises do
     SignalNuisance.Enterprises.Enterprise.get_by_member(user)
   end
 
+  def enterprise_registration_changeset(enterprise = %Enterprise{}, attrs = %{}) do
+    Enterprise.registration_changeset(enterprise, attrs)
+  end
+
   @doc """
     Register an enterprise, and add the user as its member, and grants him owner-related permissions
   """
   def register_enterprise(attrs, %SignalNuisance.Accounts.User{} = user) do
     Repo.transaction fn ->
-      with {:ok, enterprise} <- Enterprise.create(attrs),
+      with {:ok, enterprise} <- Enterprise.register(attrs),
            :ok <- add_enterprise_member(enterprise, user),
            :ok <- EnterprisePermission.grant(user, EnterprisePermission.by_role(:administrator), enterprise)
       do

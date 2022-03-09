@@ -2,6 +2,7 @@ defmodule SignalNuisance.Enterprises.Enterprise do
   use Ecto.Schema
   import Ecto.Changeset
   import Ecto.Query
+  import Slugy
 
   alias SignalNuisance.Repo
   alias SignalNuisance.Enterprise.Member
@@ -14,12 +15,23 @@ defmodule SignalNuisance.Enterprises.Enterprise do
   end
 
   @doc false
-  defp creation_changeset(enterprise, attrs) do 
+  def registration_changeset(enterprise, attrs) do 
     enterprise
-    |> cast(attrs, [:name, :slug])
+    |> cast(attrs, [:name])
+    |> slugify(:name)
     |> unique_constraint(:name, name: :enterprise_name_unique_index)
     |> unique_constraint(:slug, name: :enterprise_slug_unique_index)
     |> validate_required([:name, :slug])
+  end
+
+  @doc """
+    Get an enterprise by its slug
+  """
+  def get_by_slug(slug) do
+    from(
+      e in __MODULE__,
+      where: e.slug == ^slug
+    ) |> Repo.one()
   end
 
   @doc """
@@ -57,9 +69,9 @@ defmodule SignalNuisance.Enterprises.Enterprise do
   @doc """
     Create an enterprise
   """
-  def create(attrs) do
+  def register(attrs) do
     %__MODULE__{}
-    |> creation_changeset(attrs)
+    |> registration_changeset(attrs)
     |> Repo.insert
   end
   

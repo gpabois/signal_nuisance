@@ -25,7 +25,11 @@ defmodule SignalNuisance.Enterprises.SecurityPolicy do
     )
   end
 
-  def authorize({:access, :member_management_views}, user, %SignalNuisance.Enterprises.Enterprise{} = enterprise) do
+  def authorize({:access, :view, :register_enterprise}, nil, _args) do
+    false
+  end
+
+  def authorize({:access, :view, :member_management}, user, %SignalNuisance.Enterprises.Enterprise{} = enterprise) do
     SignalNuisance.Enterprises.Authorization.EnterprisePermission.has?(
       user,
       {:manage, :members},
@@ -41,7 +45,7 @@ defmodule SignalNuisance.Enterprises.SecurityPolicy do
     )
   end
 
-  def authorize({:access, :general_settings_views}, user, %SignalNuisance.Enterprises.Enterprise{} = enterprise) do
+  def authorize({:access, :view, :general_settings}, user, %SignalNuisance.Enterprises.Enterprise{} = enterprise) do
     SignalNuisance.Enterprises.Authorization.EnterprisePermission.has?(
       user,
       {:manage, :enterprise},
@@ -49,7 +53,7 @@ defmodule SignalNuisance.Enterprises.SecurityPolicy do
     )
   end
 
-  def authorize({:access, :common_views}, user, %SignalNuisance.Enterprises.Enterprise{} = enterprise) do
+  def authorize({:access, :view, :dashboard}, user, %SignalNuisance.Enterprises.Enterprise{} = enterprise) do
     SignalNuisance.Enterprises.Authorization.EnterprisePermission.has?(
       user,
       {:access, :common},
@@ -57,7 +61,7 @@ defmodule SignalNuisance.Enterprises.SecurityPolicy do
     )
   end
 
-  def authorize({:access, :dashboard}, user, %SignalNuisance.Enterprises.Establishment{} = establishment) do
+  def authorize({:access, :view, :dashboard}, user, %SignalNuisance.Enterprises.Establishment{} = establishment) do
     SignalNuisance.Enterprises.Authorization.EstablishmentPermission.has?(
       user,
       {:access, :common},
