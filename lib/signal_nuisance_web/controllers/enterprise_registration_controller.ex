@@ -9,12 +9,12 @@ defmodule SignalNuisanceWeb.EnterpriseRegistrationController do
       render(conn, "new.html", changeset: changeset)
     end
 
-    def create(%{assign: %{current_user: user}} = conn, %{"enterprise" => enterprise_params}) do
+    def create(%{assigns: %{current_user: user}} = conn, %{"enterprise" => enterprise_params}) do
         case Enterprises.register_enterprise(enterprise_params, user) do
           {:ok, enterprise} ->
             conn
             |> put_flash(:info, "Enterprise created successfully.")
-            |> redirect(Routes.enterprise_dashboard_path(conn, :show, enterprise.slug))
+            |> redirect(to: Routes.enterprise_dashboard_path(conn, :show, enterprise.slug))
     
           {:error, %Ecto.Changeset{} = changeset} ->
             render(conn, "new.html", changeset: changeset)
