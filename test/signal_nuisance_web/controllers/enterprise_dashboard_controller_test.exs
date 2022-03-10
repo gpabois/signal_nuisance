@@ -5,11 +5,11 @@ defmodule SignalNuisanceWeb.EnterpriseDashboardControllerTest do
 
     import SignalNuisance.EnterprisesFixtures
 
-    describe "GET /enterprises/:slug/dashboard when has permissions" do
-        test "renders page", %{conn: conn} do
-          enterprise = enterprise_fixture(%{}, register: conn.assigns.current_user)
+    describe "GET /enterprises/:slug/dashboard when has permissions" do       
+        test "renders page", %{conn: conn, user: user} do
+          enterprise = enterprise_fixture(%{}, register: user)
 
-          conn = get(conn, Routes.enterprise_dashboard_path(conn, :show, slug: enterprise.slug))
+          conn = get(conn, Routes.enterprise_dashboard_path(conn, :show, enterprise.slug))
           response = html_response(conn, 200)
           assert response =~ enterprise.name
         end
@@ -20,6 +20,13 @@ defmodule SignalNuisanceWeb.EnterpriseDashboardControllerTest do
           assert redirected_to(conn) == Routes.user_session_path(conn, :new)
         end
 
+        test "403 if user has not the right permissions", %{conn: conn} do
+          enterprise = enterprise_fixture(%{})
+
+          conn = get(conn, Routes.enterprise_dashboard_path(conn, :show, enterprise.slug))
+          response = html_response(conn, 403)
+          assert response =~ "Unauthorized"
+        end
         
     end
 end

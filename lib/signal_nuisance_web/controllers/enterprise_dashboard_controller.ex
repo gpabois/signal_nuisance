@@ -12,7 +12,7 @@ defmodule SignalNuisanceWeb.EnterpriseDashboardController do
       action: {:access, :view, :dashboard},
       user:   {SignalNuisanceWeb.UserAuth, :get_current_user},
       params: &__MODULE__.extract_enterprise/1,
-      fallback: SignalNuisanceWeb.UnauthorizedController
+      fallback: SignalNuisanceWeb.ErrorController
 
     def show(conn, _args) do
         render conn, "show.html", 
