@@ -3,11 +3,14 @@ defmodule SignalNuisanceWeb.EnterpriseDashboardControllerTest do
 
     setup :register_and_log_in_user
 
+    alias SignalNuisance.Enterprises
     import SignalNuisance.EnterprisesFixtures
 
     describe "GET /enterprises/:slug/dashboard when has permissions" do       
         test "renders page", %{conn: conn, user: user} do
-          enterprise = enterprise_fixture(%{}, register: user)
+          enterprise = enterprise_fixture(%{})
+
+          Enterprises.set_permissions(user, [access: :common], enterprise)
 
           conn = get(conn, Routes.enterprise_dashboard_path(conn, :show, enterprise.slug))
           response = html_response(conn, 200)
@@ -27,6 +30,7 @@ defmodule SignalNuisanceWeb.EnterpriseDashboardControllerTest do
           response = html_response(conn, 403)
           assert response =~ "Unauthorized"
         end
-        
     end
+
+    
 end

@@ -4,6 +4,7 @@ defmodule SignalNuisance.Enterprises.Establishment do
     import Ecto.Changeset
     import Ecto.Query
     import Geo.PostGIS
+    import Slugy
   
     alias SignalNuisance.Repo
     alias SignalNuisance.Enterprises.Enterprise
@@ -18,11 +19,12 @@ defmodule SignalNuisance.Enterprises.Establishment do
     end
   
     @doc false  
-    defp creation_changeset(establishment, attrs) do 
-        fields = [:name, :slug, :enterprise_id, :loc]
+    def registration_changeset(establishment, attrs) do 
+        fields = [:name, :enterprise_id, :loc]
         
         establishment
         |> cast(attrs, fields)
+        |> slugify(with: [:enterprise_id, :name])
         |> unique_constraint(:slug, name: :establishment_slug_unique_index)
         |> validate_required(fields)
     end
@@ -30,9 +32,9 @@ defmodule SignalNuisance.Enterprises.Establishment do
     @doc """
       Register an establishment
     """
-    def create(attrs) do
+    def register(attrs) do
       %__MODULE__{}
-      |> creation_changeset(attrs)
+      |> registration_changeset(attrs)
       |> Repo.insert()
     end
 
@@ -46,6 +48,10 @@ defmodule SignalNuisance.Enterprises.Establishment do
         ) |> Repo.all
     end
     
+    def get_by_slug(slug) do
+      Repo.get(__MODULE__, slug: slug)
+    end
+
     @doc """
       Find all establishments within range
     """

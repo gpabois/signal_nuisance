@@ -48,13 +48,18 @@ defmodule SignalNuisance.Enterprises do
     end
   end
 
+  def establishment_registration_changeset(establishment = %Establishment{}, attrs = %{}) do
+    Establishment.registration_changeset(establishment, attrs)
+  end
+
+
   @doc """
     Register an establishment, and add the user, and grants him owner-related permissions
   """
   def register_establishment(attrs, %SignalNuisance.Accounts.User{} = user) do
     Repo.transaction fn ->
       with {:ok, _enterprise} <- get_enterprise_by_id(attrs.enterprise_id),
-           {:ok, establishment} <- Establishment.create(attrs),
+           {:ok, establishment} <- Establishment.register(attrs),
            :ok <- set_permissions(user, EstablishmentPermission.by_role(:administrator), establishment)
       do
         establishment
@@ -66,6 +71,10 @@ defmodule SignalNuisance.Enterprises do
 
   def get_nearest_establishments(%Geo.Point{} = point, %GeoMath.Distance{} = distance) do
     Establishment.get_nearest(point, distance)
+  end
+
+  def get_establishment_by_slug(slug) do
+    Establishment.get_by_slug(slug)
   end
 
   def get_establishments_by_enterprise(enterprise) do

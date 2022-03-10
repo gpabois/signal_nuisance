@@ -81,6 +81,11 @@ defmodule SignalNuisanceWeb.Router do
     post "/enterprises/register", EnterpriseRegistrationController, :create
 
     get "/enterprises/:slug/dashboard", EnterpriseDashboardController, :show
+
+    get "/enterprises/:slug/establishments/register", EstablishmentRegistrationController, :new
+    post "/enterprises/:slug/establishments/register", EstablishmentRegistrationController, :create
+
+    get "/establishments/:slug/dashboard", EstablishmentDashboardController, :show
   end
 
   scope "/", SignalNuisanceWeb do
