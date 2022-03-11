@@ -47,6 +47,10 @@ defmodule SignalNuisance.Reporting do
         end
     end
 
+    def alert_creation_changeset(alert = %Alert{}, attrs \\ %{}) do
+        Alert.creation_changeset(alert, attrs)
+    end
+
     @doc """
     """
     def create_alert(attr) do
