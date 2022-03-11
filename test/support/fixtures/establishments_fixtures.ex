@@ -23,7 +23,6 @@ defmodule SignalNuisance.EstablishmentsFixtures do
 
       Enum.into(attrs, %{
         name: unique_name(),
-        slug: unique_slug(),
         loc: unique_loc()
       })
     end

@@ -37,6 +37,14 @@ defmodule SignalNuisance.Enterprises.SecurityPolicy do
     )
   end
 
+  def authorize(:register_establishment, user,  %SignalNuisance.Enterprises.Enterprise{} = enterprise) do
+    SignalNuisance.Enterprises.Authorization.EnterprisePermission.has?(
+      user,
+      {:manage, :establishments},
+      enterprise
+    )
+  end
+
   def authorize({:access, :view, :member_management}, user, %SignalNuisance.Enterprises.Enterprise{} = enterprise) do
     SignalNuisance.Enterprises.Authorization.EnterprisePermission.has?(
       user,

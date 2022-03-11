@@ -49,7 +49,10 @@ defmodule SignalNuisance.Enterprises.Establishment do
     end
     
     def get_by_slug(slug) do
-      Repo.get(__MODULE__, slug: slug)
+      from(
+        e in __MODULE__,
+        where: e.slug == ^slug
+      ) |> Repo.one()
     end
 
     @doc """

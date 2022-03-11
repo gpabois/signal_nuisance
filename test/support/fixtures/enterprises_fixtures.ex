@@ -12,8 +12,7 @@ defmodule SignalNuisance.EnterprisesFixtures do
 
     def valid_enterprise_attributes(attrs \\ %{}) do
       Enum.into(attrs, %{
-        name: unique_name(),
-        slug: unique_slug()
+        name: unique_name()
       })
     end
 

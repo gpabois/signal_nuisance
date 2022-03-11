@@ -58,8 +58,7 @@ defmodule SignalNuisance.Enterprises do
   """
   def register_establishment(attrs, %SignalNuisance.Accounts.User{} = user) do
     Repo.transaction fn ->
-      with {:ok, _enterprise} <- get_enterprise_by_id(attrs.enterprise_id),
-           {:ok, establishment} <- Establishment.register(attrs),
+      with {:ok, establishment} <- Establishment.register(attrs),
            :ok <- set_permissions(user, EstablishmentPermission.by_role(:administrator), establishment)
       do
         establishment

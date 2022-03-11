@@ -236,6 +236,21 @@ defmodule SignalNuisance.EnterpriseTest do
             assert Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :view, :register_establishment}, user, enterprise)
         end
 
+        test "Register establishment {:manage, :establishments} enterprise-related permissions" do
+            user        = user_fixture()
+            enterprise  = enterprise_fixture(%{})
+
+            EnterprisePermission.grant(user, [manage: :establishments], enterprise)
+            assert Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, :register_establishment, user, enterprise)
+        end
+
+        test "Register establishment when the user has no permissions" do
+            user        = user_fixture()
+            enterprise  = enterprise_fixture(%{})
+
+            refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, :register_establishment, user, enterprise)
+        end
+
         test "Update enterprise-related general settings when has no permissions" do
             user        = user_fixture()
             enterprise  = enterprise_fixture(%{})
