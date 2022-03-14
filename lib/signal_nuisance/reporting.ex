@@ -4,8 +4,12 @@ defmodule SignalNuisance.Reporting do
     alias SignalNuisance.Reporting.Authorization.{AlertPermission}
 
     alias SignalNuisance.Reporting.AlertNotifier
-    alias SignalNuisance.Reporting.Alert
+    alias SignalNuisance.Reporting.{Alert, AlertType}
     alias SignalNuisance.Reporting.AlertBinding
+
+    def create_alert_type(attrs) do
+        AlertType.create(attrs)
+    end
 
     def create_alert_by_email(attrs, recipient) do
         case SignalNuisance.Accounts.get_user_by_email(recipient) do

@@ -20,6 +20,9 @@ defmodule SignalNuisanceWeb.AlertCreationController do
         render conn, "show_authenticated.html", changeset: Reporting.alert_creation_changeset(%Alert{})
     end
 
+    def new_anonymous(conn, _args) do
+    end
+
     def create(%{assigns: %{current_user: user}} = conn, args) do
         case  conn do
             %{assigns: %{current_user: user}} ->
@@ -28,6 +31,10 @@ defmodule SignalNuisanceWeb.AlertCreationController do
                 create_anonymous(conn, args)
         end
     end
+
+    def create_anonymous(conn, alert_params) do
+    end
+
 
     def create_authenticated(conn, alert_params) do
     end
