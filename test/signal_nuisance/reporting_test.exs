@@ -32,5 +32,13 @@ defmodule SignalNuisance.ReportingTest do
         %{category: category} = alert_type = alert_type_fixture()
         assert Reporting.get_alert_types_by_category(category) == [alert_type]
     end
+
+    describe "get_alert_types_by_category/2 (with translation)" do
+        test "when no translation is available" do
+            %{category: category} = alert_type = alert_type_fixture()
+
+            IO.inspect(Reporting.get_alert_types_by_category(category, "lang"))
+        end
+    end
 end
   

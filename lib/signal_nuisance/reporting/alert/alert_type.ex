@@ -49,7 +49,7 @@ defmodule SignalNuisance.Reporting.AlertType do
     def get_by_category(category, lang) do
         query = from at in __MODULE__,
             where: at.category == ^category,
-            left_join: at_tl in SignalNuisance.Reporting.AlertTypeTranslation,
+            left_outer_join: at_tl in SignalNuisance.Reporting.AlertTypeTranslation,
             on: at_tl.alert_type_id == at.id,
             where: at_tl.language_code == ^lang,
             select: {at, at_tl}
