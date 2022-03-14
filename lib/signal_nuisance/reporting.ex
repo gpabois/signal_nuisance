@@ -4,11 +4,23 @@ defmodule SignalNuisance.Reporting do
     alias SignalNuisance.Reporting.Authorization.{AlertPermission}
 
     alias SignalNuisance.Reporting.AlertNotifier
-    alias SignalNuisance.Reporting.{Alert, AlertType}
+    alias SignalNuisance.Reporting.{Alert, AlertType, AlertTypeTranslation}
     alias SignalNuisance.Reporting.AlertBinding
 
     def create_alert_type(attrs) do
         AlertType.create(attrs)
+    end
+
+    def create_alert_type_translation(attrs) do
+        AlertTypeTranslation.create(attrs)
+    end
+
+    def get_alert_types_by_category(category) do
+        AlertType.get_by_category(category)
+    end
+
+    def get_alert_types_by_category(category, lang) do
+        AlertType.get_by_category(category, lang)
     end
 
     def create_alert_by_email(attrs, recipient) do

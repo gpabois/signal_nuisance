@@ -6,6 +6,8 @@ defmodule SignalNuisance.Reporting.AlertType do
 
     alias SignalNuisance.Repo
     
+    @valid_categories ["smell", "noise"]
+
     schema "alert_types" do      
         field :category, :string
         field :label, :string
@@ -17,6 +19,7 @@ defmodule SignalNuisance.Reporting.AlertType do
         alert_type
         |> cast(attrs, [:category, :label, :description])
         |> validate_required([:category, :label, :description])
+        |> validate_inclusion(:category, @valid_categories)
     end
 
     def create(attrs) do

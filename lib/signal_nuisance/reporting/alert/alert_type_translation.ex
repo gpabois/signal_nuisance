@@ -15,16 +15,16 @@ defmodule SignalNuisance.Reporting.AlertTypeTranslation do
     end
 
     @doc false
-    def creation_changeset(alert_type, attrs) do 
-        alert_type
-        |> cast(attrs, [:category, :label, :description])
+    def creation_changeset(%__MODULE__{} = alert_type_tl, attrs) do 
+        alert_type_tl
+        |> cast(attrs, [:alert_type_id, :language_code, :label_translation, :description_translation])
         |> unique_constraint(:label)
         |> foreign_key_constraint(:alert_type_id)
-        |> validate_required([:category, :label, :description])
+        |> validate_required([:alert_type_id, :language_code, :label_translation, :description_translation])
     end
 
     def create(attr) do
-        __MODULE__ 
+        %__MODULE__{} 
         |> creation_changeset(attr)
         |> Repo.insert()
     end

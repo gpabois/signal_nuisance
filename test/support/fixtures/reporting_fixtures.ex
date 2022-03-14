@@ -1,8 +1,32 @@
 defmodule SignalNuisance.ReportingFixtures do
     def random_category, do: Enum.random(["smell", "noise"])
+    def random_language_code, do: Enum.random(["fr", "en"])
     def unique_label, do: "label_#{System.unique_integer()}"
     def unique_description, do: "description #{System.unique_integer()}"
     def unique_loc, do: Geo.Fixtures.random_point()
+
+    def valid_alert_type_translation_attributes(attrs \\ %{}) do
+        compl = if Map.has_key?(attrs, :alert_type_id) do
+            %{}
+        else
+            %{
+                alert_type_id: alert_type_fixture().id
+            }
+        end |> Map.merge(%{
+            language_code: random_language_code(),
+            label_translation: unique_label(),
+            description_translation: unique_description()
+        })
+
+        Enum.into(attrs, compl)
+    end
+
+    def alert_type_translation_fixture(attrs \\ %{}) do
+        {:ok, alert_type_tl} = attrs
+        |> valid_alert_type_translation_attributes()
+        |> SignalNuisance.Reporting.create_alert_type_translation()
+        alert_type_tl
+    end
 
     def valid_alert_type_attributes(attrs \\ %{}) do
       Enum.into(attrs, %{
@@ -16,17 +40,24 @@ defmodule SignalNuisance.ReportingFixtures do
         {:ok, alert_type} = attrs
         |> valid_alert_type_attributes()
         |> SignalNuisance.Reporting.create_alert_type()
+        alert_type
     end
 
     def valid_alert_attributes(attrs \\ %{}) do
-        Enum.into(attrs, %{
-            alert_type_id: alert_type_fixture().id
-        })
+        compl = if Map.has_key?(attrs, :alert_type_id) do
+            %{}
+        else
+            %{
+                alert_type_id: alert_type_fixture().id
+            }
+        end
+        Enum.into(attrs, compl)
     end
 
     def alert_fixture(attrs \\ %{}) do
         {:ok, alert} = attrs
         |> valid_alert_attributes()
         |> SignalNuisance.Reporting.create_alert()
+        alert
     end
 end
