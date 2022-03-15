@@ -1,7 +1,12 @@
+<button phx-click="open-alert-form" id="btn-open-alert-form">Alert</button>
 <%= if @display_alert_form do %>
+    <button phx-click="close-alert-form" id="btn-close-alert-form">Close</button>
     <%= case @alert_form_step do %>
         <% :"select-category" -> %>
-
+            <ul>
+                <li phx-click="select-alert-category" phx-value-category="noise">Noise</li>
+                <li phx-click="select-alert-category" phx-value-category="smell">Smell</li>
+            </ul>
         <% :"main-form" -> %>
             <.form let={f} id="alert-form" for={@alert_changeset} phx-change="validate-alert" phx-submit="create-alert">
                 <%= label f, :intensity %>
@@ -13,11 +18,11 @@
                 <%= error_tag f, :alert_type_id %>
 
                 <%= label f, :loc_long %>
-                <%  number_input f, :loc_long%>
+                <%= number_input f, :loc_long %>
                 <%= error_tag f, :loc_long %>
 
                 <%= label f, :loc_lat %>
-                <%  number_input f, :loc_lat%>
+                <%= number_input f, :loc_lat %>
                 <%= error_tag f, :loc_lat %>
 
                 <%= submit "Save" %>

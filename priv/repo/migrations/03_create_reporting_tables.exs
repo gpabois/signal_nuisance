@@ -11,7 +11,7 @@ defmodule SignalNuisance.Repo.Migrations.CreateReportingTables do
             add :description, :text, null: false
         end
 
-        create unique_index(:alert_types, [:label], name: :alert_types_unique_index)
+        create unique_index(:alert_types, [:label], name: :alert_types_unique_index)      
 
         create table(:alert_types_translations) do
             add :alert_type_id, references("alert_types", on_delete: :delete_all), null: false
