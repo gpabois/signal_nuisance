@@ -4,6 +4,13 @@ defmodule SignalNuisance.ReportingTest do
     alias SignalNuisance.Reporting
     import SignalNuisance.ReportingFixtures
 
+    describe "create_alert/1" do
+        test "create a valid alert" do
+            alert_attrs = valid_alert_attributes()
+            assert {:ok, _alert} = Reporting.create_alert(alert_attrs)
+        end
+    end
+
     describe "create_alert_type/1" do
         test "create a valid alert type" do
             alert_type_attrs = valid_alert_type_attributes()

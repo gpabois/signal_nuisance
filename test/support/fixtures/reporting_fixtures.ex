@@ -1,6 +1,7 @@
 defmodule SignalNuisance.ReportingFixtures do
     def random_category, do: Enum.random(["smell", "noise"])
     def random_language_code, do: Enum.random(["fr", "en"])
+    def unique_intensity, do: Enum.random(0..10)
     def unique_label, do: "label_#{System.unique_integer()}"
     def unique_description, do: "description #{System.unique_integer()}"
     def unique_loc, do: Geo.Fixtures.random_point()
@@ -44,13 +45,21 @@ defmodule SignalNuisance.ReportingFixtures do
     end
 
     def valid_alert_attributes(attrs \\ %{}) do
+        %{coordinates: {long, lat}} = unique_loc()
+
         compl = if Map.has_key?(attrs, :alert_type_id) do
-            %{}
+            %{
+
+            }
         else
             %{
                 alert_type_id: alert_type_fixture().id
             }
-        end
+        end |> Map.merge(%{
+            intensity: unique_intensity(),
+            loc_long: long,
+            loc_lat: lat
+        })
         Enum.into(attrs, compl)
     end
 

@@ -14,8 +14,13 @@ defmodule SignalNuisance.Reporting.AlertTypeTranslation do
         field :description, :string
     end
 
+    def update_changeset(%__MODULE__{} = alert_type_tl, attrs \\ %{}) do
+        alert_type_tl
+        |> cast(attrs, [:label, :description])        
+    end
+
     @doc false
-    def creation_changeset(%__MODULE__{} = alert_type_tl, attrs) do 
+    def creation_changeset(%__MODULE__{} = alert_type_tl, attrs \\ %{}) do 
         alert_type_tl
         |> cast(attrs, [:alert_type_id, :language_code, :label, :description])
         |> unique_constraint(:label)
@@ -28,4 +33,5 @@ defmodule SignalNuisance.Reporting.AlertTypeTranslation do
         |> creation_changeset(attr)
         |> Repo.insert()
     end
+
 end

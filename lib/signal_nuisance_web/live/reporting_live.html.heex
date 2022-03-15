@@ -1,0 +1,26 @@
+<%= if @display_alert_form do %>
+    <%= case @alert_form_step do %>
+        <% :"select-category" -> %>
+
+        <% :"main-form" -> %>
+            <.form let={f} id="alert-form" for={@alert_changeset} phx-change="validate-alert" phx-submit="create-alert">
+                <%= label f, :intensity %>
+                <%= select f, :intensity, 0..10 %>
+                <%= error_tag f, :intensity %>
+
+                <%= label f, :alert_type_id %>
+                <%= select f, :alert_type_id, Enum.map(@alert_types, &{&1.label, &1.id}) %>
+                <%= error_tag f, :alert_type_id %>
+
+                <%= label f, :loc_long %>
+                <%  number_input f, :loc_long%>
+                <%= error_tag f, :loc_long %>
+
+                <%= label f, :loc_lat %>
+                <%  number_input f, :loc_lat%>
+                <%= error_tag f, :loc_lat %>
+
+                <%= submit "Save" %>
+            </.form>
+    <% end %>
+<% end %>

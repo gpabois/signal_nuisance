@@ -20,7 +20,7 @@ defmodule SignalNuisanceWeb.Router do
   scope "/", SignalNuisanceWeb do
     pipe_through :browser
 
-    get "/", PageController, :index
+    live "/", ReportingLive
   end
 
   # Other scopes may use custom stacks.
@@ -59,6 +59,7 @@ defmodule SignalNuisanceWeb.Router do
 
   scope "/", SignalNuisanceWeb do
     pipe_through [:browser, :redirect_if_user_is_authenticated]
+
 
     get "/users/register", UserRegistrationController, :new
     post "/users/register", UserRegistrationController, :create

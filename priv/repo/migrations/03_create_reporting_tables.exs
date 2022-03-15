@@ -26,6 +26,7 @@ defmodule SignalNuisance.Repo.Migrations.CreateReportingTables do
             add :alert_type_id, references("alert_types", on_delete: :delete_all), null: false
             add :loc,    :geography, null: false
             add :closed, :boolean, default: false
+            add :intensity, :integer, null: false
             timestamps()
         end
 
