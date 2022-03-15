@@ -10,17 +10,17 @@ defmodule SignalNuisance.Reporting.AlertTypeTranslation do
         belongs_to :alert_type,  SignalNuisance.Reporting.AlertType
 
         field :language_code, :string
-        field :label_translation, :string
-        field :description_translation, :string
+        field :label, :string
+        field :description, :string
     end
 
     @doc false
     def creation_changeset(%__MODULE__{} = alert_type_tl, attrs) do 
         alert_type_tl
-        |> cast(attrs, [:alert_type_id, :language_code, :label_translation, :description_translation])
+        |> cast(attrs, [:alert_type_id, :language_code, :label, :description])
         |> unique_constraint(:label)
         |> foreign_key_constraint(:alert_type_id)
-        |> validate_required([:alert_type_id, :language_code, :label_translation, :description_translation])
+        |> validate_required([:alert_type_id, :language_code, :label, :description])
     end
 
     def create(attr) do

@@ -46,14 +46,13 @@ defmodule SignalNuisance.Reporting.AlertType do
         query |> Repo.all()
     end
 
-    def get_by_category(category, lang) do
-        query = from at in __MODULE__,
-            where: at.category == ^category,
-            left_outer_join: at_tl in SignalNuisance.Reporting.AlertTypeTranslation,
-            on: at_tl.alert_type_id == at.id,
-            where: at_tl.language_code == ^lang,
-            select: {at, at_tl}
-
-        query |> Repo.all()
+    def get_by_category(category, locale) do
+        __MODULE__
+        |> where([at], at.category == ^category)
+        |> join(:left, [at], tl in SignalNuisance.Reporting.AlertTypeTranslation,
+            on: at.id == tl.alert_type_id and tl.language_code == ^locale
+        )
+        |> select_merge([at, tl], map(tl, [:label, :description])) 
+        |> Repo.all()
     end
 end

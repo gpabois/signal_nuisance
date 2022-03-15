@@ -36,8 +36,19 @@ defmodule SignalNuisance.ReportingTest do
     describe "get_alert_types_by_category/2 (with translation)" do
         test "when no translation is available" do
             %{category: category} = alert_type = alert_type_fixture()
+            assert Reporting.get_alert_types_by_category(category, "lang") == [alert_type]
+        end
 
-            IO.inspect(Reporting.get_alert_types_by_category(category, "lang"))
+        test "when a translation is available" do
+            %{category: category} = alert_type = alert_type_fixture()
+            alert_type_tl = alert_type_translation_fixture(%{alert_type_id: alert_type.id})
+            alert_type_translated = alert_type |> Map.merge(%{
+                label: alert_type_tl.label,
+                description: alert_type_tl.description
+            })
+            
+            refute Reporting.get_alert_types_by_category(category, alert_type_tl.language_code) == [alert_type] 
+            assert Reporting.get_alert_types_by_category(category, alert_type_tl.language_code) == [alert_type_translated]
         end
     end
 end

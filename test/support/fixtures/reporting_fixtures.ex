@@ -14,8 +14,8 @@ defmodule SignalNuisance.ReportingFixtures do
             }
         end |> Map.merge(%{
             language_code: random_language_code(),
-            label_translation: unique_label(),
-            description_translation: unique_description()
+            label: unique_label(),
+            description: unique_description()
         })
 
         Enum.into(attrs, compl)

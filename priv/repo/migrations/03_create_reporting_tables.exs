@@ -16,8 +16,8 @@ defmodule SignalNuisance.Repo.Migrations.CreateReportingTables do
         create table(:alert_types_translations) do
             add :alert_type_id, references("alert_types", on_delete: :delete_all), null: false
             add :language_code, :string, null: false
-            add :label_translation, :string, null: false
-            add :description_translation, :text, null: false
+            add :label, :string, null: false
+            add :description, :text, null: false
         end
 
         create unique_index(:alert_types_translations, [:alert_type_id, :language_code], name: :alert_types_translations_unique_index)
