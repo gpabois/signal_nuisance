@@ -6,7 +6,7 @@ defmodule SignalNuisance.Reporting.AlertType do
 
     alias SignalNuisance.Repo
     
-    @valid_categories ["smell", "noise"]
+    @categories ["smell", "noise"]
 
     schema "alert_types" do      
         field :category, :string
@@ -14,12 +14,16 @@ defmodule SignalNuisance.Reporting.AlertType do
         field :description, :string
     end
 
+    def categories() do
+         @categories
+    end
+    
     @doc false
     def creation_changeset(%__MODULE__{} = alert_type, attrs) do 
         alert_type
         |> cast(attrs, [:category, :label, :description])
         |> validate_required([:category, :label, :description])
-        |> validate_inclusion(:category, @valid_categories)
+        |> validate_inclusion(:category, @categories)
     end
 
     def create(attrs) do

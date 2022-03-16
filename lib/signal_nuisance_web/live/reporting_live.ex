@@ -8,6 +8,7 @@ defmodule SignalNuisanceWeb.ReportingLive do
         {:ok, 
             socket
             |> assign(:display_alert_form, false)
+            |> assign(:alert_categories, SignalNuisance.Reporting.AlertType.categories())
             |> assign(:alert_form_step, 0)
             |> assign(:alert_changeset, nil)
             |> assign(:alert_types, [])
@@ -37,13 +38,12 @@ defmodule SignalNuisanceWeb.ReportingLive do
 
         alert_types = Reporting.get_alert_types_by_category(category)
 
-        IO.inspect(changeset)
         {:noreply, 
             socket
             |> assign(:alert_category, category)
             |> assign(:alert_types, alert_types)
             |> assign(:alert_changeset, changeset)
-            |> assign(:alert_form_step, :"main-form")
+            |> assign(:alert_form_step, :main)
         }
     end
 
@@ -61,7 +61,7 @@ defmodule SignalNuisanceWeb.ReportingLive do
 
     def handle_event("create-alert", %{"alert" => alert_params}, socket) do
         case Reporting.create_alert(alert_params) do
-            {:ok, alert} ->
+            {:ok, _alert} ->
                 {:noreply, 
                     socket
                         |> put_flash(:info, "Alert created.")
