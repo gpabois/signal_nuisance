@@ -1,5 +1,5 @@
 defmodule SignalNuisance.ReportingFixtures do
-    def random_category, do: Enum.random(["smell", "noise"])
+    def random_category, do: SignalNuisance.Reporting.AlertType.categories() |> Enum.random()
     def random_language_code, do: Enum.random(["fr", "en"])
     def unique_intensity, do: Enum.random(0..10)
     def unique_label, do: "label_#{System.unique_integer()}"

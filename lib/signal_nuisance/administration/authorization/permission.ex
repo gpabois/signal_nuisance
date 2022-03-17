@@ -2,7 +2,7 @@ defmodule SignalNuisance.Administration.Authorization.Permission do
     alias SignalNuisance.Reporting.Authorization.UserPermission
 
     @permissions [
-        :access,
+        access: :administration,
         manage: :alerts,
         manage: :users,
         manage: :enterprises,

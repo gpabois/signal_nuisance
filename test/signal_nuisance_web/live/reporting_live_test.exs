@@ -41,10 +41,10 @@ defmodule SignalNuisanceWeb.ReportingLiveTest do
         end
 
         test "fill the form with valid attributes" do
-            alert_attributes = valid_alert_attributes()
-            
-            category = SignalNuisance.Reporting.AlertType.categories() |> Enum.random()
-            {view, _html} = alert_form_main(category)
+            alert_type = alert_type_fixture()
+            alert_attributes = valid_alert_attributes(%{alert_type_id: alert_type.id})
+
+            {view, _html} = alert_form_main(alert_type.category)
 
             view 
             |> form("#alert-form-main", %{"alert" => alert_attributes}) 
