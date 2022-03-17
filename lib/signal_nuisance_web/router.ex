@@ -13,6 +13,10 @@ defmodule SignalNuisanceWeb.Router do
     plug :fetch_current_user
   end
 
+  pipeline :root do
+    plug :put_layout, {SignalNuisanceWeb.LayoutView, "root.html"}
+  end
+
   pipeline :api do
     plug :accepts, ["json"]
   end

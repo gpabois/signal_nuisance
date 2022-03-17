@@ -12,8 +12,13 @@ defmodule SignalNuisanceWeb.ReportingLive do
             |> assign(:alert_form_step, 0)
             |> assign(:alert_changeset, nil)
             |> assign(:alert_types, [])
-            |> assign(:current_user, session["current_user"])
+            |> assign(:current_user, session["current_user"]),
+            layout: {SignalNuisanceWeb.LayoutView, "live_map.html"}
         }
+    end
+
+    def render(assigns) do
+        Phoenix.View.render(SignalNuisanceWeb.ReportingLiveView, "home.html", assigns)
     end
     
     def handle_event("open-alert-form", _, socket) do

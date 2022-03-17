@@ -1,4 +1,6 @@
 <div id="reporting">
+    <div id="map" phx-update="ignore">
+    </div>
     <button phx-click="open-alert-form" id="btn-open-alert-form">Alert</button>
     <%= if @display_alert_form do %>
         <div id="alert-form">
@@ -34,3 +36,7 @@
         </div>
     <% end %>
 </div>
+
+<script>
+    require("web/static/js/reporting_live").ReportingLive.run()
+</script>
