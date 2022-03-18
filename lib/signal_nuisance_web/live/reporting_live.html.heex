@@ -1,6 +1,6 @@
 <div id="reporting">
-    <div class="map-container">
-        <leaflet-map style="display: block" id="map" lat="51.505" lng="-0.09">
+    <div class="map-container" phx-click="close-alert-form">
+        <leaflet-map style="display: block" id="map" lat="48.856614" lng="2.3522219">
         </leaflet-map>
     </div>
 
@@ -34,27 +34,29 @@
         <button phx-click="close-alert-form" id="btn-close-alert-form">Close</button>
         <%= case @alert_form_step do %>
             <% :"select-category" -> %>
-                <ul id="alert-form-select-alert-category">
+                <div id="alert-form-select-alert-category" class="row">
                     <%= for id <- @alert_categories do %>
-                        <li id={"alert-form-#{id}-category"}  phx-click="select-alert-category" phx-value-category={id}><%= id %></li>
+                        <button id={"alert-form-#{id}-category"}  class="btn btn-lg btn-light p-2 col-auto" phx-click="select-alert-category" phx-value-category={id}>
+                            <img width="35px" height="35px" src={Routes.static_path(@socket, "/images/#{id}.svg")}/>
+                        </button>
                     <% end %>
-                </ul>
+                </div>
             <% :main -> %>
                 <.form let={f} id="alert-form-main" for={@alert_changeset} phx-change="validate-alert" phx-submit="create-alert">
                     <%= label f, :intensity %>
-                    <%= select f, :intensity, 0..10 %>
+                    <%= select f, :intensity, 0..10, class: "form-control" %>
                     <%= error_tag f, :intensity %>
 
                     <%= label f, :alert_type_id %>
-                    <%= select f, :alert_type_id, Enum.map(@alert_types, &{&1.label, &1.id}) %>
+                    <%= select f, :alert_type_id, Enum.map(@alert_types, &{&1.label, &1.id}), class: "form-control" %>
                     <%= error_tag f, :alert_type_id %>
 
                     <%= label f, :loc_long %>
-                    <%= number_input f, :loc_long %>
+                    <%= number_input f, :loc_long, class: "form-control" %>
                     <%= error_tag f, :loc_long %>
 
                     <%= label f, :loc_lat %>
-                    <%= number_input f, :loc_lat %>
+                    <%= number_input f, :loc_lat, class: "form-control" %>
                     <%= error_tag f, :loc_lat %>
 
                     <%= submit "Save" %>

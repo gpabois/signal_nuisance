@@ -64,3 +64,12 @@ body, html {
 .map-overlay, .map-overlay-bottom {
   z-index: 1000;
 }
+
+.invalid-feedback {
+  display: show;
+}
+
+#alert-form-select-alert-category li {
+  display: inline;
+  text-align: center;
+}
