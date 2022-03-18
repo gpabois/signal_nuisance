@@ -46,6 +46,7 @@ defmodule SignalNuisance.MixProject do
       {:geo_postgis, "~> 3.4"},
       {:phoenix_html, "~> 3.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
+      {:inflex, "~> 2.0.0"},
       {:phoenix_live_view, "~> 0.17.5"},
       {:floki, ">= 0.30.0", only: :test},
       {:phoenix_live_dashboard, "~> 0.6"},

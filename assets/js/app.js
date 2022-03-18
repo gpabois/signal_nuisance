@@ -24,17 +24,47 @@ import "../css/app.css"
 import "phoenix_html"
 // Establish Phoenix Socket and LiveView configuration.
 import {Socket} from "phoenix"
-import {LiveSocket} from "phoenix_live_view"
-import topbar from "../vendor/topbar"
+import {LiveSocket} from "phoenix_live_view";
+import topbar from "../vendor/topbar";
+import loadView from './views/loader';
+import './component/loader';
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 let liveSocket = new LiveSocket("/live", Socket, {params: {_csrf_token: csrfToken}})
+
+function onDOMLoaded() {
+    const viewName = document.getElementsByTagName("body")[0].dataset.jsViewName;
+    const ViewClass = loadView(viewName);
+
+    if (ViewClass !== undefined) {
+        const view = new ViewClass();
+        view.mount();
+        window.currentView = view;
+    } else {
+        window.currentView = undefined;
+    }
+}
+
+function onPhxUpdate() {
+    if(window.currentView !== undefined) {
+        window.currentView.update();
+    }
+}
+
+function onDocumentUnload() {
+    if(window.currentView !== undefined) {
+        window.currentView.unmount();
+    }
+}
+
+window.addEventListener('DOMContentLoaded', onDOMLoaded);
+window.addEventListener('unload', onDocumentUnload);
 
 // Show progress bar on live navigation and form submits
 topbar.config({barColors: {0: "#29d"}, shadowColor: "rgba(0, 0, 0, .3)"})
 window.addEventListener("phx:page-loading-start", info => topbar.show())
 window.addEventListener("phx:page-loading-stop", info => topbar.hide())
-
+window.addEventListener("phx:update", onPhxUpdate)
 // connect if there are any LiveViews on the page
 liveSocket.connect()
 
@@ -42,5 +72,4 @@ liveSocket.connect()
 // >> liveSocket.enableDebug()
 // >> liveSocket.enableLatencySim(1000)  // enabled for duration of browser session
 // >> liveSocket.disableLatencySim()
-window.liveSocket = liveSocket
-
+window.liveSocket = liveSocket;

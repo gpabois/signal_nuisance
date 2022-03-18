@@ -51,6 +51,15 @@ defmodule SignalNuisanceWeb do
     end
   end
 
+  def map_live_view do
+    quote do
+      use Phoenix.LiveView,
+        layout: {SignalNuisanceWeb.LayoutView, "live_map.html"}
+
+      unquote(view_helpers())
+    end
+  end
+
   def live_component do
     quote do
       use Phoenix.LiveComponent
