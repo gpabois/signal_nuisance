@@ -54,6 +54,7 @@
                         <%= if @current_user do %>
                             <div class="p2"><%= link "Settings", to: Routes.user_settings_path(@socket, :edit), class: "p2" %></div>
                             <%= link "Log out", to: Routes.user_session_path(@socket, :delete), method: :delete %>
+                            <p><%= @current_user.email %></p>
                         <% else %>
                             <div class="p2"><%= link "Register", to: Routes.user_registration_path(@socket, :new), class: "p2" %></div>
                             <div class="p2"><%= link "Log in", to: Routes.user_session_path(@socket, :new), class: "p2" %></div>

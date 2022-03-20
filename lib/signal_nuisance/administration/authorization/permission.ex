@@ -1,5 +1,5 @@
 defmodule SignalNuisance.Administration.Authorization.Permission do
-    alias SignalNuisance.Reporting.Authorization.UserPermission
+    alias SignalNuisance.Administration.Authorization.UserPermission
 
     @permissions [
         access: :administration,
@@ -8,12 +8,12 @@ defmodule SignalNuisance.Administration.Authorization.Permission do
         manage: :enterprises,
         manage: :administration
     ]
-    
+
     use SignalNuisance.Authorization.Permission,
         permissions: @permissions,
         dispatch_by_entity: [
-            {SignalNuisance.Accounts.User, UserPermission}         
+            {SignalNuisance.Accounts.User, UserPermission}
         ]
-    
-    
+
+
 end
