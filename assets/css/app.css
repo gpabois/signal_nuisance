@@ -51,17 +51,25 @@ body, html {
   left: 0;
 }
 
-.map-overlay-bottom {
-  position: absolute;
-  bottom: -100%;
+.map-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.map-container .map {
+  flex-grow: 4;
+}
+
+.map-bottom {
+  flex-grow: 0;
   animation: slide 0.5s forwards;
 }
 
 @keyframes slide {
-  100% { bottom: 0; }
+  100% { flex-grow: 1; }
 }
 
-.map-overlay, .map-overlay-bottom {
+.map-overlay, .map-bottom {
   z-index: 1000;
 }
 

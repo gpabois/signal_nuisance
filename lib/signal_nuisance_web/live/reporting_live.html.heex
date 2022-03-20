@@ -1,7 +1,42 @@
 <div id="reporting">
-    <div class="map-container" phx-click="close-alert-form">
-        <leaflet-map style="display: block" id="map" lat="48.856614" lng="2.3522219">
+    <div class="map-container" id="map-container">
+        <leaflet-map  id="map" class="map" lat="48.856614" lng="2.3522219"  phx-click="close-alert-form">
         </leaflet-map>
+        <%= if @display_alert_form do %>
+            <div id="alert-form" class="map-bottom bg-white container-fluid shadow-lg">
+                <button phx-click="close-alert-form" id="btn-close-alert-form">Close</button>
+                <%= case @alert_form_step do %>
+                    <% :"select-category" -> %>
+                        <div id="alert-form-select-alert-category" class="row">
+                            <%= for id <- @alert_categories do %>
+                                <button id={"alert-form-#{id}-category"}  class="btn btn-lg btn-light p-2 col-auto" phx-click="select-alert-category" phx-value-category={id}>
+                                    <img width="35px" height="35px" src={Routes.static_path(@socket, "/images/#{id}.svg")}/>
+                                </button>
+                            <% end %>
+                        </div>
+                    <% :main -> %>
+                        <.form let={f} id="alert-form-main" class="form" for={@alert_changeset} phx-change="validate-alert" phx-submit="create-alert">
+                            <%= label f, :intensity %>
+                            <%= select f, :intensity, 0..10, class: "form-control" %>
+                            <%= error_tag f, :intensity %>
+
+                            <%= label f, :alert_type_id %>
+                            <%= select f, :alert_type_id, Enum.map(@alert_types, &{&1.label, &1.id}), class: "form-control" %>
+                            <%= error_tag f, :alert_type_id %>
+
+                            <%= label f, :loc_long %>
+                            <%= number_input f, :loc_long, class: "form-control" %>
+                            <%= error_tag f, :loc_long %>
+
+                            <%= label f, :loc_lat %>
+                            <%= number_input f, :loc_lat, class: "form-control" %>
+                            <%= error_tag f, :loc_lat %>
+
+                            <%= submit "Save" %>
+                        </.form>
+                <% end %>
+            </div>
+        <% end %> 
     </div>
 
     <div class="map-overlay">
@@ -15,13 +50,13 @@
                     <div class="navbar-nav">
                         <a phx-click="open-alert-form" id="btn-open-alert-form" class="btn btn-primary nav-link active px-2" aria-current="page" href="#">Alert</a>
                     </div>
-                    <div class="d-flex flex-row-reverse">
+                    <div class="d-flex flex-row-reverse">^p
                         <%= if @current_user do %>
-                            <%= link "Settings", to: Routes.user_settings_path(@socket, :edit), class: "p2" %>
+                            <div class="p2"><%= link "Settings", to: Routes.user_settings_path(@socket, :edit), class: "p2" %></div>
                             <%= link "Log out", to: Routes.user_session_path(@socket, :delete), method: :delete %>
                         <% else %>
-                            <%= link "Register", to: Routes.user_registration_path(@socket, :new), class: "px-2" %>
-                            <%= link "Log in", to: Routes.user_session_path(@socket, :new) %>
+                            <div class="p2"><%= link "Register", to: Routes.user_registration_path(@socket, :new), class: "p2" %></div>
+                            <div class="p2"><%= link "Log in", to: Routes.user_session_path(@socket, :new), class: "p2" %></div>
                         <% end %>
                     </div>
                 </div>
@@ -29,39 +64,5 @@
         </nav>  
     </div>
 
-    <%= if @display_alert_form do %>
-    <div id="alert-form" class="map-overlay-bottom bg-white container-fluid">
-        <button phx-click="close-alert-form" id="btn-close-alert-form">Close</button>
-        <%= case @alert_form_step do %>
-            <% :"select-category" -> %>
-                <div id="alert-form-select-alert-category" class="row">
-                    <%= for id <- @alert_categories do %>
-                        <button id={"alert-form-#{id}-category"}  class="btn btn-lg btn-light p-2 col-auto" phx-click="select-alert-category" phx-value-category={id}>
-                            <img width="35px" height="35px" src={Routes.static_path(@socket, "/images/#{id}.svg")}/>
-                        </button>
-                    <% end %>
-                </div>
-            <% :main -> %>
-                <.form let={f} id="alert-form-main" for={@alert_changeset} phx-change="validate-alert" phx-submit="create-alert">
-                    <%= label f, :intensity %>
-                    <%= select f, :intensity, 0..10, class: "form-control" %>
-                    <%= error_tag f, :intensity %>
 
-                    <%= label f, :alert_type_id %>
-                    <%= select f, :alert_type_id, Enum.map(@alert_types, &{&1.label, &1.id}), class: "form-control" %>
-                    <%= error_tag f, :alert_type_id %>
-
-                    <%= label f, :loc_long %>
-                    <%= number_input f, :loc_long, class: "form-control" %>
-                    <%= error_tag f, :loc_long %>
-
-                    <%= label f, :loc_lat %>
-                    <%= number_input f, :loc_lat, class: "form-control" %>
-                    <%= error_tag f, :loc_lat %>
-
-                    <%= submit "Save" %>
-                </.form>
-        <% end %>
-    </div>
-    <% end %> 
 </div>
