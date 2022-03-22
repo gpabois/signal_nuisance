@@ -58,7 +58,7 @@ defmodule SignalNuisance.Enterprises.Establishment do
     @doc """
       Find all establishments within range
     """
-    def get_nearest(%Geo.Point{} = point, %GeoMath.Distance{} = distance) do
+    def get_nearest(%Geo.Point{srid: 4326} = point, %GeoMath.Distance{} = distance) do
       %GeoMath.Distance{value: distance} = GeoMath.Distance.to(distance, :m)
 
       from(
