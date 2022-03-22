@@ -40,7 +40,9 @@ class LeafletMap extends HTMLElement {
         markerElements.forEach(markerEl => {
             const lat = markerEl.getAttribute('lat')
             const lng = markerEl.getAttribute('lng')
+
             const leafletMarker = L.marker([lat, lng], { icon: this.defaultIcon }).addTo(this.map);
+            
             leafletMarker.addEventListener('click', (_event) => {
                 markerEl.click()
             })

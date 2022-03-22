@@ -67,5 +67,12 @@ defmodule SignalNuisance.Enterprises.Establishment do
       ) |> Repo.all
     end
 
+
+    def get_in_area(%Geo.Point{} = low_left, %Geo.Point{} = up_right) do
+      from(
+        ets in __MODULE__,
+        where: st_within(ets.loc, st_make_box_2d(^low_left, ^up_right))
+      )
+    end
   end
   

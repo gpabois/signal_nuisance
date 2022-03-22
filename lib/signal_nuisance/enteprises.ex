@@ -72,6 +72,10 @@ defmodule SignalNuisance.Enterprises do
     Establishment.get_nearest(point, distance)
   end
 
+  def get_establishments_in_area(%Geo.Point{} = lower_left, %Geo.Point{} = upper_right) do
+    Establishment.get_in_area(lower_left, upper_right)
+  end
+
   def get_establishment_by_slug(slug) do
     Establishment.get_by_slug(slug)
   end

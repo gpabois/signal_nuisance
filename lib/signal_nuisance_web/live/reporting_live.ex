@@ -16,6 +16,10 @@ defmodule SignalNuisanceWeb.ReportingLive do
         }
     end
    
+    def handle_event("map-bounds-update", box_coords, socket) do
+        
+    end
+
     def handle_event("open-alert-form", _, socket) do
         {:noreply, 
             socket

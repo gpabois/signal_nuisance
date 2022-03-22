@@ -155,7 +155,7 @@ defmodule SignalNuisance.EnterpriseTest do
             establishment = establishment_fixture()
 
             d0 = Distance.km(10)
-            d1 = Distance.km(9)
+            d1 = Distance.km(8)
             pt = GeoMath.random_within(establishment.loc, d0)
 
             assert GeoMath.within?(establishment.loc, pt, d0)
@@ -174,6 +174,20 @@ defmodule SignalNuisance.EnterpriseTest do
             refute GeoMath.within?(establishment.loc, pt, d1)
             refute establishment in Enterprises.get_nearest_establishments(pt, d1)
         end
+    end
+
+    describe "Enterprises.get_establishments_in_area/2" do
+        test "get nearest when one establishment is in range" do
+            establishment = establishment_fixture()
+
+            d0 = Distance.km(10)
+            d1 = Distance.km(9)
+            pt = GeoMath.random_within(establishment.loc, d0)
+
+            assert GeoMath.within?(establishment.loc, pt, d0)
+            assert establishment in Enterprises.get_nearest_establishments(pt, d1)
+        end
+
     end
 
     describe "SignalNuisance.Enterprises.SecurityPolicy::Enterprise" do
