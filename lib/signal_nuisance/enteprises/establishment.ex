@@ -5,10 +5,10 @@ defmodule SignalNuisance.Enterprises.Establishment do
     import Ecto.Query
     import Geo.PostGIS
     import Slugy
-  
+
     alias SignalNuisance.Repo
     alias SignalNuisance.Enterprises.Enterprise
-  
+
     schema "establishments" do
       belongs_to :enterprise, Enterprise
       field :name, :string
@@ -17,11 +17,11 @@ defmodule SignalNuisance.Enterprises.Establishment do
 
       timestamps()
     end
-  
-    @doc false  
-    def registration_changeset(establishment, attrs) do 
+
+    @doc false
+    def registration_changeset(establishment, attrs) do
         fields = [:name, :enterprise_id, :loc]
-        
+
         establishment
         |> cast(attrs, fields)
         |> slugify(with: [:enterprise_id, :name])
@@ -43,11 +43,11 @@ defmodule SignalNuisance.Enterprises.Establishment do
     """
     def get_by_enterprise(enterprise) do
         from(
-            m in __MODULE__, 
+            m in __MODULE__,
             where: m.enterprise_id == ^enterprise.id
         ) |> Repo.all
     end
-    
+
     def get_by_slug(slug) do
       from(
         e in __MODULE__,
@@ -60,7 +60,7 @@ defmodule SignalNuisance.Enterprises.Establishment do
     """
     def get_nearest(%Geo.Point{} = point, %GeoMath.Distance{} = distance) do
       %GeoMath.Distance{value: distance} = GeoMath.Distance.to(distance, :m)
- 
+
       from(
         ets in __MODULE__,
         where: st_dwithin_in_meters(^point, ets.loc, ^distance)
@@ -71,8 +71,13 @@ defmodule SignalNuisance.Enterprises.Establishment do
     def get_in_area(%Geo.Point{} = low_left, %Geo.Point{} = up_right) do
       from(
         ets in __MODULE__,
-        where: st_within(ets.loc, st_make_box_2d(^low_left, ^up_right))
-      )
+        where: st_within(
+          fragment("?::geometry", ets.loc),
+          fragment("?::geometry",
+            st_set_srid(
+              st_make_box_2d(^low_left, ^up_right), 4326)
+            )
+          )
+      ) |> Repo.all
     end
   end
-  
