@@ -42,7 +42,7 @@ defmodule GeoMath do
 
     def away_from?(ptA, ptB, %Distance{value: r, unit: unit}, eps \\ 0.01) do
         %Distance{value: d} = distance(ptA, ptB, unit)
-        d <= r + eps and d >= r - eps        
+        d <= r + eps and d >= r - eps
     end
 
     def within?(ptA, ptB, %Distance{value: r, unit: unit}, eps \\ 0.01) do
@@ -59,18 +59,34 @@ defmodule GeoMath do
         %Geo.Point{
             coordinates: {lat, long},
             srid: srid
-        }     
+        }
+    end
+
+    def bounding_box(%Geo.Point{coordinates: {lat, long}, srid: srid} = _ptA, %Distance{} = d) do
+        %Distance{value: r} = Distance.to(d, :m)
+        [[lat_ll, long_ll], [lat_ur, long_ur]] = Geocalc.bounding_box([lat, long], r)
+
+        {
+            %Geo.Point{
+                coordinates: {lat_ll, long_ll},
+                srid: srid
+            },
+            %Geo.Point{
+                coordinates: {lat_ur, long_ur},
+                srid: srid
+            }
+        }
     end
 
     def random_within(%Geo.Point{coordinates: {lat, long}, srid: srid} = _ptA, %Distance{} = d) do
         %Distance{value: r} = Distance.to(d, :m)
 
-        u = Geocalc.degrees_to_radians(:rand.uniform() * 360.0)
+        u = Geocalc.degrees_to_radians(:rand.uniform() * 359.0)
         {:ok, [lat, long]} = Geocalc.destination_point([lat, long], u, r * :rand.uniform())
 
         %Geo.Point{
             coordinates: {lat, long},
             srid: srid
-        }     
+        }
     end
 end
