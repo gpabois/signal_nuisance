@@ -1,6 +1,9 @@
 defmodule SignalNuisanceWeb.ReportingLive do
+    alias Phoenix.LiveView.JS
+
     use SignalNuisanceWeb, :map_live_view
 
+    alias SignalNuisance.Enterprises
     alias SignalNuisance.Reporting
     alias SignalNuisance.Reporting.Alert
 
@@ -8,6 +11,13 @@ defmodule SignalNuisanceWeb.ReportingLive do
         {:ok, 
             socket
             |> assign(:map_center, %{lat: 48.856614, long: 2.3522219})
+            |> assign(:markers, [
+                %{
+                    type: "establishment",
+                    id: 5,
+                    coordinates: %{lat: 48.856614, long: 2.3522220}
+                }
+            ])
             |> assign(:display_alert_form, false)
             |> assign(:alert_categories, SignalNuisance.Reporting.AlertType.categories())
             |> assign(:alert_form_step, 0)
@@ -15,6 +25,22 @@ defmodule SignalNuisanceWeb.ReportingLive do
             |> assign(:alert_types, [])
             |> assign(:current_user, session["current_user"])
         }
+    end
+
+    def update_markers(socket, {ll, ur} = _area) do
+        socket 
+        |> assign(
+            :markers, 
+            Enum.map(
+                Enterprises.get_establishments_in_area(ll, ur), 
+                fn ets -> %{type: "establishment", coordinates: ets.loc, id: ets.id} end
+            )
+        )
+    end
+
+    def handle_event("marker-clicked", marker, socket) do
+        IO.inspect(marker)
+        {:noreply, socket}
     end
    
     def handle_event("map-bounds-update", box_coords, socket) do
@@ -38,8 +64,8 @@ defmodule SignalNuisanceWeb.ReportingLive do
             coordinates: {lat_ll, long_ll},
             srid: 4326
         }
-
-        {:noreply, socket}
+        
+        {:noreply, socket |> update_markers({ll, ur})}
     end
 
     def handle_event("open-alert-form", _, socket) do

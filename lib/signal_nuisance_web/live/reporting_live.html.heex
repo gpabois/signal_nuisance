@@ -1,7 +1,9 @@
 <div id="reporting" phx-hook="ReportingLiveView">
     <div class="map-container" id="map-container">
         <leaflet-map  id="map" class="map" lat={@map_center.lat} lng={@map_center.long}  phx-click="close-alert-form">
-
+            <%= for marker <- @markers do %>
+                <leaflet-marker data-id={marker.id} data-type={marker.type} phx-click={JS.push("marker-clicked", value: marker)}></leaflet-marker>
+            <% end %>
         </leaflet-map>
         <%= if @display_alert_form do %>
             <div id="alert-form" class="map-bottom bg-white container-fluid shadow-lg">
