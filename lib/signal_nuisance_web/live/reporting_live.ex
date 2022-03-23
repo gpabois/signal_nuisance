@@ -7,6 +7,7 @@ defmodule SignalNuisanceWeb.ReportingLive do
     def mount(_params, session, socket) do
         {:ok, 
             socket
+            |> assign(:map_center, %{lat: 48.856614, long: 2.3522219})
             |> assign(:display_alert_form, false)
             |> assign(:alert_categories, SignalNuisance.Reporting.AlertType.categories())
             |> assign(:alert_form_step, 0)
@@ -17,7 +18,28 @@ defmodule SignalNuisanceWeb.ReportingLive do
     end
    
     def handle_event("map-bounds-update", box_coords, socket) do
-        
+        %{
+            "_northEast" => %{
+                "lat" => lat_ur,
+                "lng" => long_ur
+            },
+            "_southWest" => %{
+                "lat" => lat_ll,
+                "lng" => long_ll
+            }
+        } = box_coords
+
+        ur = %Geo.Point{
+            coordinates: {lat_ur, long_ur},
+            srid: 4326
+        }
+
+        ll = %Geo.Point{
+            coordinates: {lat_ll, long_ll},
+            srid: 4326
+        }
+
+        {:noreply, socket}
     end
 
     def handle_event("open-alert-form", _, socket) do

@@ -5,5 +5,5 @@ const views = {
 };
 
 export default function loadView(viewName) {
-    return views[viewName] || MainView;
+    return views[viewName] || undefined;
   }

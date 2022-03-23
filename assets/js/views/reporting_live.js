@@ -1,12 +1,25 @@
-//import "../../vendor/leaflet/leaflet.css"
-import L from "../../vendor/leaflet/leaflet"
-
 export default class ReportingLiveView { 
-    mount () {
+    view_mounted ({liveSocket}) {
         this.map_container = document.getElementById("map-container");
         this.map = document.getElementById("map").map;
+
         window.onresize = this.resizeMap;
         this.resizeMap();
+
+        var view = this;
+        
+        liveSocket.hooks.ReportingLiveView = {
+            mounted() {
+                view.map.on('moveend', function () {
+                    var bounds = view.map.getBounds();
+                    this.pushEvent("map-bounds-update", bounds);
+                }.bind(this));
+            }
+        };
+    }
+
+    view_unmounted() {
+
     }
 
     resizeMap() {
@@ -19,11 +32,8 @@ export default class ReportingLiveView {
         this.map.invalidateSize(true);
     }
 
-    update () {
+    updated () {
         this.resizeMap();
     }
 
-    unmount() {
-
-    }
 }

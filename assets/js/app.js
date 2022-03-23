@@ -29,16 +29,27 @@ import topbar from "../vendor/topbar";
 import loadView from './views/loader';
 import './component/loader';
 
-let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
-let liveSocket = new LiveSocket("/live", Socket, {params: {_csrf_token: csrfToken}})
+let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content");
+let liveSocket = new LiveSocket("/live", Socket, {params: {_csrf_token: csrfToken}});
+    
+// connect if there are any LiveViews on the page
+liveSocket.connect();
 
-function onDOMLoaded() {
+// expose liveSocket on window for web console debug logs and latency simulation:
+// >> liveSocket.enableDebug();
+// >> liveSocket.enableLatencySim(1000)  // enabled for duration of browser session
+// >> liveSocket.disableLatencySim()
+window.liveSocket = liveSocket;
+
+function onDOMLoaded() {  
     const viewName = document.getElementsByTagName("body")[0].dataset.jsViewName;
     const ViewClass = loadView(viewName);
+    var hooks = {};
 
-    if (ViewClass !== undefined) {
+    if (ViewClass !== undefined) 
+    {
         const view = new ViewClass();
-        view.mount();
+        view.view_mounted({liveSocket});
         window.currentView = view;
     } else {
         window.currentView = undefined;
@@ -46,14 +57,15 @@ function onDOMLoaded() {
 }
 
 function onPhxUpdate() {
-    if(window.currentView !== undefined) {
-        window.currentView.update();
+    if(window.currentView !== undefined) 
+    {
+        window.currentView.updated();
     }
 }
 
 function onDocumentUnload() {
     if(window.currentView !== undefined) {
-        window.currentView.unmount();
+        window.currentView.view_unmounted();
     }
 }
 
@@ -64,12 +76,4 @@ window.addEventListener('unload', onDocumentUnload);
 topbar.config({barColors: {0: "#29d"}, shadowColor: "rgba(0, 0, 0, .3)"})
 window.addEventListener("phx:page-loading-start", info => topbar.show())
 window.addEventListener("phx:page-loading-stop", info => topbar.hide())
-window.addEventListener("phx:update", onPhxUpdate)
-// connect if there are any LiveViews on the page
-liveSocket.connect()
-
-// expose liveSocket on window for web console debug logs and latency simulation:
-// >> liveSocket.enableDebug()
-// >> liveSocket.enableLatencySim(1000)  // enabled for duration of browser session
-// >> liveSocket.disableLatencySim()
-window.liveSocket = liveSocket;
+window.addEventListener("phx:update", onPhxUpdate);
