@@ -6,8 +6,8 @@ defmodule SignalNuisanceWeb.EnterpriseDashboardControllerTest do
     alias SignalNuisance.Enterprises
     import SignalNuisance.EnterprisesFixtures
 
-    describe "GET /enterprises/:slug/dashboard when has permissions" do       
-        test "renders page", %{conn: conn, user: user} do
+    describe "GET /enterprises/:slug/dashboard" do
+        test "accéder à la page quand l'utilisateur est autorisé", %{conn: conn, user: user} do
           enterprise = enterprise_fixture(%{})
 
           Enterprises.set_permissions(user, [access: :common], enterprise)
@@ -16,14 +16,14 @@ defmodule SignalNuisanceWeb.EnterpriseDashboardControllerTest do
           response = html_response(conn, 200)
           assert response =~ enterprise.name
         end
-    
-        test "redirects if user is not logged in" do
+
+        test "rediriger si l'utilisateur n'est pas connecté" do
           conn = build_conn()
           conn = get(conn, Routes.enterprise_registration_path(conn, :new))
           assert redirected_to(conn) == Routes.user_session_path(conn, :new)
         end
 
-        test "403 if user has not the right permissions", %{conn: conn} do
+        test "rediriger vers la page 403 quand l'utilisateur n'est pas autorisé", %{conn: conn} do
           enterprise = enterprise_fixture(%{})
 
           conn = get(conn, Routes.enterprise_dashboard_path(conn, :show, enterprise.slug))
@@ -32,5 +32,5 @@ defmodule SignalNuisanceWeb.EnterpriseDashboardControllerTest do
         end
     end
 
-    
+
 end
