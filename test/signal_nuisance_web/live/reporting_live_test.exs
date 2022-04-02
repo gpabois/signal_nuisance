@@ -8,7 +8,7 @@ defmodule SignalNuisanceWeb.ReportingLiveTest do
         {:ok, view, html} =  build_conn() |> live("/")
         view |> element("#btn-open-alert-form") |> render_click()
         {view, html}
-    end 
+    end
 
     def alert_form_main(category) do
         {view, html} = alert_form_select_category()
@@ -16,15 +16,15 @@ defmodule SignalNuisanceWeb.ReportingLiveTest do
         {view, html}
     end
 
-    describe "send an alert when the user is anonymous" do
-        test "it must be opened through a dedicated button (#btn-open-alert-form)" do
+    describe "faire un signalement (alert) quand on est anonyme" do
+        test "cela doit être ouvert via un bouton dédié (#btn-open-alert-form)" do
             {:ok, view, _html} =  build_conn() |> live("/")
 
             view |> element("#btn-open-alert-form") |> render_click()
             assert view |> element("#alert-form") |> has_element?()
         end
 
-        test "the first step of the alert creation, is the category selection" do
+        test "la première étape est de choisir la catégorie du signalement (olfactif, bruit...)" do
             {view, _html} = alert_form_select_category()
 
             for category <- SignalNuisance.Reporting.AlertType.categories() do
@@ -32,7 +32,7 @@ defmodule SignalNuisanceWeb.ReportingLiveTest do
             end
         end
 
-        test "once the category selected, the main form is displayed" do
+        test "une fois la catégorie choisie, le formulaire à proprement s'ouvre" do
             {view, _html} = alert_form_select_category()
 
             category = SignalNuisance.Reporting.AlertType.categories() |> Enum.random()
@@ -40,14 +40,14 @@ defmodule SignalNuisanceWeb.ReportingLiveTest do
             assert view |> element("#alert-form-main") |> has_element?()
         end
 
-        test "fill the form with valid attributes" do
+        test "remplir le formulaire avec des valeurs valides" do
             alert_type = alert_type_fixture()
             alert_attributes = valid_alert_attributes(%{alert_type_id: alert_type.id})
 
             {view, _html} = alert_form_main(alert_type.category)
 
-            view 
-            |> form("#alert-form-main", %{"alert" => alert_attributes}) 
+            view
+            |> form("#alert-form-main", %{"alert" => alert_attributes})
             |> render_submit() =~ "Alert created"
         end
     end

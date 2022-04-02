@@ -10,7 +10,7 @@ defmodule SignalNuisance.EnterpriseTest do
     alias GeoMath.Distance
 
     describe "Enterprises.register_enterprise/2" do
-        test "register the enterprise when the name is not already taken." do
+        test "enregistrer une entreprise avec des valeurs valides." do
             user = user_fixture()
             enterprise_attrs = valid_enterprise_attributes()
 
@@ -18,7 +18,7 @@ defmodule SignalNuisance.EnterpriseTest do
             assert Enterprises.is_enterprise_member?(enterprise, user)
         end
 
-        test "register when the name is already taken." do
+        test "on ne doit pas enregistrer une entreprise qui a un nom déjà pris." do
             user = user_fixture()
             enterprise_attrs = valid_enterprise_attributes()
 
@@ -31,7 +31,7 @@ defmodule SignalNuisance.EnterpriseTest do
             } = errors_on(changeset)
         end
 
-        test "registering an enterprise grants administrator permissions." do
+        test "un utilisateur qui enregistre une entreprise doit avoir les droits d'administrateur de l'entreprise." do
             user = user_fixture()
             enterprise_attrs = valid_enterprise_attributes()
 
@@ -41,12 +41,12 @@ defmodule SignalNuisance.EnterpriseTest do
     end
 
     describe "Enterprises.get_enterprise_by_name/1" do
-        test "get an enterprise by its name, when no enterprise with this name exists." do
+        test "la fonction doit la valeur nil, lorsqu'aucune entreprise avec ce nom est enregistré." do
             enterprise_attrs = valid_enterprise_attributes()
             assert nil == Enterprises.get_enterprise_by_name(enterprise_attrs.name)
         end
 
-        test "get an enterprise by its name, when an enterprise with this name exists" do
+        test "la fonction doit retourner l'entreprise, lorsqu'une entreprise avec ce nom est enregistré." do
             enterprise = enterprise_fixture()
             enterprise_id = enterprise.id
             assert %Enterprise{id: ^enterprise_id} = Enterprises.get_enterprise_by_name(enterprise.name)
@@ -54,7 +54,7 @@ defmodule SignalNuisance.EnterpriseTest do
     end
 
     describe "Enterprises.add_enterprise_member/2" do
-        test "register a member to an existing enterprise." do
+        test "la fonction doit enregistrer un nouveau membre dans l'entreprise." do
             user        = user_fixture()
             enterprise  = enterprise_fixture()
 
@@ -62,7 +62,7 @@ defmodule SignalNuisance.EnterpriseTest do
             assert Enterprises.is_enterprise_member?(enterprise, user)
         end
 
-        test "adding a member to an existing enterprise grants employee permissions" do
+        test "enregistrer un nouveau membre dans l'entreprise doit lui donner les permissions liées à un employé." do
             user        = user_fixture()
             enterprise  = enterprise_fixture()
 
@@ -70,7 +70,7 @@ defmodule SignalNuisance.EnterpriseTest do
             assert EnterprisePermission.has?(user, EnterprisePermission.by_role(:employee), enterprise)
         end
 
-        test "add a member to a non-existing enterprise" do
+        test "la fonction doit retourner une erreur lorsqu'on enregistre un utilisateur dans une entreprise qui n'existe pas." do
             user        = user_fixture()
 
             assert {:error, changeset} = Enterprises.add_enterprise_member(%{id: 100}, user)
@@ -79,7 +79,7 @@ defmodule SignalNuisance.EnterpriseTest do
             } = errors_on(changeset)
         end
 
-        test "add a non-existing member to an existing enterprise" do
+        test "la fonction doit retourner une erreur lorsqu'on enregistre un utilisateur qui n'existe pas dans une entreprise." do
             enterprise  = enterprise_fixture()
 
             assert {:error, changeset} = Enterprises.add_enterprise_member(enterprise, %{id: 100})
@@ -90,7 +90,7 @@ defmodule SignalNuisance.EnterpriseTest do
     end
 
     describe "Enterprises.remove_enterprise_member/2" do
-        test "remove a member from an existing enterprise." do
+        test "la fonction doit retirer un membre d'une entreprise." do
             user        = user_fixture()
             enterprise  = enterprise_fixture(%{}, register: user)
 
@@ -101,7 +101,7 @@ defmodule SignalNuisance.EnterpriseTest do
 
 
     describe "Enterprises.set_permissions/3" do
-        test "grant enterprise-related permissions to a user" do
+        test "la fonction doit donner des permissions, relatives à une entreprise, à un utilisateur." do
             user        = user_fixture()
             enterprise  = enterprise_fixture()
 
@@ -109,7 +109,7 @@ defmodule SignalNuisance.EnterpriseTest do
             assert Enterprises.has_permissions?(user, [:access], enterprise)
         end
 
-        test "Grant establishment-related permissions to a user" do
+        test "la fonction doit donner des permissions, relatives à un établissement, à un utilisateur." do
             user = user_fixture()
             establishment = establishment_fixture()
 
@@ -120,7 +120,7 @@ defmodule SignalNuisance.EnterpriseTest do
 
 
     describe "Enterprises.register_establishment/1" do
-        test "register establishment when the name is not already taken." do
+        test "la fonction doit enregistrer un établissement." do
             user        = user_fixture()
             enterprise  = enterprise_fixture(%{}, register: user)
 
@@ -128,7 +128,7 @@ defmodule SignalNuisance.EnterpriseTest do
             assert {:ok, _} = Enterprises.register_establishment(establishment_attrs, user)
         end
 
-        test "register establishment when the name is taken." do
+        test "la fonction doit retourner une erreur si le nom est déjà pris par un autre établissement." do
             user        = user_fixture()
             enterprise  = enterprise_fixture(%{}, register: user)
 
@@ -143,7 +143,7 @@ defmodule SignalNuisance.EnterpriseTest do
     end
 
     describe "Enterprises.get_establishments_by_enterprise/1" do
-        test "when the enterprise has an establishment" do
+        test "la fonction doit retourner les établissements liés à une entreprise." do
             enterprise = enterprise_fixture()
             establishment = establishment_fixture(%{}, enterprise: enterprise)
             assert establishment in Enterprises.get_establishments_by_enterprise(enterprise)
@@ -151,7 +151,7 @@ defmodule SignalNuisance.EnterpriseTest do
     end
 
     describe "Enterprises.get_nearest_establishments/2" do
-        test "get nearest when one establishment is in range" do
+        test "la fonction doit retourner la liste des établissements dans un rayon donné." do
             establishment = establishment_fixture()
 
             d0 = Distance.km(10)
@@ -163,7 +163,7 @@ defmodule SignalNuisance.EnterpriseTest do
         end
 
 
-        test "get nearest when no establishment is in range" do
+        test "la fonction doit retourner une liste vide, si aucun établissement ne se trouve dans le rayon donné." do
             establishment = establishment_fixture()
 
             d0 = Distance.km(10)
@@ -177,7 +177,7 @@ defmodule SignalNuisance.EnterpriseTest do
     end
 
     describe "Enterprises.get_establishments_in_area/2" do
-        test "get establishment when in area" do
+        test "la fonction doit retourner les établissements qui se situent dans une zone définie par un rectangle." do
             establishment = establishment_fixture()
 
             d0 = Distance.km(10)
@@ -194,13 +194,13 @@ defmodule SignalNuisance.EnterpriseTest do
     end
 
     describe "SignalNuisance.Enterprises.SecurityPolicy::Enterprise" do
-        test "Access enterprises dashboard view when has no permissions" do
+        test "l'utilisateur ne doit pas être autorisé à accéder au tableau de bord d'une entreprise, s'il n'a pas la permission {:access, :common} relative à l'entreprise." do
             user        = user_fixture()
             enterprise  = enterprise_fixture(%{})
 
             refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :view, :dashboard}, user, enterprise)
         end
-        test "Access enterprises common view when has {:access, :common} enterprise-related permissions" do
+        test "l'utilisateur doit être autorisé à accéder au tableau de bord d'une entreprise, s'il a la permission {:access, :common} relative à l'entreprise." do
             user        = user_fixture()
             enterprise  = enterprise_fixture(%{})
 
@@ -208,14 +208,14 @@ defmodule SignalNuisance.EnterpriseTest do
             assert Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :view, :dashboard}, user, enterprise)
         end
 
-        test "Access member management view when has no permissions" do
+        test "l'utilisateur ne doit pas être autorisé à accéder à la gestion des membres de l'entreprise, s'il n'a pas la permission {:manage, :members} relative à l'entreprise." do
             user        = user_fixture()
             enterprise  = enterprise_fixture(%{})
 
             refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :view, :member_management}, user, enterprise)
         end
 
-        test "Access member management view when has {:manage, :members} enterprise-related permissions" do
+        test "l'utilisateur doit être autorisé à accéder à la gestion des membres de l'entreprise, s'il a la permission {:manage, :members} relative à l'entreprise." do
             user        = user_fixture()
             enterprise  = enterprise_fixture(%{})
 
@@ -223,14 +223,14 @@ defmodule SignalNuisance.EnterpriseTest do
             assert Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :view, :member_management}, user, enterprise)
         end
 
-        test "Access enterprise general settings view when has no permissions" do
+        test "l'utilisateur ne doit pas être autorisé à accéder à la gestion des paramètres généraux, s'il n'a pas la permission {:manage, :enterprise} relative à l'entreprise." do
             user        = user_fixture()
             enterprise  = enterprise_fixture(%{})
 
             refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :view, :general_settings}, user, enterprise)
         end
 
-        test "Access enterprise general settings when has {:manage, :enterprise} enterprise-related permissions" do
+        test "l'utilisateur doit être autorisé à accéder à la gestion des paramètres généraux, s'il a la permission {:manage, :enterprise} relative à l'entreprise." do
             user        = user_fixture()
             enterprise  = enterprise_fixture(%{})
 
@@ -238,14 +238,14 @@ defmodule SignalNuisance.EnterpriseTest do
             assert Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :view, :general_settings}, user, enterprise)
         end
 
-        test "Access establishment registration view when has no permissions" do
+        test "l'utilisateur ne doit pas être autorisé à accéder au formulaire d'enregistrement d'un établissement, s'il n'a pas la permission {:manage, :establishments} relative à l'entreprise." do
             user        = user_fixture()
             enterprise  = enterprise_fixture(%{})
 
             refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :view, :register_establishment}, user, enterprise)
         end
 
-        test "Access establishment registration when has {:manage, :establishments} enterprise-related permissions" do
+        test "l'utilisateur doit être autorisé à accéder au formulaire d'enregistrement d'un établissement, s'il a pas la permission {:manage, :establishments} relative à l'entreprise" do
             user        = user_fixture()
             enterprise  = enterprise_fixture(%{})
 
@@ -253,7 +253,7 @@ defmodule SignalNuisance.EnterpriseTest do
             assert Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :view, :register_establishment}, user, enterprise)
         end
 
-        test "Register establishment {:manage, :establishments} enterprise-related permissions" do
+        test "l'utilisateur doit être autorisé à enregistrer un établissement, s'il a la permission {:manage, :establishments} relative à l'entreprise." do
             user        = user_fixture()
             enterprise  = enterprise_fixture(%{})
 
@@ -261,21 +261,21 @@ defmodule SignalNuisance.EnterpriseTest do
             assert Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, :register_establishment, user, enterprise)
         end
 
-        test "Register establishment when the user has no permissions" do
+        test "l'utilisateur ne doit pas être autorisé à enregistrer un établissement, s'il n'a la permission {:manage, :establishments} relative à l'entreprise" do
             user        = user_fixture()
             enterprise  = enterprise_fixture(%{})
 
             refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, :register_establishment, user, enterprise)
         end
 
-        test "Update enterprise-related general settings when has no permissions" do
+        test "l'utilisateur ne doit pas être autorisé à modifier les paramètres généraux d'une entreprise, s'il n'a pas la permission {:manage, :enterprise} relative à l'entreprise." do
             user        = user_fixture()
             enterprise  = enterprise_fixture(%{})
 
             refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:update, :general_settings}, user, enterprise)
         end
 
-        test "Update enterprise-related general settings when has {:manage, :enterprise} enterprise-related permissions" do
+        test "l'utilisateur doit être autorisé à modifier les paramètres généraux d'une entreprise, s'il a la permission {:manage, :enterprise} relative à l'entreprise." do
             user        = user_fixture()
             enterprise  = enterprise_fixture(%{})
 
@@ -283,7 +283,7 @@ defmodule SignalNuisance.EnterpriseTest do
             assert Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:update, :general_settings}, user, enterprise)
         end
 
-        test "Assign enterprise-related permissions to a member when has no permissions" do
+        test "l'utilisateur ne doit pas être autorisé à modifier les permissions, relatives à l'entreprise, d'un membre, s'il n'a pas la permission {:manage, :members} relative à l'entreprise." do
             user        = user_fixture()
             member      = user_fixture()
             enterprise  = enterprise_fixture(%{})
@@ -291,7 +291,7 @@ defmodule SignalNuisance.EnterpriseTest do
             refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:assign_permissions, enterprise}, user, member)
         end
 
-        test "Assign enterprise-related permissions to a member when has {:manage, :members} enterprise-related permissions" do
+        test "l'utilisateur doit être autorisé à modifier les permissions, relatives à l'entreprise, d'un membre, s'il a la permission {:manage, :members} relative à l'entreprise." do
             user        = user_fixture()
             member      = user_fixture()
             enterprise  = enterprise_fixture(%{})
@@ -300,7 +300,7 @@ defmodule SignalNuisance.EnterpriseTest do
             assert Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:assign_permissions, enterprise}, user, member)
         end
 
-        test "Add a member when has no permissions" do
+        test "l'utilisateur ne doit pas être autorisé à ajouter un membre à l'entreprise, s'il n'a pas la permission {:manage, :members} relative à l'entreprise" do
             user        = user_fixture()
             member      = user_fixture()
             enterprise  = enterprise_fixture(%{})
@@ -308,7 +308,7 @@ defmodule SignalNuisance.EnterpriseTest do
             refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:add_member, enterprise}, user, member)
         end
 
-        test "Add a member when has {:manage, :members} enterprise-related permissions" do
+        test "l'utilisateur doit être autorisé à ajouter un membre à l'entreprise, s'il a la permission {:manage, :members} relative à l'entreprise" do
             user        = user_fixture()
             member      = user_fixture()
             enterprise  = enterprise_fixture(%{})
@@ -317,7 +317,7 @@ defmodule SignalNuisance.EnterpriseTest do
             assert Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:add_member, enterprise}, user, member)
         end
 
-        test "Remove a member when has no permissions" do
+        test "l'utilisateur ne doit pas être autorisé à retirer un membre à l'entreprise, s'il n'a pas la permission {:manage, :members} relative à l'entreprise" do
             user        = user_fixture()
             member      = user_fixture()
             enterprise  = enterprise_fixture(%{})
@@ -325,7 +325,7 @@ defmodule SignalNuisance.EnterpriseTest do
             refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:add_member, enterprise}, user, member)
         end
 
-        test "Remove a member when has {:manage, :members} enterprise-related permissions" do
+        test "l'utilisateur doit être autorisé à retirer un membre à l'entreprise, s'il a la permission {:manage, :members} relative à l'entreprise" do
             user        = user_fixture()
             member      = user_fixture()
             enterprise  = enterprise_fixture(%{})
@@ -336,14 +336,14 @@ defmodule SignalNuisance.EnterpriseTest do
     end
 
     describe "SignalNuisance.Enterprises.SecurityPolicy::Establishment" do
-        test "Access dashboard when has no permissions" do
+        test "l'utilisateur ne doit pas être autorisé à accéder au tableau de bord de l'établissement, s'il n'a pas la permission {:access, :common} relative à l'établissement." do
             user        = user_fixture()
             establishment = establishment_fixture()
 
             refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :view, :dashboard}, user, establishment)
         end
 
-        test "Access dashboard when has {:access, :common} enterprise-related permissions" do
+        test "l'utilisateur doit être autorisé à accéder au tableau de bord de l'établissement, s'il a la permission {:access, :common} relative à l'étalissement." do
             user        = user_fixture()
             establishment = establishment_fixture()
 
@@ -351,26 +351,26 @@ defmodule SignalNuisance.EnterpriseTest do
             assert Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :view, :dashboard}, user, establishment)
         end
 
-        test "Broadcast to the public when has no permissions" do
+        test "l'utilisateur ne doit pas être autorisé à diffuser au public des messages, s'il n'a pas la permission {:manage, :communication] relative à l'établissement." do
             user = user_fixture()
             establishment = establishment_fixture()
 
             refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:broadcast, :message, establishment}, user, %{})
         end
-        test "Broadcast to the public when has {:manage, :communication} establishment permissions" do
+        test "l'utilisateur doit être autorisé à diffuser au public des messages, s'il a la permission {:manage, :communication} relative à l'établissement." do
             user = user_fixture()
             establishment = establishment_fixture()
 
             EstablishmentPermission.grant(user, [manage: :communication], establishment)
             assert Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:broadcast, :message, establishment}, user, %{})
         end
-        test "Reply to an alert when has no permissions" do
+        test "l'utilisateur ne doit pas être autorisé, au nom de l'établissement, à répondre à un signalement, si il n'a pas la permission {:manage, :communication} relative à l'établissement." do
             user = user_fixture()
             establishment = establishment_fixture()
 
             refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:reply, :alert, establishment}, user, %{})
         end
-        test "Reply to an alert when has {:manage, :communication} establishment permissions" do
+        test "l'utilisateur doit être autorisé, au nom de l'établissement, à répondre à un signalement, s'il a la permission {:manage, :communication} relative à l'établissement." do
             user = user_fixture()
             establishment = establishment_fixture()
 
