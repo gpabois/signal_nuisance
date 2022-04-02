@@ -40,15 +40,36 @@ defmodule SignalNuisanceWeb.ReportingLiveTest do
             assert view |> element("#alert-form-main") |> has_element?()
         end
 
-        test "remplir le formulaire avec des valeurs valides" do
+        test "remplir le formulaire, avec des valeurs valides, la localisation de l'utilisateur est remplie via le hook user-loc-update" do
             alert_type = alert_type_fixture()
             alert_attributes = valid_alert_attributes(%{alert_type_id: alert_type.id})
 
+            alert_attributes_2 = alert_attributes
+            |> Map.delete(:loc_long)
+            |> Map.delete(:loc_lat)
+
             {view, _html} = alert_form_main(alert_type.category)
 
-            view
+            view |> render_hook("user-loc-update", %{"long" => alert_attributes.loc_long, "lat" => alert_attributes.loc_lat})
+
+            assert view
             |> form("#alert-form-main", %{"alert" => alert_attributes})
             |> render_submit() =~ "Alert created"
+        end
+
+        test "doit renvoyer une erreur, si l'utilisateur n'a pas communiqué sa localisation." do
+            alert_type = alert_type_fixture()
+            alert_attributes = valid_alert_attributes(%{alert_type_id: alert_type.id})
+
+            alert_attributes_2 = alert_attributes
+            |> Map.delete(:loc_long)
+            |> Map.delete(:loc_lat)
+
+            {view, _html} = alert_form_main(alert_type.category)
+
+            assert view
+            |> form("#alert-form-main", %{"alert" => alert_attributes})
+            |> render_submit() =~ "Alert cannot be created"
         end
     end
 end

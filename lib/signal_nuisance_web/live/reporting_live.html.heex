@@ -27,13 +27,21 @@
                             <%= select f, :alert_type_id, Enum.map(@alert_types, &{&1.label, &1.id}), class: "form-control" %>
                             <%= error_tag f, :alert_type_id %>
 
-                            <%= label f, :loc_long %>
-                            <%= number_input f, :loc_long, class: "form-control" %>
-                            <%= error_tag f, :loc_long %>
+                            <%= case @user_loc do %>
+                            <% %{lat: nil, loc: nil} -> %>
+                                <p>Cannot locate you.</p>
+                            <% _ -> %>
+                            <% end %>
 
-                            <%= label f, :loc_lat %>
-                            <%= number_input f, :loc_lat, class: "form-control" %>
-                            <%= error_tag f, :loc_lat %>
+                            <div style="display: none">
+                                <%= label f, :loc_long %>
+                                <%= number_input f, :loc_long, class: "form-control" %>
+                                <%= error_tag f, :loc_long %>
+
+                                <%= label f, :loc_lat %>
+                                <%= number_input f, :loc_lat, class: "form-control" %>
+                                <%= error_tag f, :loc_lat %>
+                            </div>
 
                             <%= submit "Save" %>
                         </.form>
@@ -64,6 +72,14 @@
                     </div>
                 </div>
             </div>
-        </nav>  
+        </nav>
+          <p class="alert alert-info" role="alert"
+            phx-click="lv:clear-flash"
+            phx-value-key="info"><%= live_flash(@flash, :info) %></p>
+
+        <p class="alert alert-danger" role="alert"
+            phx-click="lv:clear-flash"
+            phx-value-key="error"><%= live_flash(@flash, :error) %></p>
+  
     </div>
 </div>
