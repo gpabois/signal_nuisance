@@ -10,12 +10,28 @@ export default class ReportingLiveView {
         
         liveSocket.hooks.ReportingLiveView = {
             mounted() {
+                view.hook = this;
                 view.map.on('moveend', function () {
                     var bounds = view.map.getBounds();
                     this.pushEvent("map-bounds-update", bounds);
                 }.bind(this));
             }
         };
+    }
+
+    enable_geolocation () {
+        this.locWatchId = navigator.geolocation.watchPosition(function(loc) {
+            this.hook.pushEvent('user-loc-update', {
+                lat: loc.coords.latitude,
+                long: loc.coords.longitude
+            });
+        });
+    }
+
+    disable_geolocation() {
+        if(this.locWatchId) {
+            navigator.geolocation.clearWatch(this.locWatchId);
+        }
     }
 
     view_unmounted() {

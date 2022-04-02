@@ -28,8 +28,10 @@
                             <%= error_tag f, :alert_type_id %>
 
                             <%= case @user_loc do %>
-                            <% %{lat: nil, loc: nil} -> %>
-                                <p>Cannot locate you.</p>
+                            <% %{lat: nil, long: nil} -> %>
+                                <p>
+                                    Cannot locate you. Please enable <a href="#" onclick="(_args) => window.currentView.enable_geolocation()">geolocation</a>
+                                </p>
                             <% _ -> %>
                             <% end %>
 

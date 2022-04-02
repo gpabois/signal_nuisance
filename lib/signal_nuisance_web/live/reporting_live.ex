@@ -39,7 +39,7 @@ defmodule SignalNuisanceWeb.ReportingLive do
         )
     end
 
-    def handle_event("marker-clicked", marker, socket) do
+    def handle_event("marker-clicked", _marker, socket) do
         {:noreply, socket}
     end
 
