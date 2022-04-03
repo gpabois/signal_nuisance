@@ -30,7 +30,7 @@
                             <%= case @user_loc do %>
                             <% %{lat: nil, long: nil} -> %>
                                 <p>
-                                    Cannot locate you. Please enable <a href="#" onclick="(_args) => window.currentView.enable_geolocation()">geolocation</a>
+                                    Cannot locate you. Please enable <a href="#" onclick="window.currentView.enable_geolocation()">geolocation</a>
                                 </p>
                             <% _ -> %>
                             <% end %>

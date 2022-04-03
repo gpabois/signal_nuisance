@@ -25,7 +25,7 @@ export default class ReportingLiveView {
                 lat: loc.coords.latitude,
                 long: loc.coords.longitude
             });
-        });
+        }.bind(this));
     }
 
     disable_geolocation() {
