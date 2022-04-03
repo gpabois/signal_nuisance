@@ -45,31 +45,68 @@ body, html {
   padding: 0;
 }
 
-.map-overlay, .map-container {
-  position: absolute;
-  top: 0;
-  left: 0;
+.sgn-map-container {
+  display: flex;
+  flex-direction: row;
+  position: relative;
 }
 
-.map-container {
+.sgn-drawer.sgn-hidden{
+  flex-grow: 0;
+}
+
+.sgn-drawer.sgn-show{
+  flex-grow: 2;
+  z-index: 10000;
+}
+
+.sgn-map-cell {
   display: flex;
+  flex-grow: 1;
   flex-direction: column;
 }
 
-.map-container .map {
+.sgn-map-navbar, .sgn-map-cell {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+.sgn-map-cell .sgn-map {
   flex-grow: 4;
 }
 
-.map-bottom {
+.sgn-map-drawer {
   flex-grow: 0;
+  position: relative;
   animation: slide 0.5s forwards;
+}
+
+.sgn-map-drawer .sgn-map-drawer-close {
+  position: absolute;
+  top: -50px;
+  left: 50%;
+  height: 50px;
+  width: 100px;
+}
+
+.sgn-map {
+  position: relative; 
+}
+
+.sgn-map-buttons {
+  position: absolute;
+  bottom: 100px;
+  right: 100px;
+  z-index: 1000;
 }
 
 @keyframes slide {
   100% { flex-grow: 1; }
 }
 
-.map-overlay, .map-bottom {
+.sgn-map-overlay, .sgn-map-drawer {
   z-index: 1000;
 }
 

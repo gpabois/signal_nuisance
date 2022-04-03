@@ -42,7 +42,7 @@ export default class ReportingLiveView {
         this.map_container = document.getElementById("map-container");
         this.map = document.getElementById("map").map;
         
-        this.map_container.style.width = window.innerWidth + "px";
+        this.map_container.style.width = "100%"; //window.innerWidth + "px";
         this.map_container.style.height = window.innerHeight + "px";
 
         this.map.invalidateSize(true);
