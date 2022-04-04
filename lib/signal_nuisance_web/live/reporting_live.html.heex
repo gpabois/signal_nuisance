@@ -1,95 +1,124 @@
 <div id="reporting" class="sgn-map-container" phx-hook="ReportingLiveView">
-    <div class="bg-white sgn-drawer sgn-show">
+    <div class={"bg-white sgn-drawer #{if @display_drawer, do: "sgn-show", else: "sgn-hidden"} shadow-lg"}>
         Drawer
     </div>
     <div class="sgn-map-cell" id="map-container">
         <div class="sgn-map">
-            <leaflet-map  id="map" class="sgn-map" lat={@map_center.lat} lng={@map_center.long}  phx-click="close-alert-form">
+            <leaflet-map  id="map" class="sgn-map" lat={@map_center.lat} lng={@map_center.long}>
                 <%= for marker <- @markers do %>
                     <leaflet-marker data-id={marker.id} data-type={marker.type} phx-click={JS.push("marker-clicked", value: marker)}></leaflet-marker>
                 <% end %>
             </leaflet-map>
-            <div class="sgn-map-buttons">
-                <a phx-click="open-alert-form" id="btn-open-alert-form" class="btn btn-primary nav-link active px-2" aria-current="page" href="#">Alert</a>
-            </div>
-            <div class="sgn-map-navbar">
-                <nav class="navbar navbar-expand-lg navbar-dark">
-                    <div class="container-fluid">
-                        <a class="btn btn-primary navbar-brand" href="#">Signal'Nuisance</a>
-                        <button class="btn btn-default navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                        </button>
-                        <div class="collapse navbar-collapse d-flex" id="navbarNavAltMarkup">
-                            <div class="navbar-nav">
-                            </div>
-                            <div class="d-flex flex-row-reverse">^p
-                                <%= if @current_user do %>
-                                    <div class="p2"><%= link "Settings", to: Routes.user_settings_path(@socket, :edit), class: "p2" %></div>
-                                    <%= link "Log out", to: Routes.user_session_path(@socket, :delete), method: :delete %>
-                                    <p><%= @current_user.email %></p>
-                                <% else %>
-                                    <div class="p2"><%= link "Register", to: Routes.user_registration_path(@socket, :new), class: "p2" %></div>
-                                    <div class="p2"><%= link "Log in", to: Routes.user_session_path(@socket, :new), class: "p2" %></div>
-                                <% end %>
-                            </div>
-                        </div>
-                    </div>
-                </nav>
-                <p class="alert alert-info" role="alert"
-                    phx-click="lv:clear-flash"
-                    phx-value-key="info"><%= live_flash(@flash, :info) %></p>
 
-                <p class="alert alert-danger" role="alert"
-                    phx-click="lv:clear-flash"
-                    phx-value-key="error"><%= live_flash(@flash, :error) %></p>
-            </div>
-        </div>
-        <%= if @display_alert_form do %>
-            <div id="alert-form" class="sgn-map-drawer bg-white container-fluid shadow-lg">
-                <div class="bg-white sgn-map-drawer-close">
-                    <button phx-click="close-alert-form" class="btn" id="btn-close-alert-form">Close</button>
-                </div>
-                <%= case @alert_form_step do %>
-                    <% :"select-category" -> %>
-                        <div id="alert-form-select-alert-category" class="row">
-                            <%= for id <- @alert_categories do %>
+            <div class="sgn-map-buttons">
+                <div class={"sgn-menu #{if @alert_form_step == :"select-category", do: "sgn-show", else: "sgn-hidden"}"}>
+                    <ul>
+                        <%= for id <- @alert_categories do %>         
+                            <li>
                                 <button id={"alert-form-#{id}-category"}  class="btn btn-lg btn-light p-2 col-auto" phx-click="select-alert-category" phx-value-category={id}>
                                     <img width="35px" height="35px" src={Routes.static_path(@socket, "/images/#{id}.svg")}/>
                                 </button>
-                            <% end %>
-                        </div>
-                    <% :main -> %>
-                        <.form let={f} id="alert-form-main" class="form" for={@alert_changeset} phx-change="validate-alert" phx-submit="create-alert">
-                            <%= label f, :intensity %>
-                            <%= select f, :intensity, 0..10, class: "form-control" %>
-                            <%= error_tag f, :intensity %>
+                            </li>
+                        <% end %>
+                    </ul>
+                </div>
 
-                            <%= label f, :alert_type_id %>
-                            <%= select f, :alert_type_id, Enum.map(@alert_types, &{&1.label, &1.id}), class: "form-control" %>
-                            <%= error_tag f, :alert_type_id %>
-
-                            <%= case @user_loc do %>
-                            <% %{lat: nil, long: nil} -> %>
-                                <p>
-                                    Cannot locate you. Please enable <a href="#" onclick="window.currentView.enable_geolocation()">geolocation</a>
-                                </p>
-                            <% _ -> %>
-                            <% end %>
-
-                            <div style="display: none">
-                                <%= label f, :loc_long %>
-                                <%= number_input f, :loc_long, class: "form-control" %>
-                                <%= error_tag f, :loc_long %>
-
-                                <%= label f, :loc_lat %>
-                                <%= number_input f, :loc_lat, class: "form-control" %>
-                                <%= error_tag f, :loc_lat %>
-                            </div>
-
-                            <%= submit "Save" %>
-                        </.form>
+                <a phx-click="open-alert-form"  
+                        id="btn-open-alert-form" 
+                        class="btn btn-primary sgn-btn-circle btn-xl" 
+                        aria-current="alert" href="#">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="currentColor" class="bi bi-exclamation-diamond-fill" viewBox="0 0 16 16">
+                        <path d="M9.05.435c-.58-.58-1.52-.58-2.1 0L.436 6.95c-.58.58-.58 1.519 0 2.098l6.516 6.516c.58.58 1.519.58 2.098 0l6.516-6.516c.58-.58.58-1.519 0-2.098L9.05.435zM8 4c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995A.905.905 0 0 1 8 4zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                    </svg>
+                </a>               
+            </div>
+            <div class="sgn-map-navbar container-fluid">
+                <div class="d-flex justify-content-between">
+                    <div class="p-2 bd-highlight">
+                        <span class="badge rounded-pill bg-primary">Signal'Nuisance</span>
+                    </div>
+                    <div class="p-2 bd-highlight">
+                        <span class="badge rounded-pill bg-light text-dark">Etablissements</span>
+                    </div>
+                    <div class="p-2 bd-highlight sgn-pos-rel">
+                        <%= if @current_user do %>
+                            <a href="#" class="sgn-btn-circle btn-xl bg-white shadow-lg" phx-click="toggle-user-menu"></a>
+                        <% else %>
+                            <%= link "Log in", to: Routes.user_session_path(@socket, :new), class: "btn btn-primary" %>
+                        <% end %>
+                    </div>
+                </div>
+                <%= case live_flash(@flash, :info) do %>
+                    <% nil -> %>
+                    <% info -> %>
+                    <p class="alert alert-info" role="alert"
+                        phx-click="lv:clear-flash"
+                        phx-value-key="info"><%= info %></p>
+                <% end %>
+                <%= case live_flash(@flash, :error) do %>
+                    <% nil -> %>
+                    <% error -> %>
+                    <p class="alert alert-danger" role="alert"
+                        phx-click="lv:clear-flash"
+                        phx-value-key="error"><%= error %></p>
                 <% end %>
             </div>
-        <% end %> 
+
+            <%= if @current_user do %>
+            <div id="user-menu" class={"sgn-floating-menu #{if @display_user_menu, do: "sgn-show", else: "sgn-hidden"} sgn-pos-abs sgn-top-right bg-white shadow-lg"}>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <%= link "Settings", to: Routes.user_settings_path(@socket, :edit), class: "p2" %>
+                    </li>
+                    <%= if Bodyguard.permit?(SignalNuisance.Administration.SecurityPolicy, {:access, :view, :administration_dashboard}, @current_user, {}) do %>
+                        <li class="nav-item">
+                            <%= link "Administration", to: Routes.user_settings_path(@socket, :edit), class: "p2" %>
+                        </li>
+                    <% end %>
+                    <li class="nav-item">
+                        <%= link "Log out", to: Routes.user_session_path(@socket, :delete), method: :delete %>
+                    </li>
+                </ul>
+            </div>
+            <% end %>
+        </div>
+        <div id="alert-form" class={"sgn-map-drawer #{if @alert_form_step == :main, do: "sgn-show", else: "sgn-hidden"} bg-white container-fluid shadow-lg"}>
+            <div class="bg-white sgn-map-drawer-close">
+                <button phx-click="close-alert-form" class="btn" id="btn-close-alert-form">Close</button>
+            </div>
+            <%= case @alert_form_step do %>
+                <% :main -> %>
+                    <.form let={f} id="alert-form-main" class="form" for={@alert_changeset} phx-change="validate-alert" phx-submit="create-alert">
+                        <%= label f, :intensity %>
+                        <%= select f, :intensity, 0..10, class: "form-control" %>
+                        <%= error_tag f, :intensity %>
+
+                        <%= label f, :alert_type_id %>
+                        <%= select f, :alert_type_id, Enum.map(@alert_types, &{&1.label, &1.id}), class: "form-control" %>
+                        <%= error_tag f, :alert_type_id %>
+
+                        <%= case @user_loc do %>
+                        <% %{lat: nil, long: nil} -> %>
+                            <p>
+                                Cannot locate you. Please enable <a href="#" onclick="window.currentView.enable_geolocation()">geolocation</a>
+                            </p>
+                        <% _ -> %>
+                        <% end %>
+
+                        <div style="display: none">
+                            <%= label f, :loc_long %>
+                            <%= number_input f, :loc_long, class: "form-control" %>
+                            <%= error_tag f, :loc_long %>
+
+                            <%= label f, :loc_lat %>
+                            <%= number_input f, :loc_lat, class: "form-control" %>
+                            <%= error_tag f, :loc_lat %>
+                        </div>
+
+                        <%= submit "Save" %>
+                    </.form>
+                <% _ -> %>
+            <% end %>
+        </div>
     </div>
 </div>

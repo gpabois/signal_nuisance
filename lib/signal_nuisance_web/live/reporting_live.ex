@@ -12,14 +12,9 @@ defmodule SignalNuisanceWeb.ReportingLive do
             socket
             |> assign(:map_center, %{lat: 48.856614, long: 2.3522219})
             |> assign(:user_loc, %{lat: nil, long: nil})
-            |> assign(:markers, [
-                %{
-                    type: "establishment",
-                    id: 5,
-                    coordinates: %{lat: 48.856614, long: 2.3522220}
-                }
-            ])
-            |> assign(:display_alert_form, false)
+            |> assign(:markers, [])
+            |> assign(:display_drawer, false)
+            |> assign(:display_user_menu, false)
             |> assign(:alert_categories, SignalNuisance.Reporting.AlertType.categories())
             |> assign(:alert_form_step, 0)
             |> assign(:alert_changeset, nil)
@@ -28,7 +23,7 @@ defmodule SignalNuisanceWeb.ReportingLive do
         }
     end
 
-    def update_markers(socket, {ll, ur} = _area) do
+    def update_markers(%{assigns: %{map_bounds: {ll, ur}}} = socket) do
         socket
         |> assign(
             :markers,
@@ -39,13 +34,20 @@ defmodule SignalNuisanceWeb.ReportingLive do
         )
     end
 
+    def handle_event("toggle-user-menu", _, socket) do
+        {:noreply, 
+        socket |> assign(:display_user_menu, !socket.assigns.display_user_menu)
+    }
+    end
+
     def handle_event("marker-clicked", _marker, socket) do
         {:noreply, socket}
     end
 
     def handle_event("user-loc-update", %{"lat" => lat, "long" => long}, socket) do
         {:noreply,
-            socket |> assign(:user_loc, %{lat: lat, long: long})
+            socket 
+            |> assign(:user_loc, %{lat: lat, long: long})
         }
 
     end
@@ -72,13 +74,15 @@ defmodule SignalNuisanceWeb.ReportingLive do
             srid: 4326
         }
 
-        {:noreply, socket |> update_markers({ll, ur})}
+        {:noreply, socket 
+            |> assign(:map_bounds, {ll, ur})
+            |> update_markers()
+        }
     end
 
     def handle_event("open-alert-form", _, socket) do
         {:noreply,
             socket
-            |> assign(:display_alert_form, true)
             |> assign(:alert_form_step, :"select-category")
         }
     end
@@ -86,7 +90,7 @@ defmodule SignalNuisanceWeb.ReportingLive do
     def handle_event("close-alert-form", _, socket) do
         {:noreply,
             socket
-            |> assign(:display_alert_form, false)
+            |> assign(:alert_form_step, 0)
         }
     end
 

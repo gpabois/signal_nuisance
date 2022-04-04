@@ -30,7 +30,8 @@ class LeafletMap extends HTMLElement {
         }).addTo(this.map);
 
         this.defaultIcon = L.icon({
-            iconUrl: '/images/elixir-icon.png',
+            iconUrl: '/images/marker-icon.png',
+            shadowUrl: '/images/marker-shadow.png',
             iconSize: [64, 64],
         });
     }
