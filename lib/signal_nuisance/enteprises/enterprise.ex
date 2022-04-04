@@ -5,7 +5,7 @@ defmodule SignalNuisance.Enterprises.Enterprise do
   import Slugy
 
   alias SignalNuisance.Repo
-  alias SignalNuisance.Enterprise.Member
+  alias SignalNuisance.Enterprises.EnterpriseMember, as: Member
 
   schema "enterprises" do
     field :name, :string

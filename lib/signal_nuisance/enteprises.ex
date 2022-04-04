@@ -144,6 +144,14 @@ defmodule SignalNuisance.Enterprises do
     |> Enum.map(fn (m) -> m.user end)
   end
 
+  def get_enterprises_by_member(nil) do
+    []
+  end
+
+  def get_enterprises_by_member(user) do
+    Enterprise.get_by_member(user)
+  end
+
   @doc """
     Checks if the user is a member of an enterprise.
 

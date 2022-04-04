@@ -66,19 +66,24 @@
 
             <%= if @current_user do %>
             <div id="user-menu" class={"sgn-floating-menu #{if @display_user_menu, do: "sgn-show", else: "sgn-hidden"} sgn-pos-abs sgn-top-right bg-white shadow-lg"}>
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <%= link "Settings", to: Routes.user_settings_path(@socket, :edit), class: "p2" %>
+                <h3 class="text-center"><%= @current_user.email %></h3>
+                <ul class="list-inline text-center">
+                    <li class="list-inline-item">
+                         <%= link "Settings", to: Routes.user_settings_path(@socket, :edit), id: "link-user-settings" %>
+                    </li>
+                    <li class="list-inline-item">
+                        <%= link "Log out", to: Routes.user_session_path(@socket, :delete), id: "link-user-logout", method: :delete %>
                     </li>
                     <%= if Bodyguard.permit?(SignalNuisance.Administration.SecurityPolicy, {:access, :view, :administration_dashboard}, @current_user, {}) do %>
-                        <li class="nav-item">
-                            <%= link "Administration", to: Routes.user_settings_path(@socket, :edit), class: "p2" %>
+                        <li class="list-inline-item">
+                            <%= link "Administration", to: Routes.user_settings_path(@socket, :edit), id: "link-administration", class: "p2" %>
                         </li>
                     <% end %>
-                    <li class="nav-item">
-                        <%= link "Log out", to: Routes.user_session_path(@socket, :delete), method: :delete %>
-                    </li>
                 </ul>
+
+                <%= for enterprise <- @enterprises do %>
+                    <%= link enterprise.name, to: Routes.enterprise_dashboard_path(@socket, :show, enterprise.slug) %>
+                <% end %>
             </div>
             <% end %>
         </div>

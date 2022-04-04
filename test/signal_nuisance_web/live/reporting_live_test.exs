@@ -2,6 +2,8 @@ defmodule SignalNuisanceWeb.ReportingLiveTest do
     use SignalNuisanceWeb.ConnCase, async: true
     import Phoenix.LiveViewTest
 
+    alias SignalNuisance.Administration.Authorization.Permission, as: AdminPermission
+
     import SignalNuisance.ReportingFixtures
 
     def alert_form_select_category() do
@@ -14,6 +16,21 @@ defmodule SignalNuisanceWeb.ReportingLiveTest do
         {view, html} = alert_form_select_category()
         view |> element("#alert-form-#{category}-category") |> render_click()
         {view, html}
+    end
+
+    setup :register_and_log_in_user
+
+    describe "accéder au tableau d'administration" do
+        test "lorsque l'utilisateur n'a pas les droits administrateur, le lien vers le tableau d'administration ne doit pas être affiché", %{user: _user, conn: conn} do
+            {:ok, view, _html} =  conn |> live("/")
+            refute view |> element("a#link-administration") |> has_element?()
+        end
+
+        test "lorsque l'utilisateur a les droits administrateur, le lien vers le tableau d'administration doit être affiché", %{user: user, conn: conn} do
+            AdminPermission.grant(user, {:access, :administration}, {})
+            {:ok, view, _html} =  conn |> live("/")
+            assert view |> element("a#link-administration") |> has_element?()
+        end
     end
 
     describe "faire un signalement (alert) quand on est anonyme" do
@@ -44,10 +61,6 @@ defmodule SignalNuisanceWeb.ReportingLiveTest do
             alert_type = alert_type_fixture()
             alert_attributes = valid_alert_attributes(%{alert_type_id: alert_type.id})
 
-            alert_attributes_2 = alert_attributes
-            |> Map.delete(:loc_long)
-            |> Map.delete(:loc_lat)
-
             {view, _html} = alert_form_main(alert_type.category)
 
             view |> render_hook("user-loc-update", %{"long" => alert_attributes.loc_long, "lat" => alert_attributes.loc_lat})
@@ -60,10 +73,6 @@ defmodule SignalNuisanceWeb.ReportingLiveTest do
         test "doit renvoyer une erreur, si l'utilisateur n'a pas communiqué sa localisation." do
             alert_type = alert_type_fixture()
             alert_attributes = valid_alert_attributes(%{alert_type_id: alert_type.id})
-
-            alert_attributes_2 = alert_attributes
-            |> Map.delete(:loc_long)
-            |> Map.delete(:loc_lat)
 
             {view, _html} = alert_form_main(alert_type.category)
 

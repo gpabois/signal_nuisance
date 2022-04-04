@@ -20,6 +20,7 @@ defmodule SignalNuisanceWeb.ReportingLive do
             |> assign(:alert_changeset, nil)
             |> assign(:alert_types, [])
             |> assign(:current_user, session["current_user"])
+            |> assign(:enterprises, Enterprises.get_enterprises_by_member(session["current_user"]))
         }
     end
 
