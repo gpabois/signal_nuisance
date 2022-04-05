@@ -1,4 +1,15 @@
+
 <div id="reporting" class="sgn-map-container" phx-hook="ReportingLiveView">
+    <%= case live_flash(@flash, :info) do %>
+        <% nil -> %>
+        <% info -> %>
+        <%= md_snackbar info, action: {"Fermer", "lv:clear-flash"} %>
+    <% end %>
+    <%= case live_flash(@flash, :error) do %>
+        <% nil -> %>
+        <% error -> %>
+        <%= md_snackbar error, action: {"Fermer", "lv:clear-flash"} %>
+    <% end %>
     <div class={"bg-white sgn-drawer #{if @display_drawer, do: "sgn-show", else: "sgn-hidden"} shadow-lg"}>
         Drawer
     </div>
@@ -23,101 +34,100 @@
                     </ul>
                 </div>
 
-                <button phx-click="open-alert-form" id="btn-open-alert-form" class="mdc-fab">
+                <button phx-click="open-alert-form" id="btn-open-alert-form" class="mdc-fab" mdc-auto-init="MDCFab">
                     <div class="mdc-fab__ripple"></div>
                     <span class="material-icons mdc-fab__icon">report_problem</span>
                 </button>
            
             </div>
-            <div class="sgn-map-navbar container-fluid">
-                <div class="d-flex justify-content-between">
-                    <div class="p-2 bd-highlight">
+            <div class="sgn-map-navbar mdc-layout-grid">
+                <div class="mdc-layout-grid__inner">
+                    <div class="mdc-layout-grid__cell--span-1">
                         <span class="badge rounded-pill bg-primary">Signal'Nuisance</span>
                     </div>
-                    <div class="p-2 bd-highlight">
-                        <span class="badge rounded-pill bg-light text-dark">Etablissements</span>
+                    <div class="mdc-layout-grid__cell--span-10">
+                        <span class="badge rounded-pill bg-light text-dark"><%= gettext "Etablissements" %></span>
                     </div>
-                    <div class="p-2 bd-highlight sgn-pos-rel">
+                    <div class="mdc-layout-grid__cell--span-1">
                         <%= if @current_user do %>
+                        <button id="menu-surface-button" phx-click="toggle-user-menu">Open Menu Surface</button>
+                        <div class="mdc-menu-surface--anchor">
+                            <div id="user-menu" class={"mdc-menu-surface--fixed mdc-menu-surface#{if @display_user_menu, do: "--open", else: ""}"}>
+                                <h3 class="text-center"><%= @current_user.email %></h3>
+                                <ul class="list-inline text-center">
+                                    <li class="list-inline-item">
+                                        <%= link gettext("Paramètres du compte"), to: Routes.user_settings_path(@socket, :edit), id: "link-user-settings" %>
+                                    </li>
+                                    <li class="list-inline-item">
+                                        <%= link gettext("Se déconnecter"), to: Routes.user_session_path(@socket, :delete), id: "link-user-logout", method: :delete %>
+                                    </li>
+                                    <%= if Bodyguard.permit?(SignalNuisance.Administration.SecurityPolicy, {:access, :view, :administration_dashboard}, @current_user, {}) do %>
+                                        <li class="list-inline-item">
+                                            <%= link gettext("Administration"), to: Routes.user_settings_path(@socket, :edit), id: "link-administration", class: "p2" %>
+                                        </li>
+                                    <% end %>
+                                </ul>
+
+                                <%= for enterprise <- @enterprises do %>
+                                    <%= link enterprise.name, to: Routes.enterprise_dashboard_path(@socket, :show, enterprise.slug) %>
+                                <% end %>
+                            </div>
+                        </div>
                             <a href="#" class="sgn-btn-circle btn-xl bg-white shadow-lg" phx-click="toggle-user-menu"></a>
                         <% else %>
-                            <%= link "Log in", to: Routes.user_session_path(@socket, :new), class: "btn btn-primary" %>
+                            <%= link gettext("Se connecter"), to: Routes.user_session_path(@socket, :new), class: "btn btn-primary" %>
                         <% end %>
                     </div>
                 </div>
-                <%= case live_flash(@flash, :info) do %>
-                    <% nil -> %>
-                    <% info -> %>
-                    <p class="alert alert-info" role="alert"
-                        phx-click="lv:clear-flash"
-                        phx-value-key="info"><%= info %></p>
-                <% end %>
-                <%= case live_flash(@flash, :error) do %>
-                    <% nil -> %>
-                    <% error -> %>
-                    <p class="alert alert-danger" role="alert"
-                        phx-click="lv:clear-flash"
-                        phx-value-key="error"><%= error %></p>
-                <% end %>
             </div>
 
-            <%= if @current_user do %>
-            <div id="user-menu" class={"sgn-floating-menu #{if @display_user_menu, do: "sgn-show", else: "sgn-hidden"} sgn-pos-abs sgn-top-right bg-white shadow-lg"}>
-                <h3 class="text-center"><%= @current_user.email %></h3>
-                <ul class="list-inline text-center">
-                    <li class="list-inline-item">
-                         <%= link "Settings", to: Routes.user_settings_path(@socket, :edit), id: "link-user-settings" %>
-                    </li>
-                    <li class="list-inline-item">
-                        <%= link "Log out", to: Routes.user_session_path(@socket, :delete), id: "link-user-logout", method: :delete %>
-                    </li>
-                    <%= if Bodyguard.permit?(SignalNuisance.Administration.SecurityPolicy, {:access, :view, :administration_dashboard}, @current_user, {}) do %>
-                        <li class="list-inline-item">
-                            <%= link "Administration", to: Routes.user_settings_path(@socket, :edit), id: "link-administration", class: "p2" %>
-                        </li>
-                    <% end %>
-                </ul>
-
-                <%= for enterprise <- @enterprises do %>
-                    <%= link enterprise.name, to: Routes.enterprise_dashboard_path(@socket, :show, enterprise.slug) %>
-                <% end %>
-            </div>
-            <% end %>
         </div>
         <div id="alert-form" class={"sgn-map-drawer #{if @alert_form_step == :main, do: "sgn-show", else: "sgn-hidden"} bg-white container-fluid shadow-lg"}>
             <div class="bg-white sgn-map-drawer-close">
-                <button phx-click="close-alert-form" class="btn" id="btn-close-alert-form">Close</button>
+                <button phx-click="close-alert-form" class="btn" id="btn-close-alert-form">
+                     <span class="material-icons mdc-fab__icon">close</span>
+                </button>
             </div>
             <%= case @alert_form_step do %>
                 <% :main -> %>
                     <.form let={f} id="alert-form-main" class="form" for={@alert_changeset} phx-change="validate-alert" phx-submit="create-alert">
-                        <%= label f, :intensity %>
-                        <%= select f, :intensity, 0..10, class: "form-control" %>
-                        <%= error_tag f, :intensity %>
+                        <div class="mdc-layout-grid">
+                             <div class="mdc-layout-grid__inner">
+                                <div class="mdc-layout-grid__cell">
+                                    <div class="mdc-form-field sgn-fullwidth">
+                                        <%= label f, :intensity,  gettext("Intensité perçue") %>
+                                        <%= md_slider f, :intensity, 0, 10, 1, class: "sgn-fullwidth" %>
+                                    </div>
+                                </div>
+                                <div class="mdc-layout-grid__cell">
+                                    <%= md_select f, :intensity, Enum.map(@alert_types, &{&1.label, &1.id}), label: gettext("Type de nuisance"), class: "sgn-fullwidth" %>
+                                </div>
+                                <div class="mdc-layout-grid__cell">
+                                    <%= submit gettext("Signaler"), class: "mdc-btn" %>
+                                </div>
+                                <div style="display: none">
+                                    <%= label f, :loc_long, gettext("Longitude") %> %>
+                                    <%= number_input f, :loc_long, class: "form-control" %>
+                                    <%= error_tag f, :loc_long %>
 
-                        <%= label f, :alert_type_id %>
-                        <%= select f, :alert_type_id, Enum.map(@alert_types, &{&1.label, &1.id}), class: "form-control" %>
-                        <%= error_tag f, :alert_type_id %>
-
-                        <%= case @user_loc do %>
-                        <% %{lat: nil, long: nil} -> %>
-                            <p>
-                                Cannot locate you. Please enable <a href="#" onclick="window.currentView.enable_geolocation()">geolocation</a>
-                            </p>
-                        <% _ -> %>
-                        <% end %>
-
-                        <div style="display: none">
-                            <%= label f, :loc_long %>
-                            <%= number_input f, :loc_long, class: "form-control" %>
-                            <%= error_tag f, :loc_long %>
-
-                            <%= label f, :loc_lat %>
-                            <%= number_input f, :loc_lat, class: "form-control" %>
-                            <%= error_tag f, :loc_lat %>
+                                    <%= label f, :loc_lat, gettext("Latitude") %>
+                                    <%= number_input f, :loc_lat, class: "form-control" %>
+                                    <%= error_tag f, :loc_lat %>
+                                </div>
+                                <%= case @user_loc do %>
+                                    <% %{lat: nil, long: nil} -> %>
+                                        <div class="mdc-layout-grid__cell--span-8">
+                                        <p>
+                                             <%= gettext("Vous n'êtes pas localisé, veuillez activer la %{a_geoloc_bg}géolocalisation%{a_geoloc_end}.", a_geoloc_bg: "<a href=\"#\" onclick=\"window.currentView.enable_geolocation()\">", a_geoloc_end: "</a>") |> raw %>
+                                        </p>
+                                        </div>
+                                    <% _ -> %>
+                                <%end %>
+                        </div>
                         </div>
 
-                        <%= submit "Save" %>
+
+                        
                     </.form>
                 <% _ -> %>
             <% end %>

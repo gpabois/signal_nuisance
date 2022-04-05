@@ -104,6 +104,8 @@ defmodule SignalNuisanceWeb do
       # Import basic rendering functionality (render, render_layout, etc)
       import Phoenix.View
 
+      import MD.Helpers
+
       import SignalNuisanceWeb.ErrorHelpers
       import SignalNuisanceWeb.Gettext
       alias SignalNuisanceWeb.Router.Helpers, as: Routes

@@ -133,13 +133,13 @@ defmodule SignalNuisanceWeb.ReportingLive do
             {:ok, _alert} ->
                 {:noreply,
                     socket
-                        |> put_flash(:info, "Alert created.")
+                        |> put_flash(:info, gettext("Signalement enregistré"))
                         |> assign(:display_alert_form, false)
                 }
             {:error, changeset} ->
                 {:noreply,
                     socket
-                        |> put_flash(:error, "Alert cannot be created.")
+                        |> put_flash(:error, "Le signalement ne peut pas être enregistré.")
                         |> assign(:alert_changeset, changeset)
                 }
 

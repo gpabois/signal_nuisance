@@ -9,6 +9,10 @@ export default class ReportingLiveView {
         var view = this;
         
         liveSocket.hooks.ReportingLiveView = {
+            updated () {
+                mdc.autoInit(); // Should be called each time...
+            },
+
             mounted() {
                 view.hook = this;
                 view.map.on('moveend', function () {

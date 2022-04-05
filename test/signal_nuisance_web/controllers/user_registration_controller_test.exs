@@ -35,8 +35,8 @@ defmodule SignalNuisanceWeb.UserRegistrationControllerTest do
       conn = get(conn, "/")
       response = html_response(conn, 200)
       assert response =~ email
-      assert response =~ "Settings</a>"
-      assert response =~ "Log out</a>"
+      assert response =~ "link-user-settings"
+      assert response =~ "link-user-logout"
     end
 
     test "render errors for invalid data", %{conn: conn} do
