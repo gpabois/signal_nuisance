@@ -1,6 +1,8 @@
 defmodule SignalNuisance.Enterprises.SecurityPolicy do
   @behaviour Bodyguard.Policy
 
+  use SignalNuisance.Authorization
+
   def authorize({:assign_permissions, %SignalNuisance.Enterprises.Enterprise{} = enterprise}, user, _to) do
     SignalNuisance.Enterprises.Authorization.EnterprisePermission.has?(
       user,
@@ -70,11 +72,7 @@ defmodule SignalNuisance.Enterprises.SecurityPolicy do
   end
 
   def authorize({:access, :view, :dashboard}, user, %SignalNuisance.Enterprises.Enterprise{} = enterprise) do
-    SignalNuisance.Enterprises.Authorization.EnterprisePermission.has?(
-      user,
-      {:access, :common},
-      enterprise
-    )
+    SignalNuisance.Enterprises.is_enterprise_member?(enterprise, user)
   end
 
   def authorize({:access, :view, :dashboard}, user, %SignalNuisance.Enterprises.Establishment{} = establishment) do

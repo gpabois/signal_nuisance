@@ -1,21 +1,25 @@
-<header>
-  <section class="container">
-    <nav>
-      <ul>
-        <li><a href="https://hexdocs.pm/phoenix/overview.html">Get Started</a></li>
-        <%= if function_exported?(Routes, :live_dashboard_path, 2) do %>
-          <li><%= link "LiveDashboard", to: Routes.live_dashboard_path(@conn, :home) %></li>
-        <% end %>
-      </ul>
-      <%= render "_user_menu.html", assigns %>
-    </nav>
-    <a href="https://phoenixframework.org/" class="phx-logo">
-      <img src={Routes.static_path(@conn, "/images/phoenix.png")} alt="Phoenix Framework Logo"/>
-    </a>
-  </section>
+<header class="mdc-top-app-bar">
+  <div class="mdc-top-app-bar__row">
+    <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
+      <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button" aria-label="Open navigation menu">menu</button>
+      <span class="mdc-top-app-bar__title">Signal'Nuisance · <%= assigns[:page_title] || "" %></span>
+    </section>
+    <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
+      <%= link "home", to: "/", class: "material-icons mdc-top-app-bar__action-item mdc-icon-button", aria_label: "Favorite" %>
+      <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Options">more_vert</button>
+    </section>
+  </div>
 </header>
-<main class="container">
-  <p class="alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
-  <p class="alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
+<main class="mdc-top-app-bar--fixed-adjust">
+  <%= case get_flash(@conn, :info) do %>
+      <% nil -> %>
+      <% info -> %>
+      <%= md_snackbar info %>
+  <% end %>
+  <%= case get_flash(@conn, :error) do %>
+      <% nil -> %>
+      <% error -> %>
+      <%= md_snackbar error %>
+  <% end %>
   <%= @inner_content %>
 </main>

@@ -68,6 +68,14 @@ defmodule SignalNuisance.Enterprises do
     end
   end
 
+  def get_establishment_by_enterprises(enterprise, opts \\ []) do
+    ets = Establishment.get_by_enterprise(enterprise)
+    case Keyword.get(opts, :filter, nil) do
+      nil -> ets
+      f -> Enum.filter(ets, f)
+    end
+  end
+
   def get_nearest_establishments(%Geo.Point{} = point, %GeoMath.Distance{} = distance) do
     Establishment.get_nearest(point, distance)
   end

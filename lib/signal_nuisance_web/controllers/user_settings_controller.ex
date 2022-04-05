@@ -7,7 +7,7 @@ defmodule SignalNuisanceWeb.UserSettingsController do
   plug :assign_email_and_password_changesets
 
   def edit(conn, _params) do
-    render(conn, "edit.html")
+    render(conn, "edit.html", page_title: "Paramètres du compte")
   end
 
   def update(conn, %{"action" => "update_email"} = params) do
@@ -30,7 +30,7 @@ defmodule SignalNuisanceWeb.UserSettingsController do
         |> redirect(to: Routes.user_settings_path(conn, :edit))
 
       {:error, changeset} ->
-        render(conn, "edit.html", email_changeset: changeset)
+        render(conn, "edit.html", email_changeset: changeset, page_title: "Paramètres du compte")
     end
   end
 
@@ -46,7 +46,7 @@ defmodule SignalNuisanceWeb.UserSettingsController do
         |> UserAuth.log_in_user(user)
 
       {:error, changeset} ->
-        render(conn, "edit.html", password_changeset: changeset)
+        render(conn, "edit.html", password_changeset: changeset, page_title: "Paramètres du compte")
     end
   end
 

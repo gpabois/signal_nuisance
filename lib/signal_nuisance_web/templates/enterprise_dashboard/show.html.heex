@@ -1,1 +1,4 @@
-<h1><%= gettext "Tableau de bord - %{enterprise_name}", enterprise_name: @enterprise.name %> </h1>
+<h1><%= gettext "Etablissements" %></h1>
+<%= if @can.register_establishment? do %>
+    <% link "Créer établissement", to: Routes.establishment_registration_path(@conn, :new, @enterprise.slug), id: "link-register-establishment" %>
+<% end %>

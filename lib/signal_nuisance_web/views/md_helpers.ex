@@ -59,11 +59,13 @@ defmodule MD.Helpers do
         """
     end
 
-    def md_input(form, field, values, opts \\ []) do
+    def md_input(form, field, opts \\ []) do
         assigns = %{
             form: form,
             field: field,
-            values: values,
+            type: Keyword.get(opts, :type, "text"),
+            name: Keyword.get(opts, :name, input_name(form, field)),
+            id: Keyword.get(opts, :id, input_id(form, field)),
             label: Keyword.get(opts, :label, field),
             class: Keyword.get(opts, :class, "")
         }
@@ -72,7 +74,7 @@ defmodule MD.Helpers do
         <label class={"mdc-text-field mdc-text-field--filled #{@class}"} data-mdc-auto-init="MDCTextField">
             <span class="mdc-text-field__ripple"></span>
             <span class="mdc-floating-label" id={label_id(form, field)}><%= @label %></span>
-            <input class="mdc-text-field__input" name={input_name(form, field)} id={input_id(form, field)} type="text" aria-labelledby={label_id(form, field)}>
+            <input class="mdc-text-field__input" name={@name} id={@id} type={@type} aria-labelledby={label_id(form, field)}>
             <span class="mdc-line-ripple"></span>
         </label>
         """

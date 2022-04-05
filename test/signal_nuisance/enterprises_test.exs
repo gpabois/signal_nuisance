@@ -194,17 +194,17 @@ defmodule SignalNuisance.EnterpriseTest do
     end
 
     describe "SignalNuisance.Enterprises.SecurityPolicy::Enterprise" do
-        test "l'utilisateur ne doit pas être autorisé à accéder au tableau de bord d'une entreprise, s'il n'a pas la permission {:access, :common} relative à l'entreprise." do
+        test "l'utilisateur ne doit pas être autorisé à accéder au tableau de bord d'une entreprise, s'il n'est pas membre de l'entreprise." do
             user        = user_fixture()
             enterprise  = enterprise_fixture(%{})
 
             refute Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :view, :dashboard}, user, enterprise)
         end
-        test "l'utilisateur doit être autorisé à accéder au tableau de bord d'une entreprise, s'il a la permission {:access, :common} relative à l'entreprise." do
+        test "l'utilisateur doit être autorisé à accéder au tableau de bord d'une entreprise, s'il est membre de l'entreprise." do
             user        = user_fixture()
             enterprise  = enterprise_fixture(%{})
 
-            EnterprisePermission.grant(user, [access: :common], enterprise)
+            Enterprises.add_enterprise_member(enterprise, user)
             assert Bodyguard.permit?(SignalNuisance.Enterprises.SecurityPolicy, {:access, :view, :dashboard}, user, enterprise)
         end
 

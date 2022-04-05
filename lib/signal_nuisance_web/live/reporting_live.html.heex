@@ -26,7 +26,7 @@
                     <ul>
                         <%= for id <- @alert_categories do %>         
                             <li>
-                                <button id={"alert-form-#{id}-category"}  class="btn btn-lg btn-light p-2 col-auto" phx-click="select-alert-category" phx-value-category={id}>
+                                <button id={"alert-form-#{id}-category"}  class="mdc-fab mdc-theme--secondary-bg mdc-theme--secondary" mdc-auto-init="MDCFab" phx-click="select-alert-category" phx-value-category={id}>
                                     <img width="35px" height="35px" src={Routes.static_path(@socket, "/images/#{id}.svg")}/>
                                 </button>
                             </li>
@@ -123,11 +123,8 @@
                                         </div>
                                     <% _ -> %>
                                 <%end %>
-                        </div>
-                        </div>
-
-
-                        
+                            </div>
+                        </div>                      
                     </.form>
                 <% _ -> %>
             <% end %>
