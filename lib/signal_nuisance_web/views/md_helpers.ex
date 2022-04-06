@@ -1,6 +1,8 @@
 defmodule MD.Helpers do
     import Phoenix.LiveView.Helpers
     import Phoenix.HTML.Form
+    import SignalNuisanceWeb.ErrorHelpers
+    import Phoenix.HTML.Tag
 
     defp label_id(form, field) do
         "label-#{input_id(form, field)}"
@@ -39,13 +41,15 @@ defmodule MD.Helpers do
             form: form,
             field: field,
             min: min, max: max, step: step,
+            name: Keyword.get(opts, :name, input_name(form, field)),
+            id: Keyword.get(opts, :id, input_id(form, field)),
             label: Keyword.get(opts, :label, field),
             class: Keyword.get(opts, :class, "")
         }
 
         ~H"""
         <div class={"mdc-slider #{@class}"} data-mdc-auto-init="MDCSlider">
-            <input class="mdc-slider__input" type="range" min={@min} max={@max} step={@step} value={input_value(@form, @field) || @min} name={input_name(@form, @field)} aria-label={@label}>
+            <input class="mdc-slider__input" type="range" min={@min} max={@max} step={@step} value={input_value(@form, @field) || @min} name={@name} id={@id} aria-label={@label}>
             <div class="mdc-slider__track">
                 <div class="mdc-slider__track--inactive"></div>
                 <div class="mdc-slider__track--active">
@@ -55,6 +59,15 @@ defmodule MD.Helpers do
             <div class="mdc-slider__thumb">
                 <div class="mdc-slider__thumb-knob"></div>
             </div>
+        </div>
+        <div class="mdc-text-field-helper-line">
+            <%= Enum.map(Keyword.get_values(form.errors, field), fn error ->
+                content_tag(:div, translate_error(error),
+                    class: "mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg",
+                    phx_feedback_for: input_name(form, field)
+            )
+            end)
+        %>
         </div>
         """
     end
@@ -71,12 +84,20 @@ defmodule MD.Helpers do
         }
 
         ~H"""
-        <label class={"mdc-text-field mdc-text-field--filled #{@class}"} data-mdc-auto-init="MDCTextField">
+        <div class={"mdc-text-field mdc-text-field--filled #{@class}"} data-mdc-auto-init="MDCTextField">
             <span class="mdc-text-field__ripple"></span>
             <span class="mdc-floating-label" id={label_id(form, field)}><%= @label %></span>
             <input class="mdc-text-field__input" name={@name} id={@id} type={@type} aria-labelledby={label_id(form, field)}>
             <span class="mdc-line-ripple"></span>
-        </label>
+        </div>
+        <div class="mdc-text-field-helper-line">
+            <%= for error <- Keyword.get_values(form.errors, field) do %>
+            <div class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent mdc-text-field-helper-text--validation-msg" phx-feedback-for={@name} mdc-auto-init="MDCTextFieldHelperText">
+                <%= translate_error(error) %>
+            </div>
+        <% end %>
+        %>
+        </div>
         """
     end
 
@@ -91,7 +112,7 @@ defmodule MD.Helpers do
             class: Keyword.get(opts, :class, "")
         }
         ~H"""
-        <div lass={"mdc-select #{@class}"} data-mdc-auto-init="MDCSelect">
+        <div class={"mdc-select #{@class}"} data-mdc-auto-init="MDCSelect">
             <i class="mdc-select__dropdown-icon"></i>
             <select class="mdc-select__native-control" id={@id} name={@name}>
                 <option value="" disabled selected></option>
@@ -110,6 +131,13 @@ defmodule MD.Helpers do
             </select>
             <label class="mdc-floating-label"><%= @label %></label>
             <div class="mdc-line-ripple"></div>
+        </div>
+        <div class="mdc-text-field-helper-line">
+             <%= for error <- Keyword.get_values(form.errors, field) do %>
+                <div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg" phx-feedback-for={@name} mdc-auto-init="MDCTextFieldHelperText">
+                    <%= translate_error(error) %>
+                </div>
+            <% end %>
         </div>
         """
     end
