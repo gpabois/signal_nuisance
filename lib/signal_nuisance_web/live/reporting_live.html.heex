@@ -100,7 +100,7 @@
                                     </div>
                                 </div>
                                 <div class="mdc-layout-grid__cell">
-                                    <%= md_select f, :intensity, Enum.map(@alert_types, &{&1.label, &1.id}), label: gettext("Type de nuisance"), class: "sgn-fullwidth" %>
+                                    <%= md_select f, :alert_type_id, Enum.map(@alert_types, &{&1.label, &1.id}), label: gettext("Type de nuisance"), class: "sgn-fullwidth" %>
                                 </div>
                                 <div class="mdc-layout-grid__cell">
                                     <%= submit gettext("Signaler"), class: "mdc-btn" %>

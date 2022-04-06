@@ -22,6 +22,7 @@ defmodule SignalNuisanceWeb.ChannelCase do
       # Import conveniences for testing with channels
       import Phoenix.ChannelTest
       import SignalNuisanceWeb.ChannelCase
+      import SignalNuisanceWeb.Gettext
 
       # The default endpoint for testing
       @endpoint SignalNuisanceWeb.Endpoint

@@ -28,7 +28,7 @@ defmodule MD.Helpers do
                         </button>
                     </div>
                     <% _ -> %>
-                <% end %> 
+                <% end %>
             </div>
         </aside>
         """
@@ -85,65 +85,31 @@ defmodule MD.Helpers do
             form: form,
             field: field,
             values: values,
+            name: Keyword.get(opts, :name, input_name(form, field)),
+            id: Keyword.get(opts, :id, input_id(form, field)),
             label: Keyword.get(opts, :label, field),
             class: Keyword.get(opts, :class, "")
         }
-
         ~H"""
-        <div class={"mdc-select mdc-select--filled #{@class}"}  data-mdc-auto-init="MDCSelect">
-            <div class="mdc-select__anchor"
-                role="button"
-                aria-haspopup="listbox"
-                aria-expanded="true"
-                aria-labelledby="demo-label demo-selected-text">
-                <span class="mdc-select__ripple"></span>
-                <span id="demo-label" class="mdc-floating-label"><%= @label %></span>
-                <span class="mdc-select__selected-text-container">
-                <span id="demo-selected-text" class="mdc-select__selected-text"></span>
-                </span>
-                <span class="mdc-select__dropdown-icon">
-                    <svg
-                        class="mdc-select__dropdown-icon-graphic"
-                        viewBox="7 10 10 5" focusable="true">
-                        <polygon
-                            class="mdc-select__dropdown-icon-inactive"
-                            stroke="none"
-                            fill-rule="evenodd"
-                            points="7 10 12 15 17 10">
-                        </polygon>
-                        <polygon
-                            class="mdc-select__dropdown-icon-active"
-                            stroke="none"
-                            fill-rule="evenodd"
-                            points="7 15 12 10 17 15">
-                        </polygon>
-                    </svg>
-                </span>
-                <span class="mdc-line-ripple"></span>
-            </div>
-
-            <div class="mdc-select__menu mdc-menu mdc-menu-surface mdc-menu-surface--fullwidth">
-                <ul class="mdc-list" role="listbox" aria-label={@label}>
-                    <%= for value <- @values do %>
-                        <%= case value do %>
-                        <% {label, value} -> %>   
-                            <li class="mdc-list-item" aria-selected="false" data-value={value} role="option">
-                                <span class="mdc-list-item__ripple"></span>
-                                <span class="mdc-list-item__text">
-                                    <%= label %>
-                                </span>
-                            </li>
-                        <% value -> %>
-                        <li class="mdc-list-item" aria-selected="false" data-value={value} role="option">
-                            <span class="mdc-list-item__ripple"></span>
-                            <span class="mdc-list-item__text">
-                                <%= value %>
-                            </span>
-                        </li>                        
-                        <% end %>
-                    <% end %> 
-                </ul>
-            </div>
+        <div lass={"mdc-select #{@class}"} data-mdc-auto-init="MDCSelect">
+            <i class="mdc-select__dropdown-icon"></i>
+            <select class="mdc-select__native-control" id={@id} name={@name}>
+                <option value="" disabled selected></option>
+                <%= for value <- @values do %>
+                    <%= case value do %>
+                    <% {label, value} -> %>
+                        <option value={value}>
+                            <%= label %>
+                        </option>
+                    <% value -> %>
+                        <option value={value}>
+                            <%= value %>
+                        </option>
+                    <% end %>
+                <% end %>
+            </select>
+            <label class="mdc-floating-label"><%= @label %></label>
+            <div class="mdc-line-ripple"></div>
         </div>
         """
     end

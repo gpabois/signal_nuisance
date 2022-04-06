@@ -67,7 +67,7 @@ defmodule SignalNuisanceWeb.ReportingLiveTest do
 
             assert view
             |> form("#alert-form-main", %{"alert" => alert_attributes})
-            |> render_submit() =~ "Alert created"
+            |> render_submit() =~ gettext("Signalement enregistré")
         end
 
         test "doit renvoyer une erreur, si l'utilisateur n'a pas communiqué sa localisation." do
@@ -78,7 +78,7 @@ defmodule SignalNuisanceWeb.ReportingLiveTest do
 
             assert view
             |> form("#alert-form-main", %{"alert" => alert_attributes})
-            |> render_submit() =~ "Alert cannot be created"
+            |> render_submit() =~ gettext("Le signalement ne peut pas être enregistré.")
         end
     end
 end

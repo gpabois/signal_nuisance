@@ -36,7 +36,7 @@ defmodule SignalNuisanceWeb.ReportingLive do
     end
 
     def handle_event("toggle-user-menu", _, socket) do
-        {:noreply, 
+        {:noreply,
         socket |> assign(:display_user_menu, !socket.assigns.display_user_menu)
     }
     end
@@ -47,7 +47,7 @@ defmodule SignalNuisanceWeb.ReportingLive do
 
     def handle_event("user-loc-update", %{"lat" => lat, "long" => long}, socket) do
         {:noreply,
-            socket 
+            socket
             |> assign(:user_loc, %{lat: lat, long: long})
         }
 
@@ -75,7 +75,7 @@ defmodule SignalNuisanceWeb.ReportingLive do
             srid: 4326
         }
 
-        {:noreply, socket 
+        {:noreply, socket
             |> assign(:map_bounds, {ll, ur})
             |> update_markers()
         }
@@ -139,7 +139,7 @@ defmodule SignalNuisanceWeb.ReportingLive do
             {:error, changeset} ->
                 {:noreply,
                     socket
-                        |> put_flash(:error, "Le signalement ne peut pas être enregistré.")
+                        |> put_flash(:error, gettext("Le signalement ne peut pas être enregistré."))
                         |> assign(:alert_changeset, changeset)
                 }
 

@@ -24,6 +24,7 @@ defmodule SignalNuisance.DataCase do
       import Ecto.Changeset
       import Ecto.Query
       import SignalNuisance.DataCase
+      import SignalNuisanceWeb.Gettext
     end
   end
 

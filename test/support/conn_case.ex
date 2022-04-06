@@ -23,6 +23,7 @@ defmodule SignalNuisanceWeb.ConnCase do
       import Plug.Conn
       import Phoenix.ConnTest
       import SignalNuisanceWeb.ConnCase
+      import SignalNuisanceWeb.Gettext
 
       alias SignalNuisanceWeb.Router.Helpers, as: Routes
 
