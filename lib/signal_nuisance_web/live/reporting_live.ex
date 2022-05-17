@@ -3,7 +3,7 @@ defmodule SignalNuisanceWeb.ReportingLive do
 
     use SignalNuisanceWeb, :map_live_view
 
-    alias SignalNuisance.Enterprises
+    alias SignalNuisance.Facilities
     alias SignalNuisance.Reporting
     alias SignalNuisance.Reporting.Alert
 
@@ -20,7 +20,7 @@ defmodule SignalNuisanceWeb.ReportingLive do
             |> assign(:alert_changeset, nil)
             |> assign(:alert_types, [])
             |> assign(:current_user, session["current_user"])
-            |> assign(:enterprises, Enterprises.get_enterprises_by_member(session["current_user"]))
+            |> assign(:facilities, Facilities.get_by_member(session["current_user"]))
         }
     end
 
@@ -29,8 +29,8 @@ defmodule SignalNuisanceWeb.ReportingLive do
         |> assign(
             :markers,
             Enum.map(
-                Enterprises.get_establishments_in_area(ll, ur),
-                fn ets -> %{type: "establishment", coordinates: ets.loc, id: ets.id} end
+                Facilities.get_facilities_in_area(ll, ur),
+                fn ets -> %{type: "facility", coordinates: ets.loc, id: ets.id} end
             )
         )
     end
@@ -133,7 +133,7 @@ defmodule SignalNuisanceWeb.ReportingLive do
             {:ok, _alert} ->
                 {:noreply,
                     socket
-                        |> put_flash(:info, gettext("Signalement enregistré"))
+                        |> put_flash(:info, gettext("Signalement enregistré avec succés."))
                         |> assign(:display_alert_form, false)
                 }
             {:error, changeset} ->

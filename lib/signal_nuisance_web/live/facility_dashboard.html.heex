@@ -1,0 +1,25 @@
+
+<div id="facility" class="sgn-map-container" phx-hook="FacilityDashboardView">
+    <%= case live_flash(@flash, :info) do %>
+        <% nil -> %>
+        <% info -> %>
+        <%= md_snackbar info, action: {"Fermer", "lv:clear-flash"} %>
+    <% end %>
+    <%= case live_flash(@flash, :error) do %>
+        <% nil -> %>
+        <% error -> %>
+        <%= md_snackbar error, action: {"Fermer", "lv:clear-flash"} %>
+    <% end %>
+    <div class={"bg-white sgn-drawer #{if @display_drawer, do: "sgn-show", else: "sgn-hidden"} shadow-lg"}>
+        Drawer
+    </div>
+    <div class="sgn-map-cell" id="map-container">
+        <div class="sgn-map">
+            <leaflet-map  id="map" class="sgn-map" lat={@map_center.lat} lng={@map_center.long}>
+                <%= for marker <- @markers do %>
+                    <leaflet-marker data-id={marker.id} data-type={marker.type} phx-click={JS.push("marker-clicked", value: marker)}></leaflet-marker>
+                <% end %>
+            </leaflet-map>
+        </div>
+    </div>
+</div>

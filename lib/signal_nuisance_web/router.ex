@@ -82,15 +82,11 @@ defmodule SignalNuisanceWeb.Router do
     put "/users/settings", UserSettingsController, :update
     get "/users/settings/confirm_email/:token", UserSettingsController, :confirm_email
 
-    get "/enterprises/register", EnterpriseRegistrationController, :new
-    post "/enterprises/register", EnterpriseRegistrationController, :create
+    get "/facilities/register", FacilitiesRegistrationController, :new
+    post "/facilities/register", FacilitiesRegistrationController, :create
 
-    get "/enterprises/:slug/dashboard", EnterpriseDashboardController, :show
+    live "/facilities/:id/dashboard", FacilitiesDashboardLive
 
-    get "/enterprises/:slug/establishments/register", EstablishmentRegistrationController, :new
-    post "/enterprises/:slug/establishments/register", EstablishmentRegistrationController, :create
-
-    get "/establishments/:slug/dashboard", EstablishmentDashboardController, :show
   end
 
   scope "/", SignalNuisanceWeb do
