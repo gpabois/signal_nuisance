@@ -5,7 +5,7 @@ defmodule SignalNuisanceWeb.FacilityRegistrationController do
     alias SignalNuisance.Facilities.Facility
     
     def new(conn, _params) do
-      changeset = Enterprises.enterprise_registration_changeset(%Enterprise{}, %{})
+      changeset = Facilities.registration_changeset(%Enterprise{}, %{})
       render(conn, "new.html", changeset: changeset)
     end
 
@@ -14,7 +14,7 @@ defmodule SignalNuisanceWeb.FacilityRegistrationController do
           {:ok, facility} ->
             conn
             |> put_flash(:info, "L'installation a été enregistrée avec succés.")
-            |> redirect(to: Routes.enterprise_dashboard_path(conn, :show, enterprise.slug))
+            |> redirect(to: Routes.facility_dashboard_live_route(conn, facility.id))
     
           {:error, %Ecto.Changeset{} = changeset} ->
             render(conn, "new.html", changeset: changeset)
