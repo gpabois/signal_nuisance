@@ -9,7 +9,7 @@ defmodule SignalNuisanceWeb.FacilityRegistrationControllerTest do
         test "accéder à la page", %{conn: conn} do
           conn = get(conn, Routes.facility_registration_path(conn, :new))
           response = html_response(conn, 200)
-          assert response =~ "<h1>Register an enterprise</h1>"
+          assert response =~ "Enregistrer une installation"
         end
 
         test "rediriger si l'utilisateur n'est pas connecté" do
@@ -30,13 +30,14 @@ defmodule SignalNuisanceWeb.FacilityRegistrationControllerTest do
             "facility" => facility_attributes
           })
 
-        enterprise_redir = Routes.facility_dashboard_live_path(conn, :show, slug)
-        assert redirected_to(conn) == enterprise_redir
+        assert %{id: id} = redirected_params(conn)
 
-        # Now do a logged in request and assert on the menu
-        conn = get(conn, enterprise_redir)
+        facility_dashboard_redir = Routes.facility_dashboard_live_path(conn, id)
+        assert redirected_to(conn) == facility_dashboard_redir
+
+        conn = get(conn, facility_dashboard_redir)
         response = html_response(conn, 200)
-        assert response =~ enterprise_attributes.name
+        assert response =~ facility_attributes.name
       end
     end
 end

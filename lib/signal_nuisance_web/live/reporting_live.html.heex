@@ -17,7 +17,13 @@
         <div class="sgn-map">
             <leaflet-map  id="map" class="sgn-map" lat={@map_center.lat} lng={@map_center.long}>
                 <%= for marker <- @markers do %>
-                    <leaflet-marker data-id={marker.id} data-type={marker.type} phx-click={JS.push("marker-clicked", value: marker)}></leaflet-marker>
+                    <leaflet-marker 
+                        data-id={marker.id} 
+                        data-type={marker.type} 
+                        lat={marker.coordinates.lat}
+                        lng={marker.coordinates.lng}
+                        phx-click={JS.push("marker-clicked", value: marker)}
+                    ></leaflet-marker>
                 <% end %>
             </leaflet-map>
 

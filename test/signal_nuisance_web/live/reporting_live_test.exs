@@ -33,6 +33,12 @@ defmodule SignalNuisanceWeb.ReportingLiveTest do
         end
     end
 
+    describe "afficher les marqueurs de carte" do
+        test "quand une installation est située dans la zone d'affiche, la carte doit afficher un marqueur dédié" do
+            {:ok, view, _html} =  build_conn() |> live("/")
+        end
+    end
+
     describe "faire un signalement (alert) quand on est anonyme" do
         test "cela doit être ouvert via un bouton dédié (#btn-open-alert-form)" do
             {:ok, view, _html} =  build_conn() |> live("/")
