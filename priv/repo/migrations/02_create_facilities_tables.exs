@@ -5,9 +5,9 @@ defmodule SignalNuisance.Repo.Migrations.CreateEnterpriseTables do
     execute "CREATE EXTENSION IF NOT EXISTS postgis"
     create table(:facilities) do
       add :name, :string
-      add :slug, :string
       add :loc, :geography
-
+      add :description, :string
+      add :valid, :boolean
       timestamps()
     end
     

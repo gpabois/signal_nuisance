@@ -95,7 +95,7 @@ defmodule GeoMath do
     def random_within(%Geo.Point{coordinates: {lat, long}, srid: srid} = _ptA, %Distance{} = d) do
         %Distance{value: r} = Distance.to(d, :m)
 
-        u = Geocalc.degrees_to_radians(:rand.uniform() * 359.0)
+        u = Geocalc.degrees_to_radians(:rand.uniform() * 360.0)
         {:ok, [lat, long]} = Geocalc.destination_point([lat, long], u, r * :rand.uniform())
 
         %Geo.Point{

@@ -12,9 +12,8 @@ defmodule SignalNuisance.Facilities.Facility do
       field :name, :string
       field :loc, Geo.PostGIS.Geometry
       field :address, :string
-      field :short_description, :string
       field :description, :string
-      field :valid, :boolean
+      field :valid, :boolean, default: false
       timestamps()
     end
 
