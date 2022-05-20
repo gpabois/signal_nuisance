@@ -1,6 +1,6 @@
 <h1>Enregistrer une installation</h1>
 
-<.form let={f} for={@changeset} action={Routes.facility_registration_path(@conn, :create)}>
+<.form let={f} for={@changeset} action={Routes.facility_registration_path(@conn, :create)} as="facility" id="facility">
   <%= if @changeset.action do %>
     <div class="alert alert-danger">
       <p>Une erreur est survenue !</p>

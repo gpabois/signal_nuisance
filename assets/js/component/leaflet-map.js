@@ -36,7 +36,7 @@ class LeafletMap extends HTMLElement {
         });
     }
 
-    connectedCallback() {
+    reloadMarkers() {
         const markerElements = this.querySelectorAll('leaflet-marker')
         markerElements.forEach(markerEl => {
             const lat = markerEl.getAttribute('lat')
@@ -59,6 +59,10 @@ class LeafletMap extends HTMLElement {
                 }))
             })
         })
+    }
+
+    connectedCallback() {
+        this.reloadMarkers();
     }
 }
 

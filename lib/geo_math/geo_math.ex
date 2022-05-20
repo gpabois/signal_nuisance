@@ -79,8 +79,8 @@ defmodule GeoMath do
     end
     
     def random_within_box(%Geo.Point{coordinates: {ll_lat, ll_lng}, srid: srid} = _ll, %Geo.Point{coordinates: {ru_lat, ru_lng}} = _ru) do
-        lat = (ru_lat - ll_lat) * :rand.uniform()
-        lng = (ru_lng - ll_lng) * :rand.uniform()
+        lat = (ru_lat - ll_lat) * :rand.uniform() + ll_lat
+        lng = (ru_lng - ll_lng) * :rand.uniform() + ll_lng
 
         %Geo.Point{
             coordinates: {lat, lng},

@@ -25,18 +25,22 @@ defmodule SignalNuisanceWeb.ReportingLive do
     end
 
     def update_markers(%{assigns: %{map_bounds: {ll, ur}}} = socket) do
+        markers = Enum.map(
+            Facilities.get_facilities_in_area(ll, ur),
+            fn facility -> 
+                %{coordinates: {lat, lng}} = facility.loc
+                %{
+                id: "marker-facility-#{facility.id}", 
+                data_id: facility.id,
+                data_type: "facility", 
+                coordinates: %{lat: lat, lng: lng}
+            } end
+        )
+
         socket
         |> assign(
             :markers,
-            Enum.map(
-                Facilities.get_facilities_in_area(ll, ur),
-                fn facility -> %{
-                    id: "marker-facility-#{facility.id}", 
-                    data_id: facility.id,
-                    data_type: "facility", 
-                    coordinates: facility.loc
-                } end
-            )
+            markers
         )
     end
 

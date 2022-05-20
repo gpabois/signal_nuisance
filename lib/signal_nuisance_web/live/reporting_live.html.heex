@@ -66,6 +66,9 @@
                                         <%= link gettext("Paramètres du compte"), to: Routes.user_settings_path(@socket, :edit), id: "link-user-settings" %>
                                     </li>
                                     <li class="list-inline-item">
+                                        <%= link gettext("Créer une installation"), to: Routes.facility_registration_path(@socket, :create), id: "link-facility-registration" %>
+                                    </li>
+                                    <li class="list-inline-item">
                                         <%= link gettext("Se déconnecter"), to: Routes.user_session_path(@socket, :delete), id: "link-user-logout", method: :delete %>
                                     </li>
                                     <%= if Bodyguard.permit?(SignalNuisance.Administration.SecurityPolicy, {:access, :view, :administration_dashboard}, @current_user, {}) do %>

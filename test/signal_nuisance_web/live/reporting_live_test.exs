@@ -43,8 +43,9 @@ defmodule SignalNuisanceWeb.ReportingLiveTest do
             
             facility_loc = random_within_box map_area
             facility = facility_fixture(%{loc: facility_loc})
-
+            
             {:ok, view, _html} =  build_conn() |> live("/")
+            
             event_payload = %{
                 "_northEast" => %{
                     "lat" => lat_ur,

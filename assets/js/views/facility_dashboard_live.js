@@ -8,7 +8,7 @@ export default class FacilityDashboardLiveView {
 
         var view = this;
         
-        liveSocket.hooks.ReportingLiveView = {
+        liveSocket.hooks.FacilityDashboardLiveView = {
             updated () {
                 mdc.autoInit(); // Should be called each time...
             },
@@ -23,24 +23,7 @@ export default class FacilityDashboardLiveView {
         };
     }
 
-    enable_geolocation () {
-        this.locWatchId = navigator.geolocation.watchPosition(function(loc) {
-            this.hook.pushEvent('user-loc-update', {
-                lat: loc.coords.latitude,
-                long: loc.coords.longitude
-            });
-        }.bind(this));
-    }
-
-    disable_geolocation() {
-        if(this.locWatchId) {
-            navigator.geolocation.clearWatch(this.locWatchId);
-        }
-    }
-
-    view_unmounted() {
-
-    }
+    view_unmounted() {}
 
     resizeMap() {
         this.map_container = document.getElementById("map-container");
