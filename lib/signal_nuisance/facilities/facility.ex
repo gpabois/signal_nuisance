@@ -1,4 +1,7 @@
-defmodule SignalNuisance.Falicities.Facility do
+
+
+
+defmodule SignalNuisance.Facilities.Facility do
     use Ecto.Schema
 
     import Ecto.Changeset
@@ -28,9 +31,12 @@ defmodule SignalNuisance.Falicities.Facility do
       Register an establishment
     """
     def create(attrs) do
-      %__MODULE__{}
-      |> registration_changeset(attrs)
-      |> Repo.insert()
+      case attrs do
+        {:error, changeset} -> {:error, changeset}
+        {:ok, %__MODULE__{} = facility} -> Repo.insert(facility)
+        attrs -> %__MODULE__{} |> registration_changeset(attrs) |> Repo.insert()
+      end
+
     end
 
     def get_by_id(id) do

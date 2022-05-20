@@ -18,8 +18,9 @@
             <leaflet-map  id="map" class="sgn-map" lat={@map_center.lat} lng={@map_center.long}>
                 <%= for marker <- @markers do %>
                     <leaflet-marker 
-                        data-id={marker.id} 
-                        data-type={marker.type} 
+                        id={marker.id}
+                        data-id={marker.data_id} 
+                        data-type={marker.data_type} 
                         lat={marker.coordinates.lat}
                         lng={marker.coordinates.lng}
                         phx-click={JS.push("marker-clicked", value: marker)}

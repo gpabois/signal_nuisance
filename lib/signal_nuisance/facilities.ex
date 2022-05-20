@@ -38,29 +38,6 @@ defmodule SignalNuisance.Facilities do
     end
   end
 
-  @doc """
-    Register an establishment, and add the user, and grants him owner-related permissions
-  """
-  def register_establishment(attrs, %SignalNuisance.Accounts.User{} = user) do
-    Repo.transaction fn ->
-      with {:ok, establishment} <- Establishment.register(attrs),
-           :ok <- set_permissions(user, EstablishmentPermission.by_role(:administrator), establishment)
-      do
-        establishment
-      else
-        {:error, error} -> Repo.rollback(error)
-      end
-    end
-  end
-
-  def get_establishment_by_enterprises(enterprise, opts \\ []) do
-    ets = Establishment.get_by_enterprise(enterprise)
-    case Keyword.get(opts, :filter, nil) do
-      nil -> ets
-      f -> Enum.filter(ets, f)
-    end
-  end
-
   def get_nearest_facilities(%Geo.Point{} = point, %GeoMath.Distance{} = distance) do
     Facility.get_nearest(point, distance)
   end

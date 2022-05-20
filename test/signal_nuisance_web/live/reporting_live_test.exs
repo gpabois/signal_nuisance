@@ -5,6 +5,10 @@ defmodule SignalNuisanceWeb.ReportingLiveTest do
     alias SignalNuisance.Administration.Authorization.Permission, as: AdminPermission
 
     import SignalNuisance.ReportingFixtures
+    import SignalNuisance.FacilitiesFixtures
+
+    import Geo.Fixtures
+    import GeoMath
 
     def alert_form_select_category() do
         {:ok, view, html} =  build_conn() |> live("/")
@@ -34,8 +38,28 @@ defmodule SignalNuisanceWeb.ReportingLiveTest do
     end
 
     describe "afficher les marqueurs de carte" do
-        test "quand une installation est située dans la zone d'affiche, la carte doit afficher un marqueur dédié" do
+        test "quand une installation est située dans la zone d'affichage, la carte doit afficher un marqueur dédié" do
+            {%{coordinates: {lat_ll, long_ll}}, %{coordinates: {lat_ur, long_ur}}} = map_area = random_area()
+            
+            facility_loc = random_within_area map_area
+            facility = facility_fixture(%{loc: facility_loc})
+
             {:ok, view, _html} =  build_conn() |> live("/")
+            event_payload = %{
+                "_northEast" => %{
+                    "lat" => lat_ur,
+                    "lng" => long_ur
+                },
+                "_southWest" => %{
+                    "lat" => lat_ll,
+                    "lng" => long_ll
+                }
+            }
+
+            view |> render_hook(view, "map-bounds-update", event_payload)
+            assert view 
+            |> element("#marker-facility-#{facility.id}")
+            |> has_element?()
         end
     end
 

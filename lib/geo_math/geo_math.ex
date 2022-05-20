@@ -77,6 +77,20 @@ defmodule GeoMath do
             }
         }
     end
+    
+    def random_within_box(%Geo.Point{coordinates: {ll_lat, ll_lng}, srid: srid} = _ll, %Geo.Point{coordinates: {ru_lat, ru_lng}} = _ru) do
+        lat = (ru_lat - ll_lat) * :rand.uniform()
+        lng = (ru_lng - ll_lng) * :random.uniform()
+
+        %Geo.Point{
+            coordinates: {lat, long},
+            srid: srid
+        }
+    end
+
+    def random_within_box({ll, ru} = box) do
+        random_within_box  ll, ru
+    end
 
     def random_within(%Geo.Point{coordinates: {lat, long}, srid: srid} = _ptA, %Distance{} = d) do
         %Distance{value: r} = Distance.to(d, :m)

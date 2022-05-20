@@ -1,0 +1,26 @@
+<h1>Enregistrer une installation</h1>
+
+<.form let={f} for={@changeset} action={Routes.facility_registration_path(@conn, :create, @enterprise.slug)}>
+  <%= if @changeset.action do %>
+    <div class="alert alert-danger">
+      <p>Une erreur est survenue !</p>
+    </div>
+  <% end %>
+
+  <%= label f, :name %>
+  <%= text_input  f, :name, required: true %>
+  <%= error_tag f, :name %>
+
+  <%= label f, :lat %>
+  <%= text_input  f, :lat, required: true %>
+  <%= error_tag f, :lat %>
+
+  <%= label f, :long %>
+  <%= text_input  f, :long, required: true %>
+  <%= error_tag f, :long %>
+
+  <div>
+    <%= submit "Enregistrer" %>
+  </div>
+</.form>
+

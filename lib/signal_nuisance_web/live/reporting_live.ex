@@ -30,7 +30,7 @@ defmodule SignalNuisanceWeb.ReportingLive do
             :markers,
             Enum.map(
                 Facilities.get_facilities_in_area(ll, ur),
-                fn ets -> %{type: "facility", coordinates: ets.loc, id: ets.id, id: facility.id} end
+                fn ets -> %{id: "marker-facility-#{facility.id}", data_type: "facility", coordinates: ets.loc, data_id: facility.id} end
             )
         )
     end

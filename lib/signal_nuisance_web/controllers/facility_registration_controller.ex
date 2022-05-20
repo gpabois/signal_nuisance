@@ -2,14 +2,17 @@ defmodule SignalNuisanceWeb.FacilityRegistrationController do
     use SignalNuisanceWeb, :controller
   
     alias SignalNuisance.Facilities
-    alias SignalNuisance.Facilities.Facility
+    alias SignalNuisance.Facilities.{Facility, FacilityForm}
     
     def new(conn, _params) do
-      changeset = Facilities.registration_changeset(%Enterprise{}, %{})
+      changeset = FacilityForm.registration_changeset(%FacilityForm{}, %{})
       render(conn, "new.html", changeset: changeset)
     end
 
     def create(%{assigns: %{current_user: user}} = conn, %{"facility" => params}) do
+        params = FacilityForm.registration_changeset(%FacilityForm{}, params)
+        |> FacilityForm.to_facility()
+        
         case Facilities.register(params, user) do
           {:ok, facility} ->
             conn
