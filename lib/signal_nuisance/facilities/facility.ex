@@ -20,8 +20,8 @@ defmodule SignalNuisance.Facilities.Facility do
 
         facility
         |> cast(attrs, fields)
+        |> unique_constraint(:name, name: :facility_name_unique_index)
         |> validate_required(fields)
-        |> unique_constraint(:name)
     end
 
     @doc """

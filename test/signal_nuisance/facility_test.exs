@@ -30,7 +30,7 @@ defmodule SignalNuisance.EnterpriseTest do
             {:error, changeset} = Facilities.register(attrs, user)
 
             assert %{
-                slug: ["has already been taken"]
+                name: ["has already been taken"]
             } = errors_on(changeset)
         end
     end

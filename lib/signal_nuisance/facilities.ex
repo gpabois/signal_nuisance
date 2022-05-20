@@ -11,7 +11,6 @@ defmodule SignalNuisance.Facilities do
     Facility.get_by_id(id)
   end
 
-
   def get_by_member(user) do
     if user == nil do
       []
@@ -23,10 +22,6 @@ defmodule SignalNuisance.Facilities do
         where: m.user_id == ^user.id
       ) |> Repo.all
     end
-  end
-
-  def registration_changeset(facility = %Facility{}, attrs = %{}) do
-    Facility.registration_changeset(facility, attrs)
   end
 
   @doc """
