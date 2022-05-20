@@ -3,6 +3,7 @@ defmodule SignalNuisanceWeb.ReportingLiveTest do
     import Phoenix.LiveViewTest
 
     alias SignalNuisance.Administration.Authorization.Permission, as: AdminPermission
+    alias SignalNuisance.Facilities
 
     import SignalNuisance.ReportingFixtures
     import SignalNuisance.FacilitiesFixtures
@@ -34,6 +35,16 @@ defmodule SignalNuisanceWeb.ReportingLiveTest do
             AdminPermission.grant(user, {:access, :administration}, {})
             {:ok, view, _html} =  conn |> live("/")
             assert view |> element("a#link-administration") |> has_element?()
+        end
+    end
+
+    describe "accéder aux installations dont on est membre" do
+        test "lorsque l'utilisateur est membre d'une installation, le lien vers ce dernier doit être accessible", %{user: user, conn: conn} do
+            facility = facility_fixture()
+            Facilities.add_member(facility, user)
+
+            {:ok, view, _html} =  conn |> live("/")
+            assert view |> element("a#facility-#{facility.id}-dashboard") |> has_element?()
         end
     end
 

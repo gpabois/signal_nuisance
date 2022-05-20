@@ -11,6 +11,10 @@ defmodule SignalNuisance.Facilities.Facility do
     schema "facilities" do
       field :name, :string
       field :loc, Geo.PostGIS.Geometry
+      field :address, :string
+      field :short_description, :string
+      field :description, :string
+      field :valid, :boolean
       timestamps()
     end
 

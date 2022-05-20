@@ -79,7 +79,7 @@
                                 </ul>
 
                                 <%= for facility <- @facilities do %>
-                                    <%= link facility.name, to: Routes. facility_dashboard_path(@socket, :dashboard, facility.id) %>
+                                    <%= link facility.name, id: "facility-#{facility.id}-dashboard", to: Routes. facility_dashboard_path(@socket, :dashboard, facility.id) %>
                                 <% end %>
                             </div>
                         </div>
