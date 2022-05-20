@@ -6,6 +6,7 @@ defmodule SignalNuisance.Repo.Migrations.CreateEnterpriseTables do
     create table(:facilities) do
       add :name, :string
       add :loc, :geography
+      add :address, :string
       add :description, :string
       add :valid, :boolean
       timestamps()
