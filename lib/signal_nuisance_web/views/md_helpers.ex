@@ -61,14 +61,20 @@ defmodule MD.Helpers do
             </div>
         </div>
         <div class="mdc-text-field-helper-line">
-            <%= Enum.map(Keyword.get_values(form.errors, field), fn error ->
-                content_tag(:div, translate_error(error),
-                    class: "mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg",
-                    phx_feedback_for: input_name(form, field)
-            )
-            end)
-        %>
+            <%= md_errors(form, field) %>
         </div>
+        """
+    end
+
+    def md_errors(form, field) do
+        assigns = %{errors: Keyword.get_values(form.errors, field)}
+
+        ~H"""
+            <%= for error <- @errors do %>
+                <div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg mdc-text-field-helper-text--persistent " aria-hidden="false" phx_feedback_for={input_name(form, field)}>
+                    <%= translate_error(error) %>
+                </div>
+            <% end %>
         """
     end
 
@@ -80,23 +86,19 @@ defmodule MD.Helpers do
             name: Keyword.get(opts, :name, input_name(form, field)),
             id: Keyword.get(opts, :id, input_id(form, field)),
             label: Keyword.get(opts, :label, field),
-            class: Keyword.get(opts, :class, "")
+            class: Keyword.get(opts, :class, ""),
+            has_errors: !(Keyword.get_values(form.errors, field) |> Enum.empty?)
         }
 
         ~H"""
-        <div class={"mdc-text-field mdc-text-field--filled #{@class}"} data-mdc-auto-init="MDCTextField">
+        <div class={"mdc-text-field #{if @has_errors, do: "mdc-text-field--invalid", else: ""} mdc-text-field--filled #{@class}"} data-mdc-auto-init="MDCTextField">
             <span class="mdc-text-field__ripple"></span>
             <span class="mdc-floating-label" id={label_id(form, field)}><%= @label %></span>
             <input class="mdc-text-field__input" name={@name} id={@id} type={@type} aria-labelledby={label_id(form, field)}>
             <span class="mdc-line-ripple"></span>
         </div>
         <div class="mdc-text-field-helper-line">
-            <%= for error <- Keyword.get_values(form.errors, field) do %>
-            <div class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent mdc-text-field-helper-text--validation-msg" phx-feedback-for={@name} mdc-auto-init="MDCTextFieldHelperText">
-                <%= translate_error(error) %>
-            </div>
-        <% end %>
-        %>
+            <%= md_errors(form, field) %>
         </div>
         """
     end
@@ -133,11 +135,7 @@ defmodule MD.Helpers do
             <div class="mdc-line-ripple"></div>
         </div>
         <div class="mdc-text-field-helper-line">
-             <%= for error <- Keyword.get_values(form.errors, field) do %>
-                <div class="mdc-text-field-helper-text mdc-text-field-helper-text--validation-msg" phx-feedback-for={@name} mdc-auto-init="MDCTextFieldHelperText">
-                    <%= translate_error(error) %>
-                </div>
-            <% end %>
+            <%= md_errors(form, field) %>
         </div>
         """
     end

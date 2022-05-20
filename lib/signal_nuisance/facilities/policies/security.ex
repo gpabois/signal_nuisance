@@ -7,8 +7,7 @@ defmodule SignalNuisance.Facilities.SecurityPolicy do
     alias SignalNuisance.Facilities.Authorization.Permission
 
     def authorize(:manage_members, user, facility) do
-      Permission.has?
-        user,
+      Permission.has? user,
         {:manage, :members},
         facility
     end
@@ -46,8 +45,7 @@ defmodule SignalNuisance.Facilities.SecurityPolicy do
     end
    
     def authorize(:manage_communication, user, %Facility{} = facility) do
-      Permission.has?
-        user,
+      Permission.has? user,
         {:manage, :communication},
         facility
     end

@@ -53,7 +53,7 @@
                         <span class="badge rounded-pill bg-primary">Signal'Nuisance</span>
                     </div>
                     <div class="mdc-layout-grid__cell--span-10">
-                        <span class="badge rounded-pill bg-light text-dark"><%= gettext "Etablissements" %></span>
+                        <span class="badge rounded-pill bg-light text-dark"><%= gettext "Installations" %></span>
                     </div>
                     <div class="mdc-layout-grid__cell--span-1">
                         <%= if @current_user do %>
@@ -75,8 +75,8 @@
                                     <% end %>
                                 </ul>
 
-                                <%= for enterprise <- @enterprises do %>
-                                    <%= link enterprise.name, to: Routes.enterprise_dashboard_path(@socket, :show, enterprise.slug) %>
+                                <%= for facility <- @facilities do %>
+                                    <%= link facility.name, to: Routes. facility_dashboard_path(@socket, :dashboard, facility.id) %>
                                 <% end %>
                             </div>
                         </div>

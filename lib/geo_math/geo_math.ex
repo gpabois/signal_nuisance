@@ -80,15 +80,15 @@ defmodule GeoMath do
     
     def random_within_box(%Geo.Point{coordinates: {ll_lat, ll_lng}, srid: srid} = _ll, %Geo.Point{coordinates: {ru_lat, ru_lng}} = _ru) do
         lat = (ru_lat - ll_lat) * :rand.uniform()
-        lng = (ru_lng - ll_lng) * :random.uniform()
+        lng = (ru_lng - ll_lng) * :rand.uniform()
 
         %Geo.Point{
-            coordinates: {lat, long},
+            coordinates: {lat, lng},
             srid: srid
         }
     end
 
-    def random_within_box({ll, ru} = box) do
+    def random_within_box({ll, ru} = _box) do
         random_within_box  ll, ru
     end
 

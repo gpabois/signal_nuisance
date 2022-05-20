@@ -5,7 +5,7 @@ defmodule SignalNuisance.Administration.Authorization.Permission do
         access: :administration,
         manage: :alerts,
         manage: :users,
-        manage: :enterprises,
+        manage: :facilities,
         manage: :administration
     ]
 

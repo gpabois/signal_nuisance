@@ -39,9 +39,9 @@ defmodule SignalNuisanceWeb.ReportingLiveTest do
 
     describe "afficher les marqueurs de carte" do
         test "quand une installation est située dans la zone d'affichage, la carte doit afficher un marqueur dédié" do
-            {%{coordinates: {lat_ll, long_ll}}, %{coordinates: {lat_ur, long_ur}}} = map_area = random_area()
+            {%{coordinates: {lat_ll, long_ll}}, %{coordinates: {lat_ur, long_ur}}} = map_area = random_box()
             
-            facility_loc = random_within_area map_area
+            facility_loc = random_within_box map_area
             facility = facility_fixture(%{loc: facility_loc})
 
             {:ok, view, _html} =  build_conn() |> live("/")
@@ -56,7 +56,7 @@ defmodule SignalNuisanceWeb.ReportingLiveTest do
                 }
             }
 
-            view |> render_hook(view, "map-bounds-update", event_payload)
+            view |> render_hook("map-bounds-update", event_payload)
             assert view 
             |> element("#marker-facility-#{facility.id}")
             |> has_element?()

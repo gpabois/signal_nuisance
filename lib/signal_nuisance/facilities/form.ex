@@ -1,12 +1,12 @@
 defmodule SignalNuisance.Facilities.FacilityForm do
     use Ecto.Schema
   
-    import Echo.Changeset
+    import Ecto.Changeset
   
     embedded_schema do
       field :name, :string
-      field :lat, :number
-      field :long, :number
+      field :lat, :float
+      field :long, :float
     end
   
     @fields [:name, :lat, :long]
@@ -19,11 +19,11 @@ defmodule SignalNuisance.Facilities.FacilityForm do
   
     end
   
-    def to_facility(changeset) do
+    def to_facility_attributes(changeset) do
         if changeset.valid? do
             %{name: name, lat: lat, long: long} = apply_changes(changeset)
             loc = %Geo.Point{coordinates: {lat, long}, srid: 4326}
-            {:ok, %SignalNuisance.Facilities{name: name, loc: loc}}
+            {:ok, %{name: name, loc: loc}}
         else
             {:error, changeset} 
         end

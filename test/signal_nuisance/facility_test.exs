@@ -10,23 +10,23 @@ defmodule SignalNuisance.EnterpriseTest do
     alias GeoMath.Distance
 
     describe "Facilities.register/2" do
-        test "enregistrer une entreprise avec des valeurs valides." do
+        test "enregistrer une installation avec des valeurs valides." do
             user = user_fixture()
-            attrs = valid_facilities_attributes()
+            attrs = valid_facility_attributes()
 
             {:ok, facility} = Facilities.register(attrs, user)
 
             # On doit assurer que l'utilisateur qui enregistre l'installation en est membre.
             assert Facilities.is_member?(facility, user)
             # On doit assurer que l'utilisateur qui enregistre l'installation en a les droits administrateurs.
-            assert Permission.has(user, Permission.by_role(:administrator), facility)
+            assert Permission.has?(user, Permission.by_role(:administrator), facility)
         end
 
-        test "on ne doit pas enregistrer une entreprise qui a un nom déjà pris." do
+        test "on ne doit pas enregistrer une installation qui a un nom déjà pris." do
             user = user_fixture()
-            attrs = valid_fixtures_attributes()
+            attrs = valid_facility_attributes()
 
-            Facilities.register(attrs)
+            {:ok, _facility} = Facility.create(attrs)
             {:error, changeset} = Facilities.register(attrs, user)
 
             assert %{
@@ -41,10 +41,10 @@ defmodule SignalNuisance.EnterpriseTest do
 
             d0 = Distance.km(10)
             d1 = Distance.km(8)
-            pt = GeoMath.random_within(establishment.loc, d1)
+            pt = GeoMath.random_within(facility.loc, d1)
 
-            assert GeoMath.within?(establishment.loc, pt, d0)
-            assert establishment in Facilities.get_nearest_facilities(pt, d1)
+            assert GeoMath.within?(facility.loc, pt, d0)
+            assert facility in Facilities.get_nearest_facilities(pt, d1)
         end
 
 

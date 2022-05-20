@@ -1,4 +1,6 @@
 defmodule SignalNuisance.Facilities do
+  import Ecto.Query
+
   alias SignalNuisance.Repo
 
   alias SignalNuisance.Accounts.User
@@ -9,13 +11,18 @@ defmodule SignalNuisance.Facilities do
     Facility.get_by_id(id)
   end
 
+
   def get_by_member(user) do
-    from(
-      e in Facility,
-      join: m in FacilityMember,
-      on: m.facility_id == e.id,
-      where: m.user_id == ^user.id
-    ) |> Repo.all
+    if user == nil do
+      []
+    else
+      from(
+        f in Facility,
+        join: m in FacilityMember,
+        on: m.facility_id == f.id,
+        where: m.user_id == ^user.id
+      ) |> Repo.all
+    end
   end
 
   def registration_changeset(facility = %Facility{}, attrs = %{}) do
@@ -53,7 +60,7 @@ defmodule SignalNuisance.Facilities do
   """
   def add_member(facility, user) do
     case Repo.transaction(fn ->
-      with :ok <- FacilityMember.add(enterprise, user),
+      with :ok <- FacilityMember.add(facility, user),
            :ok <- Permission.grant(
               user,
               Permission.by_role(:employee),
@@ -97,7 +104,7 @@ defmodule SignalNuisance.Facilities do
     Returns the list of an enterprise's members
   """
   def get_members(facility) do
-    enterprise
+    facility
     |> FacilityMember.get_by_facility()
     |> Enum.map(fn (m) -> m.user end)
   end
@@ -146,7 +153,7 @@ defmodule SignalNuisance.Facilities do
     - permissions: a permission as planned in SignalNuisance.Enterprises.Authorization.EnterprisePermission.permissions/0
   """
   def has_permissions?(entity, permissions, %Facility{} = facility) do
-    EnterprisePermission.has?(
+    Permission.has?(
       entity,
       permissions,
       facility

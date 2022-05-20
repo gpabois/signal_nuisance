@@ -1,18 +1,14 @@
 
-
-
 defmodule SignalNuisance.Facilities.Facility do
     use Ecto.Schema
 
     import Ecto.Changeset
     import Ecto.Query
     import Geo.PostGIS
-    import Slugy
 
     alias SignalNuisance.Repo
-    alias SignalNuisance.Enterprises.Enterprise
 
-    schema "falicities" do
+    schema "facilities" do
       field :name, :string
       field :loc, Geo.PostGIS.Geometry
       timestamps()
@@ -22,18 +18,19 @@ defmodule SignalNuisance.Facilities.Facility do
     def registration_changeset(facility, attrs) do
         fields = [:name, :loc]
 
-        establishment
+        facility
         |> cast(attrs, fields)
         |> validate_required(fields)
+        |> unique_constraint(:name)
     end
 
     @doc """
-      Register an establishment
+      Register a facility
     """
     def create(attrs) do
       case attrs do
         {:error, changeset} -> {:error, changeset}
-        {:ok, %__MODULE__{} = facility} -> Repo.insert(facility)
+        {:ok, attrs} -> create(attrs)
         attrs -> %__MODULE__{} |> registration_changeset(attrs) |> Repo.insert()
       end
 

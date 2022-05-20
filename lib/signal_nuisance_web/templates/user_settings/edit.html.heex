@@ -39,10 +39,10 @@
           <%= md_input f, :password, required: true, label: gettext("Nouveau mot de passe"), type: "password", class: "sgn-fullwidth" %>
         </div>
         <div class="mdc-layout-grid__cell--span-8">
-          <%= md_input f, :password, required: true, label: gettext("Confirmer le mot de passe"), type: "password", class: "sgn-fullwidth" %>
+          <%= md_input f, :password_confirmation, required: true, label: gettext("Confirmer le mot de passe"), type: "password", class: "sgn-fullwidth" %>
         </div>
         <div class="mdc-layout-grid__cell--span-8">
-          <%= md_input f, :password, required: true, label: gettext("Mot de passe actuel"), name: "current_password", id: "current_password_for_password", class: "sgn-fullwidth" %>
+          <%= md_input f, :current_password, required: true, label: gettext("Mot de passe actuel"), name: "current_password", id: "current_password_for_password", class: "sgn-fullwidth" %>
         </div>
         <div class="mdc-layout-grid__cell--span-8">
           <%= submit "Change password" %>

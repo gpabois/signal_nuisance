@@ -3,11 +3,12 @@ defmodule SignalNuisanceWeb.FacilityDashboardLive do
 
     use SignalNuisanceWeb, :map_live_view
 
-    alias SignalNuisance.Facilities
-
-    def mount(_params, session, socket) do
+    def mount(_params, _session, socket) do
         {:ok,
             socket
+            |> assign(:display_drawer, false)
+            |> assign(:map_center, %{lat: 48.856614, long: 2.3522219})
+            |> assign(:markers, [])
         }
     end
 

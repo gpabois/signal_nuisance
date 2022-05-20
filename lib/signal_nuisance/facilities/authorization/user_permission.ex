@@ -1,4 +1,4 @@
-defmodule SignalNuisance.Falicities.Authorization.UserPermission do
+defmodule SignalNuisance.Facilities.Authorization.UserPermission do
     use Ecto.Schema
     use Bitwise
 
@@ -14,10 +14,10 @@ defmodule SignalNuisance.Falicities.Authorization.UserPermission do
         permissions: Permission.permissions(),
         encoding: :byte
 
-    schema "facilities_user_permissions" do
-        belongs_to :establishment,  Establishment
-        belongs_to :user,       User
-        field :permissions,     :integer
+    schema "facility_user_permissions" do
+        belongs_to :facility, Facility
+        belongs_to :user, User
+        field :permissions, :integer
     end
 
     def create(user, facility, permissions) do
@@ -39,12 +39,12 @@ defmodule SignalNuisance.Falicities.Authorization.UserPermission do
         ) |> Repo.one > 0
     end
 
-    def grant(user, permissions, establishment) do
-        result = if not has_entry?(user, establishment, permissions) do
-            create(user, establishment, permissions)
+    def grant(user, permissions, facility) do
+        result = if not has_entry?(user, facility, permissions) do
+            create(user, facility, permissions)
         else
             permissions = encode_permission(permissions)
-            Repo.get_by(__MODULE__, user_id: user.id, establishment_id: establishment.id)
+            Repo.get_by(__MODULE__, user_id: user.id, facility_id: facility.id)
             |> change(%{permissions: permissions})
             |> Repo.update
         end
@@ -65,7 +65,7 @@ defmodule SignalNuisance.Falicities.Authorization.UserPermission do
     end
 
     def revoke_all(user, facility) do
-        Repo.delete_all from (
+        Repo.delete_all from(
             perm in __MODULE__,
             where: perm.user_id == ^user.id,
             where: perm.facility == ^facility.id

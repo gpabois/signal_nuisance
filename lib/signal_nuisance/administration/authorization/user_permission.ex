@@ -42,7 +42,7 @@ defmodule SignalNuisance.Administration.Authorization.UserPermission do
         - permissions
         - resource: [enterprise: enterprise]
     """
-    def grant(user, permissions, enterprise) do
+    def grant(user, permissions, _) do
         result = if not has_entry?(user, permissions) do
             create(user, permissions)
         else

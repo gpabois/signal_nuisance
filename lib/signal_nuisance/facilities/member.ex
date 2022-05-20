@@ -48,7 +48,7 @@ defmodule SignalNuisance.Facilities.FacilityMember do
     end
 
     def get_by_facility(facility) do
-      from (
+      from(
         m in __MODULE__,
         where: m.facility_id == ^facility.id
       ) |> Repo.all

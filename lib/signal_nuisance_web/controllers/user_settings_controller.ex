@@ -25,7 +25,7 @@ defmodule SignalNuisanceWeb.UserSettingsController do
         conn
         |> put_flash(
           :info,
-          "A link to confirm your email change has been sent to the new address."
+          "Un lien pour confirmer le nouveau courriel a été envoyé à la nouvelle adresse."
         )
         |> redirect(to: Routes.user_settings_path(conn, :edit))
 
@@ -41,7 +41,7 @@ defmodule SignalNuisanceWeb.UserSettingsController do
     case Accounts.update_user_password(user, password, user_params) do
       {:ok, user} ->
         conn
-        |> put_flash(:info, "Password updated successfully.")
+        |> put_flash(:info, "Mot de passe mis à jour avec succés.")
         |> put_session(:user_return_to, Routes.user_settings_path(conn, :edit))
         |> UserAuth.log_in_user(user)
 
