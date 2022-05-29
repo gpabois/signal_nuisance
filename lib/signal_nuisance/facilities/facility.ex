@@ -25,6 +25,11 @@ defmodule SignalNuisance.Facilities.Facility do
         |> cast(attrs, fields)
         |> unique_constraint(:name, name: :facility_name_unique_index)
         |> validate_required(fields)
+    end  
+
+    def update_changeset(facility, attrs) do  
+      facility
+      |> cast(attrs, [:loc, :address, :description, :valid])
     end
 
     @doc """

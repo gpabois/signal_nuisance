@@ -15,7 +15,7 @@ defmodule SignalNuisanceWeb.FacilityRegistrationController do
         case Facilities.register(params, user) do
           {:ok, facility} ->
             conn
-            |> put_flash(:info, "L'installation a été enregistrée avec succés.")
+            |> put_flash(:info, "L'installation a été enregistrée avec succés, la demande sera examinée par un administrateur.")
             |> redirect(to: Routes.facility_dashboard_path(conn, :dashboard, facility.id))
     
           {:error, %Ecto.Changeset{} = changeset} ->

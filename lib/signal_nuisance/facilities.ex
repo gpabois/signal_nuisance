@@ -7,6 +7,12 @@ defmodule SignalNuisance.Facilities do
   alias SignalNuisance.Facilities.Authorization.Permission
   alias SignalNuisance.Facilities.{Facility, FacilityMember}
 
+
+  def paginate_facilities(params) do
+    from(f in Facility, order_by: [desc: created_at])
+    |> Repo.paginate(params)
+  end
+
   def get_by_id(id) do
     Facility.get_by_id(id)
   end
@@ -38,6 +44,17 @@ defmodule SignalNuisance.Facilities do
         {:error, error} -> Repo.rollback(error)
       end
     end
+  end
+
+  def facility_change(facility, attrs) do
+    Facility.update_changeset(facility, attrs)
+  end
+
+  
+  def update_facility(facility, attrs) do
+    facility
+    |> facility_change(attrs) 
+    |> Repo.update
   end
 
   def get_nearest_facilities(%Geo.Point{} = point, %GeoMath.Distance{} = distance) do

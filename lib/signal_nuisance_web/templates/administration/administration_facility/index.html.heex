@@ -1,0 +1,16 @@
+<%= render SignalNuisanceWeb.PaginationView, "pagination.html", conn: @conn, pagination: @pagination %>
+<table>
+    <thead>
+        <td>Nom</td>
+        <td>Valider ?</td>
+    </thead>
+    <tbody>
+        <%= for facility <- @facilities do %>
+        <tr>
+            <td><%= link facility.name, to: Routes.administration_facility_path(@conn, :show, facility) %></td>
+            <td><%= facility.valid %></td>
+        </tr>
+        <% end %>
+    </tbody>
+</table
+<%= render SignalNuisanceWeb.PaginationView, "pagination.html", conn: @conn, pagination: @pagination %>

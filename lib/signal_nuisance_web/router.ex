@@ -86,7 +86,14 @@ defmodule SignalNuisanceWeb.Router do
     post "/facilities/register", FacilityRegistrationController, :create
 
     live "/facilities/:id/dashboard", FacilityDashboardLive, :dashboard
+    
+    scope "/admin", Administration do
+      get "/facilities", AdministrationFacilityController, :index
 
+      get "/facilities/:id", AdministrationFacilityController, :show
+      get "/facilities/:id/toggle_validation", AdministrationController, :toggle_validation
+      get "/facilities/:id/delete", AdministrationFacilityController, :delete
+    end
   end
 
   scope "/", SignalNuisanceWeb do
