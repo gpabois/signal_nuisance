@@ -71,7 +71,7 @@
                                     <li class="list-inline-item">
                                         <%= link gettext("Se déconnecter"), to: Routes.user_session_path(@socket, :delete), id: "link-user-logout", method: :delete %>
                                     </li>
-                                    <%= if Bodyguard.permit?(SignalNuisance.Administration.SecurityPolicy, {:access, :view, :administration_dashboard}, @current_user, {}) do %>
+                                    <%= if Bodyguard.permit?(SignalNuisance.Administration.SecurityPolicy, {:view, :administration}, @current_user, {}) do %>
                                         <li class="list-inline-item">
                                             <%= link gettext("Administration"), to: Routes.user_settings_path(@socket, :edit), id: "link-administration", class: "p2" %>
                                         </li>

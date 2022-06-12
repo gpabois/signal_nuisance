@@ -3,6 +3,7 @@ defmodule SignalNuisanceWeb.ReportingLiveTest do
     import Phoenix.LiveViewTest
 
     alias SignalNuisance.Administration.Authorization.Permission, as: AdminPermission
+    alias SignalNuisance.Administration
     alias SignalNuisance.Facilities
 
     import SignalNuisance.ReportingFixtures
@@ -32,7 +33,7 @@ defmodule SignalNuisanceWeb.ReportingLiveTest do
         end
 
         test "lorsque l'utilisateur a les droits administrateur, le lien vers le tableau d'administration doit être affiché", %{user: user, conn: conn} do
-            AdminPermission.grant(user, {:access, :administration}, {})
+            Administration.add_administrator(user)
             {:ok, view, _html} =  conn |> live("/")
             assert view |> element("a#link-administration") |> has_element?()
         end
@@ -51,12 +52,12 @@ defmodule SignalNuisanceWeb.ReportingLiveTest do
     describe "afficher les marqueurs de carte" do
         test "quand une installation est située dans la zone d'affichage, la carte doit afficher un marqueur dédié" do
             {%{coordinates: {lat_ll, long_ll}}, %{coordinates: {lat_ur, long_ur}}} = map_area = random_box()
-            
+
             facility_loc = random_within_box map_area
             facility = facility_fixture(%{loc: facility_loc})
-            
+
             {:ok, view, _html} =  build_conn() |> live("/")
-            
+
             event_payload = %{
                 "_northEast" => %{
                     "lat" => lat_ur,
@@ -69,7 +70,7 @@ defmodule SignalNuisanceWeb.ReportingLiveTest do
             }
 
             view |> render_hook("map-bounds-update", event_payload)
-            assert view 
+            assert view
             |> element("#marker-facility-#{facility.id}")
             |> has_element?()
         end

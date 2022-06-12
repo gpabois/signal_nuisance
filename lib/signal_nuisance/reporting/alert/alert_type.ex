@@ -5,10 +5,10 @@ defmodule SignalNuisance.Reporting.AlertType do
     import Ecto.Query
 
     alias SignalNuisance.Repo
-    
+
     @categories ["smell", "noise"]
 
-    schema "alert_types" do      
+    schema "alert_types" do
         field :category, :string
         field :label, :string
         field :description, :string
@@ -17,17 +17,23 @@ defmodule SignalNuisance.Reporting.AlertType do
     def categories() do
          @categories
     end
-    
+
     @doc false
-    def creation_changeset(%__MODULE__{} = alert_type, attrs) do 
+    def creation_changeset(%__MODULE__{} = alert_type, attrs) do
         alert_type
         |> cast(attrs, [:category, :label, :description])
         |> validate_required([:category, :label, :description])
         |> validate_inclusion(:category, @categories)
     end
 
+    def update_changeset(%__MODULE__{} = alert_type, attrs) do
+        alert_type
+        |> cast(attrs, [:category, :label, :description])
+        |> validate_inclusion(:category, @categories)
+    end
+
     def create(attrs) do
-        %__MODULE__{} 
+        %__MODULE__{}
         |> creation_changeset(attrs)
         |> Repo.insert()
     end
@@ -45,7 +51,7 @@ defmodule SignalNuisance.Reporting.AlertType do
         |> join(:left, [at], tl in SignalNuisance.Reporting.AlertTypeTranslation,
             on: at.id == tl.alert_type_id and tl.language_code == ^locale
         )
-        |> select_merge([at, tl], map(tl, [:label, :description])) 
+        |> select_merge([at, tl], map(tl, [:label, :description]))
         |> Repo.all()
     end
 
@@ -55,7 +61,7 @@ defmodule SignalNuisance.Reporting.AlertType do
         |> join(:left, [at], tl in SignalNuisance.Reporting.AlertTypeTranslation,
             on: at.id == tl.alert_type_id and tl.language_code == ^locale
         )
-        |> select_merge([at, tl], map(tl, [:label, :description])) 
+        |> select_merge([at, tl], map(tl, [:label, :description]))
         |> Repo.all()
     end
 end

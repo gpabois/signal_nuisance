@@ -1,0 +1,5 @@
+<h1>Modifier le type de nuisance</h1>
+
+<%= render "form.html", Map.put(assigns, :action, Routes.administration_alert_type_path(@conn, :update, @alert_type)) %>
+
+<span><%= link "Retour", to: Routes.administration_alert_type_path(@conn, :index) %></span>

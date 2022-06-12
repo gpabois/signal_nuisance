@@ -1,0 +1,15 @@
+<h1>Liste des types de nuisances</h1>
+<%= render SignalNuisanceWeb.PaginationView, "pagination.html", conn: @conn, pagination: @pagination %>
+<table>
+    <thead>
+        <td>Nom</td>
+        <td></td>
+    </thead>
+    <tbody>
+        <%= for alert_type <- @alert_types do %>
+        <tr>
+        </tr>
+        <% end %>
+    </tbody>
+</table>
+<%= render SignalNuisanceWeb.PaginationView, "pagination.html", conn: @conn, pagination: @pagination %>

@@ -1,4 +1,5 @@
 defmodule SignalNuisance.Reporting do
+    import Ecto.Query
     alias SignalNuisance.Repo
 
     alias SignalNuisance.Reporting.Authorization.{AlertPermission}
@@ -15,12 +16,43 @@ defmodule SignalNuisance.Reporting do
         AlertTypeTranslation.create(attrs)
     end
 
+    def alert_type_creation_changeset(alert_type, attrs \\ %{}) do
+        AlertType.creation_changeset(alert_type, attrs)
+    end
+
+    def change_alert_type(alert_type, attrs \\ %{}) do
+        AlertType.update_changeset(alert_type, attrs)
+    end
+
+    def update_alert_type(alert_type, attrs \\ %{}) do
+        alert_type
+        |> change_alert_type(attrs)
+        |> Repo.update
+    end
+
+    def get_alert_type!(id) do
+        Repo.get!(AlertType, id)
+    end
+
+    def delete_alert_type(alert_type) do
+        Repo.delete(alert_type)
+    end
+
+    def paginate_alert_types(params) do
+        from(at in AlertType)
+        |> Repo.paginate(params)
+    end
+
     def get_alert_types_by_category(category) do
         AlertType.get_by_category(category)
     end
 
     def get_alert_types_by_category(category, lang) do
         AlertType.get_by_category(category, lang)
+    end
+
+    def get_alert_type!(id) do
+        Repo.get!(AlertType, id)
     end
 
     def create_alert_by_email(attrs, recipient) do
@@ -50,8 +82,8 @@ defmodule SignalNuisance.Reporting do
             with {:ok, alert} <- Alert.create(attrs),
                 :ok <- AlertBinding.bind_to_user(alert, user),
                 :ok <- AlertPermission.grant(
-                    user, 
-                    AlertPermission.by_role(:owner), 
+                    user,
+                    AlertPermission.by_role(:owner),
                     alert
                 ),
                 {:ok, _mail} <- AlertNotifier.deliver_user_based_receipt(user, alert)
