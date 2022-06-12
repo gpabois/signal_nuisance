@@ -38,7 +38,7 @@ defmodule SignalNuisance.MixProject do
       {:slugy, "~> 4.1.1"},
       {:phoenix, "~> 1.6.6"},
       {:phoenix_ecto, "~> 4.4"},
-      {:phoenix_pagination, "~> 0.7.0"},
+      {:phoenix_pagination, git: "https://github.com/FunkyStudioHQ/phoenix_pagination"},
       {:ecto_sql, "~> 3.6"},
       {:postgrex, ">= 0.0.0"},
       {:geo, "~> 3.4"},

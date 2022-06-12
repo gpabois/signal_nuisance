@@ -8,5 +8,12 @@ defmodule SignalNuisance.Repo.Migrations.CreateAdministrationTables do
     end
 
     create unique_index(:administration_user_permissions, [:user_id], name: :administration_user_permissions_unique_index)
+
+    create table (:administrators) do
+      add :user_id, references(:users), null: false
+    end
+
+    create unique_index(:administrators, [:user_id], name: :administrators_unique_index)
+
   end
 end

@@ -5,6 +5,8 @@ defmodule SignalNuisanceWeb.FacilityRegistrationControllerTest do
 
     import SignalNuisance.FacilitiesFixtures
 
+    alias SignalNuisance.Facilities
+
     describe "GET /facilities/register" do
         test "accéder à la page", %{conn: conn} do
           conn = get(conn, Routes.facility_registration_path(conn, :new))
@@ -18,7 +20,6 @@ defmodule SignalNuisanceWeb.FacilityRegistrationControllerTest do
           assert redirected_to(conn) == Routes.user_session_path(conn, :new)
         end
     end
-
 
     describe "POST /facilities/register" do
       @tag :capture_log
@@ -38,7 +39,9 @@ defmodule SignalNuisanceWeb.FacilityRegistrationControllerTest do
         conn = get(conn, facility_dashboard_redir)
         response = html_response(conn, 200)
 
-        assert response =~ "a été enregistrée avec succés."
+        assert response =~ "a été enregistrée avec succés"
+
+        assert %{valid: false} = Facilities.get_facility!(id)
       end
     end
 end

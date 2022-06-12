@@ -1,11 +1,11 @@
 defmodule SignalNuisanceWeb.AlertCreationController do
     use SignalNuisanceWeb, :controller
-  
+
     alias SignalNuisance.Reporting
     alias SignalNuisance.Reporting.Alert
-    
+
     @doc """
-        New in case 
+        New in case
     """
     def new(%{assigns: %{current_user: user}} = conn, args) do
         case  conn do

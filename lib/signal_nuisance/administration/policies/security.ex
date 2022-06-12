@@ -17,10 +17,18 @@ defmodule SignalNuisance.Administration.SecurityPolicy do
 
     def authorize({:manage, :facilities}, user, _) do
         AdminPermission.has?(user, {:manage, :facilities}, {})
-        
+
     end
 
-    def authorize({:toggle_validation, :facility}, user, _facility) do
+    def authorize({:update, :facility}, user, _facility) do
+        authorize {:manage, :facilities}, user, {}
+    end
+
+    def authorize({:delete, :facility}, user, _facility) do
+        authorize {:manage, :facilities}, user, {}
+    end
+
+    def authorize({:view, :facilities}, user, _facility) do
         authorize {:manage, :facilities}, user, {}
     end
 
@@ -28,4 +36,3 @@ defmodule SignalNuisance.Administration.SecurityPolicy do
         authorize {:manage, :facilities}, user, {}
     end
 end
-  

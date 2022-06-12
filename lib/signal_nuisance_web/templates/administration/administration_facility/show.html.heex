@@ -1,3 +1,4 @@
 <h1><%= @facility.name %></h1>
 
-<%= link if(facility.valid, do: "Dévalider", else: "Valider"), to: Routes.administration_facility_path(@conn, :toggle_validation, @facility) %>
+<%= link if(@facility.valid, do: "Dévalider", else: "Valider"), to: Routes.administration_facility_path(@conn, :toggle_validation, @facility) %>
+<%= link "Supprimer", to: Routes.administration_facility_path(@conn, :delete, @facility), data: [confirm: "Confirmer la suppression ?"] %>

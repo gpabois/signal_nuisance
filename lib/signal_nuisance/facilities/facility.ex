@@ -25,9 +25,9 @@ defmodule SignalNuisance.Facilities.Facility do
         |> cast(attrs, fields)
         |> unique_constraint(:name, name: :facility_name_unique_index)
         |> validate_required(fields)
-    end  
+    end
 
-    def update_changeset(facility, attrs) do  
+    def update_changeset(facility, attrs) do
       facility
       |> cast(attrs, [:loc, :address, :description, :valid])
     end
@@ -42,6 +42,10 @@ defmodule SignalNuisance.Facilities.Facility do
         attrs -> %__MODULE__{} |> registration_changeset(attrs) |> Repo.insert()
       end
 
+    end
+
+    def get!(id) do
+      Repo.get!(__MODULE__, id)
     end
 
     def get_by_id(id) do

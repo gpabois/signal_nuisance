@@ -9,12 +9,20 @@ defmodule SignalNuisance.Facilities do
 
 
   def paginate_facilities(params) do
-    from(f in Facility, order_by: [desc: created_at])
+    from(f in Facility, order_by: [desc: f.inserted_at])
     |> Repo.paginate(params)
   end
 
   def get_by_id(id) do
     Facility.get_by_id(id)
+  end
+
+  def get_facility!(id) do
+    Facility.get!(id)
+  end
+
+  def delete_facility(facility) do
+    Repo.delete(facility)
   end
 
   def get_by_member(user) do
@@ -50,10 +58,10 @@ defmodule SignalNuisance.Facilities do
     Facility.update_changeset(facility, attrs)
   end
 
-  
+
   def update_facility(facility, attrs) do
     facility
-    |> facility_change(attrs) 
+    |> facility_change(attrs)
     |> Repo.update
   end
 
