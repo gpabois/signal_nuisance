@@ -3,7 +3,6 @@ defmodule SignalNuisance.AdministrationTest do
 
     import SignalNuisance.AccountsFixtures
 
-    alias SignalNuisance.Administration.Authorization.Permission, as: AdminPermission
     alias SignalNuisance.Administration
     alias SignalNuisance.Administration.SecurityPolicy, as: AdminSecPolicy
 

@@ -2,7 +2,6 @@ defmodule SignalNuisanceWeb.ReportingLiveTest do
     use SignalNuisanceWeb.ConnCase, async: true
     import Phoenix.LiveViewTest
 
-    alias SignalNuisance.Administration.Authorization.Permission, as: AdminPermission
     alias SignalNuisance.Administration
     alias SignalNuisance.Facilities
 

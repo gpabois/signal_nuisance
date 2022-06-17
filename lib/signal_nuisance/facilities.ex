@@ -1,5 +1,6 @@
 defmodule SignalNuisance.Facilities do
   import Ecto.Query
+  import SignalNuisance.Filter
 
   alias SignalNuisance.Repo
 
@@ -7,23 +8,40 @@ defmodule SignalNuisance.Facilities do
   alias SignalNuisance.Facilities.Authorization.Permission
   alias SignalNuisance.Facilities.{Facility, FacilityMember}
 
+  @doc """
+    Create a facilities filter changeset
+  """
+  def facilities_filter_changeset(data, params \\ %{}) do
+    types = %{valid: :boolean}
+    {data, types}
+    |> Ecto.Changeset.cast(params, Map.keys(types))
+  end
 
-  def paginate_facilities(params) do
-    from(f in Facility, order_by: [desc: f.inserted_at])
+  @doc """
+    Turns the facilities filter changeset into a facilities filter
+  """
+  def filter_facility(changeset), do: Ecto.Changeset.apply_changes(changeset)
+
+  @doc """
+    Paginates facilities
+  """
+  def paginate_facilities(params, opts \\ []) do
+    from(p in Facility)
+    |> filter(opts[:filter], Facility)
     |> Repo.paginate(params)
   end
 
-  def get_by_id(id) do
-    Facility.get_by_id(id)
-  end
+  @doc """
+    Get a facility by its id
 
-  def get_facility!(id) do
-    Facility.get!(id)
-  end
+    raises Ecto.NoResults if no facility exist
+  """
+  def get_facility!(id), do: Facility.get!(id)
 
-  def delete_facility(facility) do
-    Repo.delete(facility)
-  end
+  @doc """
+    Deletes a facility
+  """
+  def delete_facility(facility), do: Repo.delete(facility)
 
   def get_by_member(user) do
     if user == nil do

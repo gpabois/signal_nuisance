@@ -1,18 +1,16 @@
-<h1>Liste des installations</h1>
+<h1>Liste des utilisateurs</h1>
 
 <%= render "filter_form.html", conn: @conn, filter: @filter %>
 
 <%= render SignalNuisanceWeb.PaginationView, "pagination.html", conn: @conn, pagination: @pagination %>
 <table>
     <thead>
-        <td>Nom</td>
-        <td>Validé</td>
+        <td>Email</td>
     </thead>
     <tbody>
-        <%= for facility <- @facilities do %>
-        <tr id={"facility-#{facility.id}"}>
-            <td><%= link facility.name, to: Routes.administration_facility_path(@conn, :show, facility) %></td>
-            <td><%= facility.valid %></td>
+        <%= for user <- @users do %>
+        <tr id={"user-#{facility.id}"}>
+            <td><%= link facility.name, to: Routes.administration_user_path(@conn, :show, user) %></td>
         </tr>
         <% end %>
     </tbody>

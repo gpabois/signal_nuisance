@@ -4,6 +4,8 @@ defmodule SignalNuisance.Accounts do
   """
 
   import Ecto.Query, warn: false
+  import SignalNuisance.Filter
+
   alias SignalNuisance.Repo
 
   alias SignalNuisance.Accounts.{User, UserToken, UserNotifier}
@@ -349,5 +351,38 @@ defmodule SignalNuisance.Accounts do
       {:ok, %{user: user}} -> {:ok, user}
       {:error, :user, changeset, _} -> {:error, changeset}
     end
+  end
+
+  @doc """
+  Deletes a user
+  """
+  def delete_user(%User{} = user), do: Repo.delete(user)
+
+  @doc """
+    Create the users filter changeset
+  """
+  def users_filter_changeset(data, params \\ %{}) do
+    types = %{email: :string}
+    {data, types}
+    |> Ecto.Changeset.cast(params, Map.keys(types))
+  end
+
+  @doc """
+    Turns the filter changeset into a filter
+  """
+  def filter_user(changeset), do: Ecto.Changeset.apply_changes(changeset)
+
+  @doc """
+    Paginate users.
+
+    Examples:
+
+      iex> paginate_users(%{}, filter: %{email: "someone%"})
+      {users, pagination}
+  """
+  def paginate_users(params, opts \\ []) do
+    from(u in User)
+    |> filter(opts[:filter], User)
+    |> Repo.paginate(params)
   end
 end

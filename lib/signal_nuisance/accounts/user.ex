@@ -1,13 +1,15 @@
 defmodule SignalNuisance.Accounts.User do
   use Ecto.Schema
+
   import Ecto.Changeset
+  import Ecto.Query
 
   schema "users" do
     field :email, :string
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
-    
+
     timestamps()
   end
 
@@ -134,5 +136,9 @@ defmodule SignalNuisance.Accounts.User do
     else
       add_error(changeset, :current_password, "is not valid")
     end
+  end
+
+  def filter_on_attribute({"email", email}, query) do
+    where(query, [b], like(b.email, ^email))
   end
 end

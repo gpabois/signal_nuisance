@@ -32,6 +32,14 @@ defmodule SignalNuisance.Administration.SecurityPolicy do
         authorize({:manage, :alerts}, user, {})
     end
 
+    def authorize({:manage, :users}, user, _) do
+        AdminPermission.has?(user, {:manage, :users}, {})
+    end
+
+    def authorize({:view, :users}, user, _) do
+        AdminPermission.has?(user, {:manage, :users}, {})
+    end
+
     def authorize({:acces, :view, :administration_permissions}, user, _) do
         AdminPermission.has?(user, {:manage, :administration}, {})
     end

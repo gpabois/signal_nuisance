@@ -64,11 +64,15 @@ defmodule SignalNuisanceWeb.Router do
   scope "/", SignalNuisanceWeb do
     pipe_through [:browser, :redirect_if_user_is_authenticated]
 
-
+    # Register a user
     get "/users/register", UserRegistrationController, :new
     post "/users/register", UserRegistrationController, :create
+
+    # Login a user
     get "/users/log_in", UserSessionController, :new
     post "/users/log_in", UserSessionController, :create
+
+    # Reset passwords
     get "/users/reset_password", UserResetPasswordController, :new
     post "/users/reset_password", UserResetPasswordController, :create
     get "/users/reset_password/:token", UserResetPasswordController, :edit
@@ -78,21 +82,30 @@ defmodule SignalNuisanceWeb.Router do
   scope "/", SignalNuisanceWeb do
     pipe_through [:browser, :require_authenticated_user]
 
+    # User settings
     get "/users/settings", UserSettingsController, :edit
     put "/users/settings", UserSettingsController, :update
     get "/users/settings/confirm_email/:token", UserSettingsController, :confirm_email
 
+    # Register a facility
     get "/facilities/register", FacilityRegistrationController, :new
     post "/facilities/register", FacilityRegistrationController, :create
 
+    # Facility dashboard
     live "/facilities/:id/dashboard", FacilityDashboardLive, :dashboard
 
+    # Administration section
     scope "/admin", Administration do
       # Facilities
       get "/facilities", AdministrationFacilityController, :index
       get "/facilities/:id", AdministrationFacilityController, :show
       get "/facilities/:id/toggle_validation", AdministrationFacilityController, :toggle_validation
       get "/facilities/:id/delete", AdministrationFacilityController, :delete
+
+      # Users
+      get "/users", AdministrationUserController, :index
+      get "/users/:id", AdministrationUserController, :show
+      get "/users/:id/delete", AdministrationUserController, :delete
 
       # Alert types
       get "/alerts/types", AdministrationAlertTypeController, :index

@@ -8,11 +8,13 @@ defmodule SignalNuisanceWeb.Administration.AdministrationFacilityController do
 
     def index(conn, params) do
         user = conn.assigns.current_user
+        filter_changeset = Map.get(params, "filter", %{}) |> Facilities.facilities_filter_changeset()
+        filter = Facilities.filter_facility(filter_changeset)
 
         with :ok <- Bodyguard.permit(SecPol, {:view, :facilities}, user, {}) do
-            {facilities, pagination} = Facilities.paginate_facilities(params)
+            {facilities, pagination} = Facilities.paginate_facilities(params, filter: filter)
             conn
-            |> render("index.html", facilities: facilities, pagination: pagination)
+            |> render("index.html", facilities: facilities, pagination: pagination, filter: filter_changeset)
         end
     end
 

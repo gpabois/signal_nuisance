@@ -1,4 +1,3 @@
-
 defmodule SignalNuisance.Facilities.Facility do
     use Ecto.Schema
 
@@ -55,6 +54,10 @@ defmodule SignalNuisance.Facilities.Facility do
       ) |> Repo.one()
     end
 
+    def filter_on_attribute({"valid", flag}, query) do
+      where(query, [b], b.valid == ^flag)
+    end
+
     @doc """
       Find all establishments within range
     """
@@ -66,7 +69,6 @@ defmodule SignalNuisance.Facilities.Facility do
         where: st_dwithin_in_meters(^point, ets.loc, ^distance)
       ) |> Repo.all
     end
-
 
     def get_in_area(%Geo.Point{} = low_left, %Geo.Point{} = up_right) do
       from(

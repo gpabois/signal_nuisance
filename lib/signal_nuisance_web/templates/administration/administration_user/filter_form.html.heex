@@ -1,0 +1,9 @@
+<.form let={f} for={@filter} action={Routes.administration_facility_path(@conn, :index)} as={:filter} method="get">
+  <%= label f, :email, class: "fr-label" %>
+  <%= text_input f, :email, class: "fr-input" %>
+  <%= error_tag f, :email %>
+
+  <div>
+    <%= submit "Filtrer" %>
+  </div>
+</.form>
