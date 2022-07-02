@@ -9,8 +9,8 @@
     </thead>
     <tbody>
         <%= for user <- @users do %>
-        <tr id={"user-#{facility.id}"}>
-            <td><%= link facility.name, to: Routes.administration_user_path(@conn, :show, user) %></td>
+        <tr id={"user-#{user.id}"}>
+            <td><%= link user.email, to: Routes.administration_user_path(@conn, :show, user) %></td>
         </tr>
         <% end %>
     </tbody>

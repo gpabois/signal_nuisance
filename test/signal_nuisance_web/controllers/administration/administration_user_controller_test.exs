@@ -41,7 +41,7 @@ defmodule SignalNuisanceWeb.Administration.AdministrationUserControllerTest do
       tuser = user_fixture()
       conn = get(conn, Routes.administration_user_path(conn, :show, tuser))
       response = html_response(conn, 200)
-      assert response =~ facility.name
+      assert response =~ tuser.email
     end
   end
 
@@ -57,7 +57,7 @@ defmodule SignalNuisanceWeb.Administration.AdministrationUserControllerTest do
 
     test "executer l'action avec l'autorisation", %{conn: conn, user: user} do
       grant_credentials(user)
-      tuser = user()
+      tuser = user_fixture()
 
       conn = get(conn, Routes.administration_user_path(conn, :delete, tuser))
       assert redirected_to(conn) == Routes.administration_user_path(conn, :index)

@@ -47,13 +47,6 @@ defmodule SignalNuisance.Facilities.Facility do
       Repo.get!(__MODULE__, id)
     end
 
-    def get_by_id(id) do
-      from(
-        e in __MODULE__,
-        where: e.id == ^id
-      ) |> Repo.one()
-    end
-
     def filter_on_attribute({"valid", flag}, query) do
       where(query, [b], b.valid == ^flag)
     end
@@ -66,11 +59,11 @@ defmodule SignalNuisance.Facilities.Facility do
 
       from(
         ets in __MODULE__,
-        where: st_dwithin_in_meters(^point, ets.loc, ^distance)
+        where: st_dwithin(^point, ets.loc, ^distance)
       ) |> Repo.all
     end
 
-    def get_in_area(%Geo.Point{} = low_left, %Geo.Point{} = up_right) do
+    def get_in_area(%Geo.Point{srid: 4326} = low_left, %Geo.Point{srid: 4326} = up_right) do
       from(
         ets in __MODULE__,
         where: st_within(

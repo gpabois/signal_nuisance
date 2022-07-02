@@ -2,7 +2,7 @@ defmodule SignalNuisanceWeb.Administration.AdministrationUserController do
     use SignalNuisanceWeb, :controller
 
     alias SignalNuisance.Administration.SecurityPolicy, as: SecPol
-    alias SignalNuisance.Facilities
+    alias SignalNuisance.Accounts
 
     action_fallback SignalNuisanceWeb.FallbackController
 
