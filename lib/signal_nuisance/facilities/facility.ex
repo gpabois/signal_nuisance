@@ -13,6 +13,7 @@ defmodule SignalNuisance.Facilities.Facility do
       field :address, :string
       field :description, :string
       field :valid, :boolean, default: false
+      field :range, :integer, default: 10000
       timestamps()
     end
 
@@ -51,6 +52,12 @@ defmodule SignalNuisance.Facilities.Facility do
       where(query, [b], b.valid == ^flag)
     end
 
+    def get_at_range(%Geo.Point{srid: 4326} = point) do
+      from(
+        ets in __MODULE__,
+        where: st_dwithin(^point, ets.loc, ets.range)
+      ) |> Repo.all
+    end
     @doc """
       Find all establishments within range
     """

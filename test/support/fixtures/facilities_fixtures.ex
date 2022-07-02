@@ -49,5 +49,18 @@ defmodule SignalNuisance.FacilitiesFixtures do
       end
     end
 
-  end
   
+  @doc """
+  Generate a facility_alert_binding.
+  """
+  def facility_alert_binding_fixture(attrs \\ %{}) do
+    {:ok, facility_alert_binding} =
+      attrs
+      |> Enum.into(%{
+
+      })
+      |> SignalNuisance.Facilities.create_facility_alert_binding()
+
+    facility_alert_binding
+  end
+end

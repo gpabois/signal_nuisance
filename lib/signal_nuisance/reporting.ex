@@ -7,6 +7,7 @@ defmodule SignalNuisance.Reporting do
     alias SignalNuisance.Reporting.AlertNotifier
     alias SignalNuisance.Reporting.{Alert, AlertType, AlertTypeTranslation}
     alias SignalNuisance.Reporting.AlertBinding
+    alias SignalNuisance.Reporting.AlertDispatcher
 
     def create_alert_type(attrs) do
         AlertType.create(attrs)
@@ -51,46 +52,13 @@ defmodule SignalNuisance.Reporting do
         AlertType.get_by_category(category, lang)
     end
 
-    def get_alert_type!(id) do
-        Repo.get!(AlertType, id)
-    end
-
-    def create_alert_by_email(attrs, recipient) do
-        case SignalNuisance.Accounts.get_user_by_email(recipient) do
-            nil ->
-                Repo.transaction fn ->
-                    with {:ok, alert} <- Alert.create(attrs),
-                        {:ok, token} <- AlertPermission.grant(
-                            {:email, recipient},
-                            AlertPermission.by_role(:owner),
-                            alert
-                        ),
-                        :ok <- AlertBinding.bind_to_email(alert, recipient),
-                        {:ok, _mail} <- AlertNotifier.deliver_token_based_receipt(recipient, alert, token)
-                    do
-                        {:ok, :alert, [token: token]}
-                    else
-                        {:error, error} -> Repo.rollback(error)
-                    end
-                end
-            user -> create_alert_by_user(attrs, user)
-        end
-    end
-
-    def create_alert_by_user(attrs, user) do
+    def create_alert(attrs, %SignalNuisance.Accounts.User{} = user) do
         Repo.transaction fn ->
             with {:ok, alert} <- Alert.create(attrs),
                 :ok <- AlertBinding.bind_to_user(alert, user),
-                :ok <- AlertPermission.grant(
-                    user,
-                    AlertPermission.by_role(:owner),
-                    alert
-                ),
-                {:ok, _mail} <- AlertNotifier.deliver_user_based_receipt(user, alert)
+                :ok <- AlertDispatcher.dispatch(alert)
             do
-                {:ok, :alert, []}
-            else
-                {:error, error} -> Repo.rollback(error)
+                alert
             end
         end
     end
@@ -105,7 +73,7 @@ defmodule SignalNuisance.Reporting do
         Alert.create(attr)
     end
 
-    def get_alert_by_id(id) do
+    def get_alert!(id) do
         with {:ok, report} <- Repo.get(Alert, id: id)
         do
             {:ok, report}

@@ -9,6 +9,7 @@ defmodule SignalNuisance.Repo.Migrations.CreateEnterpriseTables do
       add :address, :string
       add :description, :string
       add :valid, :boolean
+      add :range, :integer
       timestamps()
     end
 
